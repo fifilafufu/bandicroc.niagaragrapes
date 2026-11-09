@@ -94,6 +94,29 @@ export const GRAPES: Grape[] = [
 
 export const GENERAL_GRAPE_ARTICLE = "Grape";
 
+// Checked facts about grapes in general (from the full Wikipedia "Grape", "History of wine" and
+// "Twelve Grapes" articles). The intro Grape Bot reads leaves most of this out, so it's always included.
+export const GENERAL_FACTS = [
+  "Origin: grapes come from the Middle East / Western Asia, where people began growing them 6,000–8,000 years ago. The main species, Vitis vinifera, is native to the Mediterranean and Central Asia. North America has its own wild species, such as Vitis labrusca (Concord, Niagara).",
+  "Early history: the earliest known traces of wine are from near Tbilisi, Georgia (c. 6000 BCE); the oldest known winery is Areni-1 in Armenia (c. 4100 BCE). Ancient Egyptians, Greeks, Phoenicians and Romans grew grapes.",
+  "Where grown today: world production in 2023 was 72.5 million tonnes, led by China (19%), with Italy and France as major producers. Peru and Chile were the top exporters.",
+  "Uses: about 71% of grapes become wine, 27% are eaten fresh and 2% are dried (raisins, currants, sultanas). Also juice, jam, jelly, vinegar and grape-seed oil.",
+  "Plant: a grape is botanically a berry, growing in clusters of 15–300 on woody vines of the genus Vitis. Table grapes are usually large, seedless and thin-skinned; wine grapes are picked very sweet (about 24% sugar). The most widely planted variety is believed to be Sultana (Thompson Seedless).",
+  "Nutrition: raw grapes are 81% water and 18% carbohydrates; 100 g has about 69 kcal and some vitamin K.",
+  "Culture: Dionysus (Roman Bacchus) was the Greek god of wine-making and fertility. In Spain people eat twelve grapes at midnight on New Year's Eve, one per bell strike, for luck in each month (popularised in 1909).",
+];
+
+// Extra Wikipedia articles for common general topics (all checked to exist). Matched on the question's words.
+export const TOPICS: { wiki: string; keywords: string[] }[] = [
+  { wiki: "Winemaking", keywords: ["wine is made", "make wine", "making wine", "winemaking", "ferment", "wino", "robi się wino"] },
+  { wiki: "Raisin", keywords: ["raisin", "currant", "dried grape", "rodzyn"] },
+  { wiki: "Viticulture", keywords: ["vineyard", "grow grapes", "growing grapes", "plant grapes", "prune", "vine", "uprawa", "winnic"] },
+  { wiki: "Grape juice", keywords: ["juice", "sok"] },
+  { wiki: "Twelve Grapes", keywords: ["new year", "twelve grapes", "12 grapes", "sylwester", "nowy rok"] },
+  { wiki: "Dionysus", keywords: ["dionysus", "bacchus", "god of wine", "myth", "bóg wina"] },
+  { wiki: "History of wine", keywords: ["history", "ancient", "oldest", "historia", "starożyt"] },
+];
+
 export const wikiUrl = (title: string) => `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 
 export const findGrape = (name: string | null | undefined) =>

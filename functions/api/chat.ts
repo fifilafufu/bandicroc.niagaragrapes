@@ -4,7 +4,7 @@
 // Usage is kept low on purpose: only the intro of 1–2 matching articles is sent, Wikipedia
 // intros are cached for 24 h, only the last 6 messages are sent, and answers are capped.
 
-import { GRAPES, GENERAL_GRAPE_ARTICLE, findGrape, findGrapeByWiki, wikiUrl } from "../../shared/grapes";
+import { GRAPES, GENERAL_FACTS, GENERAL_GRAPE_ARTICLE, TOPICS, findGrape, findGrapeByWiki, wikiUrl } from "../../shared/grapes";
 
 interface Env {
   AI: Ai;
@@ -76,6 +76,9 @@ function pickArticles(messages: Turn[], favourite: string | null): string[] {
     if (g) add(g.wiki);
   }
 
+  // General topics (wine-making, raisins, history, New Year…) get their own article.
+  TOPICS.filter((t) => t.keywords.some((k) => latest.includes(k))).forEach((t) => add(t.wiki));
+
   if (!titles.length) add(GENERAL_GRAPE_ARTICLE);
   return titles;
 }
@@ -123,7 +126,12 @@ function systemPrompt(favourite: string | null, titles: string[], articles: Arti
 
   // Checked facts for the grapes in question, plus Niagara (the bot defends it and must get it right).
   const factGrapes = [...new Set(["Niagara (grape)", ...titles])].map(findGrapeByWiki).filter((g) => g !== null);
-  const keyFacts = factGrapes.map((g) => `- ${g.name}: ${g.facts}`).join("\n");
+  // General questions (no specific variety) also get the checked general facts: origin, history, where grown…
+  const isGeneral = !titles.some((t) => findGrapeByWiki(t) !== null);
+  const keyFacts = [
+    ...(isGeneral ? GENERAL_FACTS.map((f) => `- Grapes in general. ${f}`) : []),
+    ...factGrapes.map((g) => `- ${g.name}: ${g.facts}`),
+  ].join("\n");
 
   const sources = articles.length
     ? articles.map((a) => `### ${a.title}\n${a.text}`).join("\n\n")
