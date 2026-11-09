@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import type { Secret } from "../lib/useAuthAndFavourite";
@@ -205,16 +205,37 @@ function Profile(props: Omit<Props, "ready" | "user"> & { user: User }) {
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Collapsed it only shows your pick; open it to choose another. Starts open if nothing is picked yet.
+  const [pickerOpen, setPickerOpen] = useState(!favourite);
+  // The favourite loads a moment after the page opens: collapse once it arrives, unless the user already toggled.
+  const touched = useRef(false);
+  useEffect(() => {
+    if (favourite && !touched.current) setPickerOpen(false);
+  }, [favourite]);
+
   async function pick(grape: string) {
     setSaving(grape);
-    setError(await saveFavourite(grape));
+    const err = await saveFavourite(grape);
+    setError(err);
     setSaving(null);
+    if (!err) setPickerOpen(false);
   }
 
   return (
     <div className="stack">
-      <section className="card">
-        <h2>🍇 Your favourite grape</h2>
+      <details
+        className="card collapsible"
+        open={pickerOpen}
+        onToggle={(e) => {
+          const open = (e.currentTarget as HTMLDetailsElement).open;
+          if (open !== pickerOpen) touched.current = true;
+          setPickerOpen(open);
+        }}
+      >
+        <summary>
+          <span>🍇 Your favourite grape</span>
+          <span className={`fav-choice ${favourite ? "" : "none"}`}>{favourite ?? "Pick one"}</span>
+        </summary>
         <p className="muted small">Saved to your account. Change it here and your other devices update live.</p>
         <div className="grape-grid">
           {GRAPES.map(({ name }) => (
@@ -230,14 +251,16 @@ function Profile(props: Omit<Props, "ready" | "user"> & { user: User }) {
           ))}
         </div>
         {error && <p className="notice">{error}</p>}
-      </section>
+      </details>
 
       {findGrape(favourite) && <GrapeCard grape={findGrape(favourite)!} />}
 
       <SecretMessage secret={props.secret} missing={props.secretMissing} save={props.saveSecret} />
 
-      <section className="card">
-        <h2>📖 Learn about each grape</h2>
+      <details className="card collapsible">
+        <summary>
+          <span>📖 Learn about each grape</span>
+        </summary>
         <p className="muted small">Every grape here has a Wikipedia article. Grape Bot reads them too.</p>
         <ul className="wiki-list">
           {GRAPES.map((g) => (
@@ -248,7 +271,7 @@ function Profile(props: Omit<Props, "ready" | "user"> & { user: User }) {
             </li>
           ))}
         </ul>
-      </section>
+      </details>
 
       <details className="card settings">
         <summary>⚙️ Account settings</summary>
