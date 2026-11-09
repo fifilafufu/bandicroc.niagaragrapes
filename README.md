@@ -25,13 +25,11 @@ The plan and the reasons behind each choice are in [PLAN.md](PLAN.md).
 4. **Project Settings → API**: copy the **Project URL** and the **anon public** key.
 
 ### 2. Cloudflare Pages (hosting + AI)
-1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git** → pick `bandicroc.niagragrapes`.
+1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git** → pick `bandicroc.niagaragrapes`.
 2. Build settings:
    - Build command: `npm run build`
    - Build output directory: `dist`
-3. **Environment variables**:
-   - `VITE_SUPABASE_URL` = your Project URL
-   - `VITE_SUPABASE_ANON_KEY` = your anon key
+3. No environment variables are needed. The public Supabase URL and key are in `src/lib/supabase.ts`, and `wrangler.toml` makes the dashboard's variables read-only anyway. Secrets, such as `OPENROUTER_API_KEY`, can still be added.
 4. Deploy. The Workers AI binding comes from `wrangler.toml` automatically, so there's no AI key to set.
 5. Back in Supabase → **Authentication → URL Configuration**: set **Site URL** to your `https://<name>.pages.dev` address.
 
