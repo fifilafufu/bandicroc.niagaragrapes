@@ -2,7 +2,7 @@
 
 **Deadline:** tomorrow (2026-11-10)
 **Repo:** https://github.com/fifilafufu/bandicroc.niagaragrapes
-**Local folder:** `Desktop\.dev\bandicroc.grapes`
+**Local folder:** `Desktop\.dev\bandicroc.niagaragrapes`
 **Total cost:** $0, with no credit card anywhere
 **Accounts used:** Cloudflare (you have it), Supabase (new, free), with OpenRouter (you have it) as the backup
 
