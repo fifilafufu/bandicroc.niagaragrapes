@@ -1,68 +1,150 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Counter from "./Counter";
+import Quiz from "./Quiz";
+import { fetchSummary } from "../lib/wiki";
+import { findGrapeByWiki, wikiUrl } from "../../shared/grapes";
 
 type Source = { title: string; url: string };
-export type Msg = { role: "user" | "assistant"; content: string; sources?: Source[] };
+type Photo = { wiki: string; name: string; src: string };
+export type Msg = {
+  role: "user" | "assistant";
+  content: string;
+  sources?: Source[];
+  followUps?: string[];
+  photos?: Photo[];
+  pending?: boolean; // still being written
+  id?: string;
+};
 
 export const GREETING: Msg = {
   role: "assistant",
   content: "Hi! I'm Grape Bot, your grape tutor. Ask me anything about grapes, and I'll answer from Wikipedia. 🍇",
 };
 const SUGGESTIONS = [
-  "Where do Niagara grapes come from?",
-  "How are Concord and Niagara different?",
+  "Where are grapes from?",
+  "Can dogs eat grapes?",
+  "What colours do grapes come in?",
   "What's my favourite grape?",
-  "What is Riesling used for?",
 ];
+const MAX = 500;
 
 type Props = {
   favourite: string | null;
   loggedIn: boolean;
   messages: Msg[];
   setMessages: React.Dispatch<React.SetStateAction<Msg[]>>;
+  autoAsk?: string | null;
+  onAutoAsked?: () => void;
 };
 
-export default function Chat({ favourite, loggedIn, messages, setMessages }: Props) {
+export default function Chat({ favourite, loggedIn, messages, setMessages, autoAsk, onAutoAsked }: Props) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [quiz, setQuiz] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
   const generation = useRef(0);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, busy]);
 
+  // Update the reply being written (always the last message).
+  const patchLast = (gen: number, fn: (m: Msg) => Msg) => {
+    if (gen !== generation.current) return;
+    setMessages((all) => {
+      const last = all[all.length - 1];
+      if (!last || last.role !== "assistant" || !last.pending) return all;
+      return [...all.slice(0, -1), fn(last)];
+    });
+  };
+
   async function send(text: string) {
-    const content = text.trim();
+    const content = text.trim().slice(0, MAX);
     if (!content || busy) return;
     const gen = generation.current;
-    const next = [...messages, { role: "user" as const, content }];
-    setMessages(next);
+    const history = [...messages, { role: "user" as const, content }];
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setMessages([...history, { role: "assistant", content: "", pending: true, id }]);
     setInput("");
     setBusy(true);
-    let reply: Msg;
+
+    // Grapes that already had a photo in this chat don't get another one.
+    const shown = new Set(messages.flatMap((m) => m.photos?.map((p) => p.wiki) ?? []));
+
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: next.filter((m) => m !== GREETING).map(({ role, content }) => ({ role, content })),
+          messages: history.filter((m) => m !== GREETING).map(({ role, content }) => ({ role, content })),
           favourite: loggedIn ? favourite : null,
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { reply?: string; sources?: Source[] };
-      reply = {
-        role: "assistant",
-        content: data.reply || "Something went wrong on the vine. Try again? 🍇",
-        sources: Array.isArray(data.sources) ? data.sources : [],
-      };
+      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        let nl;
+        while ((nl = buffer.indexOf("\n")) >= 0) {
+          const line = buffer.slice(0, nl).trim();
+          buffer = buffer.slice(nl + 1);
+          if (!line) continue;
+          const ev = JSON.parse(line) as {
+            type: string;
+            text?: string;
+            sources?: Source[];
+            followUps?: string[];
+            grapes?: string[];
+          };
+          if (ev.type === "meta") {
+            patchLast(gen, (m) => ({ ...m, sources: ev.sources ?? [], followUps: ev.followUps ?? [] }));
+            // First time a grape comes up in this chat: show its Wikipedia photo.
+            for (const wiki of (ev.grapes ?? []).filter((w) => !shown.has(w)).slice(0, 2)) {
+              shown.add(wiki);
+              fetchSummary(wiki).then((s) => {
+                if (!s?.thumbnail || gen !== generation.current) return;
+                const photo = { wiki, name: findGrapeByWiki(wiki)?.name ?? s.title, src: s.thumbnail.source };
+                setMessages((all) =>
+                  all.map((m) =>
+                    m.id === id && !m.photos?.some((p) => p.wiki === wiki)
+                      ? { ...m, photos: [...(m.photos ?? []), photo] }
+                      : m,
+                  ),
+                );
+              });
+            }
+          } else if (ev.type === "text" || ev.type === "error") {
+            patchLast(gen, (m) => ({ ...m, content: m.content + (ev.text ?? "") }));
+          }
+        }
+      }
+      patchLast(gen, (m) => ({ ...m, pending: false, content: m.content.trim() || "Something went wrong on the vine. Try again? 🍇" }));
     } catch {
-      reply = { role: "assistant", content: "I can't reach the vineyard. Are you offline? 🍇" };
+      patchLast(gen, (m) => ({
+        ...m,
+        pending: false,
+        followUps: [],
+        content: m.content.trim() || (navigator.onLine ? "Something went wrong on the vine. Try again? 🍇" : "I can't reach the vineyard. Are you offline? 🍇"),
+      }));
+    } finally {
+      if (gen === generation.current) setBusy(false);
     }
-    if (gen === generation.current) setMessages((m) => [...m, reply]);
-    setBusy(false);
   }
+
+  // Send a question handed over from another screen, once.
+  const sendRef = useRef(send);
+  sendRef.current = send;
+  useEffect(() => {
+    if (!autoAsk) return;
+    onAutoAsked?.();
+    sendRef.current(autoAsk);
+  }, [autoAsk, onAutoAsked]);
 
   function clearChat() {
     generation.current += 1;
@@ -75,66 +157,136 @@ export default function Chat({ favourite, loggedIn, messages, setMessages }: Pro
     send(input);
   };
 
+  const lastIndex = messages.length - 1;
+
   return (
     <div className="chat">
       <div className="chat-head">
         <img src="/favicon.svg" alt="" width={36} height={36} />
         <div className="who">
-          <b>Grape Bot</b>
-          <span>Grape tutor · answers from Wikipedia</span>
+          <b>{quiz ? "Grape Quiz" : "Grape Bot"}</b>
+          <span>{quiz ? "8 questions · facts from Wikipedia" : "Grape tutor · answers from Wikipedia"}</span>
         </div>
-        <button className="clear-btn" onClick={clearChat} disabled={messages.length <= 1 && !busy}>
-          🧹 Clear chat
+        <button className="clear-btn" onClick={() => setQuiz((q) => !q)}>
+          {quiz ? "💬 Chat" : "🎯 Quiz"}
         </button>
+        {!quiz && (
+          <button className="clear-btn" onClick={clearChat} disabled={messages.length <= 1 && !busy} aria-label="Clear chat">
+            🧹
+          </button>
+        )}
       </div>
 
-      <div className="messages" aria-live="polite">
-        {messages.map((m, i) => (
-          <div key={i} className={`bubble ${m.role}`}>
-            {m.content}
-            {m.sources && m.sources.length > 0 && (
-              <div className="sources">
-                {m.sources.map((s) => (
-                  <a key={s.url} href={s.url} target="_blank" rel="noreferrer">
-                    📖 {s.title}
-                  </a>
+      {quiz ? (
+        <div className="messages">
+          <Quiz onExit={() => setQuiz(false)} />
+        </div>
+      ) : (
+        <>
+          <div className="messages" aria-live="polite">
+            {messages.map((m, i) => (
+              <div key={i} className={`bubble ${m.role} ${m.pending && !m.content ? "typing" : ""}`}>
+                {m.pending && !m.content ? (
+                  <>
+                    <span />
+                    <span />
+                    <span />
+                  </>
+                ) : (
+                  <>
+                    {m.photos?.map((p) => (
+                      <a key={p.wiki} className="bubble-photo" href={wikiUrl(p.wiki)} target="_blank" rel="noreferrer">
+                        <img src={p.src} alt={`${p.name} grapes`} loading="lazy" />
+                        <span>{p.name}</span>
+                      </a>
+                    ))}
+                    {m.content}
+                    {m.pending && <span className="caret" aria-hidden="true" />}
+                    {m.role === "assistant" && !m.pending && m !== GREETING && <AnswerTools text={m.content} />}
+                    {m.sources && m.sources.length > 0 && !m.pending && (
+                      <div className="sources">
+                        {m.sources.map((s) => (
+                          <a key={s.url} href={s.url} target="_blank" rel="noreferrer">
+                            📖 {s.title}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+
+            {/* Follow-up questions under the latest answer; starter questions on an empty chat. */}
+            {!busy && (
+              <div className="suggestions">
+                {(messages.length === 1 ? SUGGESTIONS : messages[lastIndex].followUps ?? []).map((s) => (
+                  <button key={s} className="chip" onClick={() => send(s)}>
+                    {s}
+                  </button>
                 ))}
+                {messages.length === 1 && (
+                  <button className="chip quiz-chip" onClick={() => setQuiz(true)}>
+                    🎯 Try the grape quiz
+                  </button>
+                )}
               </div>
             )}
+            <div ref={endRef} />
           </div>
-        ))}
-        {busy && (
-          <div className="bubble assistant typing" aria-label="Grape Bot is typing">
-            <span />
-            <span />
-            <span />
-          </div>
-        )}
-        {messages.length === 1 && !busy && (
-          <div className="suggestions">
-            {SUGGESTIONS.map((s) => (
-              <button key={s} className="chip" onClick={() => send(s)}>
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
-        <div ref={endRef} />
-      </div>
 
-      <form className="composer" onSubmit={onSubmit}>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask Grape Bot about grapes…"
-          maxLength={500}
-          aria-label="Message"
-        />
-        <button className="primary" disabled={busy || !input.trim()}>
-          Send
+          <form className="composer" onSubmit={onSubmit}>
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask Grape Bot about grapes…"
+              maxLength={MAX}
+              aria-label="Message"
+              enterKeyHint="send"
+            />
+            <button className="primary" disabled={busy || !input.trim()}>
+              Send
+            </button>
+            <Counter length={input.length} max={MAX} />
+          </form>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Copy an answer, or send it with the phone's share sheet.
+function AnswerTools({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const canShare = typeof navigator.share === "function";
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard blocked */
+    }
+  }
+  async function share() {
+    try {
+      await navigator.share({ text: `${text}\n\n— Grape Bot 🍇 https://bandicroc-niagaragrapes.pages.dev` });
+    } catch {
+      /* closed the share sheet */
+    }
+  }
+
+  return (
+    <div className="answer-tools">
+      <button onClick={copy} aria-label="Copy answer">
+        {copied ? "✓ Copied" : "📋 Copy"}
+      </button>
+      {canShare && (
+        <button onClick={share} aria-label="Share answer">
+          📤 Share
         </button>
-        <Counter length={input.length} max={500} />
-      </form>
+      )}
     </div>
   );
 }

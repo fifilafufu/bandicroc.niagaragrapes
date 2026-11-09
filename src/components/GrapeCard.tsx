@@ -1,34 +1,22 @@
 import { useEffect, useState } from "react";
 import { wikiUrl, type Grape } from "../../shared/grapes";
-
-type Summary = { extract: string; thumbnail?: { source: string; width: number; height: number } };
-
-// Loads straight from Wikipedia in the browser, so it uses none of the AI allowance.
-const cache = new Map<string, Summary>();
+import { fetchSummary, type Summary } from "../lib/wiki";
 
 export default function GrapeCard({ grape }: { grape: Grape }) {
-  const [summary, setSummary] = useState<Summary | null>(cache.get(grape.wiki) ?? null);
-  const [failed, setFailed] = useState(false);
+  const [state, setState] = useState<{ wiki: string; summary: Summary | null; failed: boolean } | null>(null);
 
   useEffect(() => {
-    if (cache.has(grape.wiki)) {
-      setSummary(cache.get(grape.wiki)!);
-      return;
-    }
     let cancelled = false;
-    setSummary(null);
-    setFailed(false);
-    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(grape.wiki.replace(/ /g, "_"))}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data: Summary) => {
-        cache.set(grape.wiki, data);
-        if (!cancelled) setSummary(data);
-      })
-      .catch(() => !cancelled && setFailed(true));
+    fetchSummary(grape.wiki).then((summary) => {
+      if (!cancelled) setState({ wiki: grape.wiki, summary, failed: summary === null });
+    });
     return () => {
       cancelled = true;
     };
   }, [grape.wiki]);
+
+  const current = state?.wiki === grape.wiki ? state : null;
+  const summary = current?.summary;
 
   return (
     <section className="card grape-card">
@@ -44,7 +32,7 @@ export default function GrapeCard({ grape }: { grape: Grape }) {
       )}
       {summary ? (
         <p>{summary.extract}</p>
-      ) : failed ? (
+      ) : current?.failed ? (
         <p className="muted">Couldn't load Wikipedia right now.</p>
       ) : (
         <p className="muted">Loading from Wikipedia…</p>

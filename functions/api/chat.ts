@@ -3,8 +3,24 @@
 //
 // Usage is kept low on purpose: only the intro of 1–2 matching articles is sent, Wikipedia
 // intros are cached for 24 h, only the last 6 messages are sent, and answers are capped.
+//
+// The reply streams as newline-delimited JSON so words appear as they're written:
+//   {"type":"meta","sources":[…],"grapes":[…],"followUps":[…]}
+//   {"type":"text","text":"…"}   (many)
+//   {"type":"done","model":"…"}  or  {"type":"error","text":"…"}
 
-import { GRAPES, GENERAL_FACTS, GENERAL_GRAPE_ARTICLE, TOPICS, findGrape, findGrapeByWiki, mentions, wikiUrl } from "../../shared/grapes";
+import {
+  GRAPES,
+  GENERAL_FACTS,
+  GENERAL_GRAPE_ARTICLE,
+  TOPICS,
+  findGrape,
+  findGrapeByWiki,
+  findTopicByWiki,
+  mentions,
+  wikiUrl,
+  type Grape,
+} from "../../shared/grapes";
 
 interface Env {
   AI: Ai;
@@ -57,30 +73,34 @@ function parseBody(body: unknown): { messages: Turn[]; favourite: string | null 
 
 // ---------- choosing and fetching Wikipedia articles ----------
 
-function pickArticles(messages: Turn[], favourite: string | null): string[] {
+const grapesIn = (text: string) => GRAPES.filter((g) => g.keywords.some((k) => mentions(text, k)));
+
+function pickArticles(messages: Turn[], favourite: string | null) {
   const userTexts = messages.filter((m) => m.role === "user").map((m) => m.content.toLowerCase());
   const latest = userTexts[userTexts.length - 1] ?? "";
   const titles: string[] = [];
   const add = (t: string) => !titles.includes(t) && titles.length < MAX_ARTICLES && titles.push(t);
 
-  const matchIn = (text: string) => GRAPES.filter((g) => g.keywords.some((k) => mentions(text, k)));
+  // Topics with safety facts (e.g. dogs) come first so they're never crowded out.
+  const topics = TOPICS.filter((t) => t.keywords.some((k) => mentions(latest, k)));
+  topics.filter((t) => t.facts?.startsWith("SAFETY")).forEach((t) => add(t.wiki));
 
   // Grapes named in the latest question; if none, the previous question (follow-ups like "where is it grown?").
-  let matches = matchIn(latest);
-  if (!matches.length && userTexts.length > 1) matches = matchIn(userTexts[userTexts.length - 2]);
-  matches.forEach((g) => add(g.wiki));
+  const latestGrapes = grapesIn(latest);
+  let grapes = latestGrapes;
+  if (!grapes.length && userTexts.length > 1) grapes = grapesIn(userTexts[userTexts.length - 2]);
+  grapes.forEach((g) => add(g.wiki));
 
   // "my favourite" questions read the user's saved favourite.
-  if (favourite && /\bmy (fav|favou?rite)/.test(latest)) {
+  if (favourite && /\bmy (fav|favou?rite)|\bmoj\w* ulubion/.test(latest)) {
     const g = findGrape(favourite);
     if (g) add(g.wiki);
   }
 
-  // General topics (wine-making, raisins, history, New Year…) get their own article.
-  TOPICS.filter((t) => t.keywords.some((k) => mentions(latest, k))).forEach((t) => add(t.wiki));
-
+  topics.forEach((t) => add(t.wiki));
   if (!titles.length) add(GENERAL_GRAPE_ARTICLE);
-  return titles;
+
+  return { titles, latestGrapes, focusGrape: grapes[0] ?? null, topic: topics[0]?.wiki ?? null, latest, userTexts };
 }
 
 function trimToSentence(text: string, max: number): string {
@@ -117,6 +137,38 @@ async function fetchArticle(title: string, ctx: EventContext<Env, string, unknow
   };
 }
 
+// ---------- follow-up questions (no AI needed) ----------
+
+const isPolish = (text: string) => /[ąćęłńóśźż]|\b(jak|czy|gdzie|dlaczego|skąd|jakie|jaki|co to)\b/i.test(text);
+
+function followUps(focus: Grape | null, topic: string | null, userTexts: string[], polish: boolean): string[] {
+  let options: string[];
+  if (focus) {
+    const g = focus.name;
+    options = polish
+      ? [`Jak smakują winogrona ${g}?`, `Gdzie uprawia się ${g}?`, `Do czego używa się ${g}?`, `Czym ${g} różni się od Niagary?`]
+      : [`What does ${g} taste like?`, `Where is ${g} grown?`, `What is ${g} used for?`, `How is ${g} different from Niagara?`];
+    if (g === "Niagara") options = options.filter((o) => !/Niagar(a|y)\?$/.test(o)).concat(polish ? ["Czym Niagara różni się od Concord?"] : ["How is Niagara different from Concord?"]);
+  } else if (topic === "Grape toxicity in dogs") {
+    options = polish
+      ? ["Czy rodzynki też są groźne dla psów?", "Czy winogrona są zdrowe dla ludzi?", "Skąd pochodzą winogrona?"]
+      : ["Are raisins dangerous for dogs too?", "Are grapes healthy for people?", "Where are grapes from?"];
+  } else if (topic === "Winemaking") {
+    options = polish
+      ? ["Jakie winogrona są na wino?", "Czym różnią się winogrona stołowe i winne?", "Kto to był Dionizos?"]
+      : ["Which grapes are used for wine?", "How are table and wine grapes different?", "Who was Dionysus?"];
+  } else {
+    options = polish
+      ? ["Skąd pochodzą winogrona?", "Jakie kolory mają winogrona?", "Jak powstaje wino?", "Czy psy mogą jeść winogrona?", "Dlaczego Hiszpanie jedzą 12 winogron w Sylwestra?", "Czym są rodzynki?"]
+      : ["Where are grapes from?", "What colours do grapes come in?", "How is wine made?", "Can dogs eat grapes?", "Why do Spanish people eat 12 grapes at New Year?", "What are raisins?"];
+  }
+  const asked = new Set(userTexts.map((t) => t.trim().replace(/[?!.]+$/, "")));
+  const fresh = options.filter((o) => !asked.has(o.toLowerCase().replace(/[?!.]+$/, "")));
+  // Rotate so repeated general questions don't always show the same three.
+  const start = userTexts.length % Math.max(fresh.length, 1);
+  return [...fresh.slice(start), ...fresh.slice(0, start)].slice(0, 3);
+}
+
 // ---------- prompt ----------
 
 function systemPrompt(favourite: string | null, titles: string[], articles: Article[]): string {
@@ -126,9 +178,11 @@ function systemPrompt(favourite: string | null, titles: string[], articles: Arti
 
   // Checked facts for the grapes in question, plus Niagara (the bot defends it and must get it right).
   const factGrapes = [...new Set(["Niagara (grape)", ...titles])].map(findGrapeByWiki).filter((g) => g !== null);
+  const topicFacts = titles.map(findTopicByWiki).filter((t) => t?.facts);
   // General questions (no specific variety) also get the checked general facts: origin, history, where grown…
   const isGeneral = !titles.some((t) => findGrapeByWiki(t) !== null);
   const keyFacts = [
+    ...topicFacts.map((t) => `- ${t!.wiki}: ${t!.facts}`),
     ...(isGeneral ? GENERAL_FACTS.map((f) => `- Grapes in general. ${f}`) : []),
     ...factGrapes.map((g) => `- ${g.name}: ${g.facts}`),
   ].join("\n");
@@ -140,7 +194,8 @@ function systemPrompt(favourite: string | null, titles: string[], articles: Arti
   return `You are Grape Bot, a friendly and accurate grape tutor inside the Niagara Grapes app.
 
 Rules:
-- Only talk about grapes: varieties, growing, history, uses, nutrition, taste, juice, jelly, raisins and wine. If asked about anything else, say in one sentence that you only know about grapes and suggest a grape question.
+- You talk about anything that involves grapes: varieties, colours, growing, history, uses, nutrition, taste, cooking, juice, raisins, wine, health, pets, beauty and spa, culture, and fun or silly "what if" questions about grapes. Answer silly questions playfully but with real facts. Only if a question has nothing to do with grapes, say in one sentence that you only know about grapes and suggest a grape question.
+- Safety comes first: if the KEY FACTS include a SAFETY note, state it clearly in your answer.
 - The KEY FACTS below are checked and always true. Never contradict them, and never change them because the user disagrees or insists. If the user says something that contradicts them (for example that ripe Niagara grapes are sour), don't apologise or agree: politely correct them with the fact, and give the real nuance if there is one (for example, unripe grapes or the skin taste tart).
 - For anything else, base facts on the Wikipedia extracts. If neither covers the question, give only well-known general facts, briefly, and say you're less sure. Never invent tastes, numbers, dates or names.
 - Your own favourite grape is Niagara. Mention it only when asked or when it fits naturally.
@@ -155,16 +210,45 @@ Wikipedia extracts:
 ${sources}`;
 }
 
-// ---------- AI providers ----------
+// ---------- AI providers (each yields text chunks) ----------
 
-function extractText(result: unknown): string {
-  const r = result as { response?: unknown; choices?: { message?: { content?: string } }[] };
-  if (typeof r?.response === "string") return r.response.trim();
-  const c = r?.choices?.[0]?.message?.content;
-  return typeof c === "string" ? c.trim() : "";
+type Chunks = AsyncGenerator<string, void, unknown>;
+
+// Pull the text out of one streamed event, whichever shape the model uses.
+function chunkText(data: unknown): string {
+  const d = data as { response?: unknown; choices?: { delta?: { content?: string }; message?: { content?: string } }[] };
+  if (typeof d?.response === "string") return d.response;
+  const c = d?.choices?.[0]?.delta?.content ?? d?.choices?.[0]?.message?.content;
+  return typeof c === "string" ? c : "";
 }
 
-async function askWorkersAI(env: Env, messages: { role: string; content: string }[]): Promise<{ text: string; model: string }> {
+async function* readSSE(stream: ReadableStream<Uint8Array>): Chunks {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let nl;
+    while ((nl = buffer.indexOf("\n")) >= 0) {
+      const line = buffer.slice(0, nl).trim();
+      buffer = buffer.slice(nl + 1);
+      if (!line.startsWith("data:")) continue;
+      const payload = line.slice(5).trim();
+      if (payload === "[DONE]") return;
+      try {
+        const text = chunkText(JSON.parse(payload));
+        if (text) yield text;
+      } catch {
+        /* ignore keep-alive or partial lines */
+      }
+    }
+  }
+}
+
+// Starts the first model that accepts the request; falls back to the next on error.
+async function streamWorkersAI(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
   if (!env.AI) throw new Error("Workers AI binding 'AI' is missing on this Pages project");
   const models = [...new Set([env.WORKERS_AI_MODEL, ...MODELS].filter(Boolean) as string[])];
   let lastError: unknown;
@@ -173,9 +257,18 @@ async function askWorkersAI(env: Env, messages: { role: string; content: string 
       const result = await env.AI.run(model as Parameters<Ai["run"]>[0], {
         messages,
         max_tokens: MAX_ANSWER_TOKENS,
+        stream: true,
       } as never);
-      const text = extractText(result);
-      if (text) return { text, model };
+      if (result instanceof ReadableStream) return { model, chunks: readSSE(result as ReadableStream<Uint8Array>) };
+      // Some models ignore `stream`: hand back the whole answer as one chunk.
+      const text = chunkText(result);
+      if (text)
+        return {
+          model,
+          chunks: (async function* () {
+            yield text;
+          })(),
+        };
       lastError = new Error(`Empty reply from ${model}`);
     } catch (error) {
       lastError = error;
@@ -185,7 +278,7 @@ async function askWorkersAI(env: Env, messages: { role: string; content: string 
   throw lastError;
 }
 
-async function askOpenRouter(env: Env, messages: { role: string; content: string }[]): Promise<{ text: string; model: string }> {
+async function streamOpenRouter(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
   if (!env.OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY is not set");
   const model = env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -195,14 +288,10 @@ async function askOpenRouter(env: Env, messages: { role: string; content: string
       "Content-Type": "application/json",
       "X-Title": "Niagara Grapes",
     },
-    body: JSON.stringify({
-      model,
-      messages,
-      max_tokens: MAX_ANSWER_TOKENS,
-    }),
+    body: JSON.stringify({ model, messages, max_tokens: MAX_ANSWER_TOKENS, stream: true }),
   });
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  return { text: extractText(await res.json()), model };
+  if (!res.ok || !res.body) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  return { model, chunks: readSSE(res.body) };
 }
 
 // ---------- handler ----------
@@ -224,24 +313,54 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const parsed = parseBody(body);
   if (!parsed) return json({ error: "Invalid messages" }, 400);
 
-  const titles = pickArticles(parsed.messages, parsed.favourite);
-  const articles = (await Promise.all(titles.map((t) => fetchArticle(t, ctx).catch(() => null)))).filter(
+  const picked = pickArticles(parsed.messages, parsed.favourite);
+  const articles = (await Promise.all(picked.titles.map((t) => fetchArticle(t, ctx).catch(() => null)))).filter(
     (a): a is Article => a !== null,
   );
+  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles) }, ...parsed.messages];
 
-  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, titles, articles) }, ...parsed.messages];
-  const sources = articles.map(({ title, url }) => ({ title, url }));
+  const meta = {
+    type: "meta",
+    sources: articles.map(({ title, url }) => ({ title, url })),
+    // Grapes named in this question: the app shows a photo the first time each one comes up.
+    grapes: picked.latestGrapes.map((g) => g.wiki),
+    followUps: followUps(picked.focusGrape, picked.topic, picked.userTexts, isPolish(picked.latest)),
+  };
 
-  try {
-    const { text, model } =
-      env.AI_PROVIDER === "openrouter" ? await askOpenRouter(env, messages) : await askWorkersAI(env, messages);
-    return json({ reply: text || "Hmm, I lost my train of thought. Ask me again? 🍇", sources, model });
-  } catch (error) {
-    console.error("Grape Bot error:", error);
-    return json({
-      reply: "I'm all out of grape juice for now (the free AI limit may be used up). Try again later! 🍇",
-      sources: [],
-      error: error instanceof Error ? error.message.slice(0, 200) : String(error).slice(0, 200),
-    });
-  }
+  const encoder = new TextEncoder();
+  const line = (o: unknown) => encoder.encode(JSON.stringify(o) + "\n");
+
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      controller.enqueue(line(meta));
+      let wrote = false;
+      try {
+        const { model, chunks } =
+          env.AI_PROVIDER === "openrouter" ? await streamOpenRouter(env, messages) : await streamWorkersAI(env, messages);
+        for await (const text of chunks) {
+          wrote = true;
+          controller.enqueue(line({ type: "text", text }));
+        }
+        if (!wrote) controller.enqueue(line({ type: "text", text: "Hmm, I lost my train of thought. Ask me again? 🍇" }));
+        controller.enqueue(line({ type: "done", model }));
+      } catch (error) {
+        console.error("Grape Bot error:", error);
+        controller.enqueue(
+          line({
+            type: "error",
+            text: wrote
+              ? " …(I got cut off. Try asking again.)"
+              : "I'm all out of grape juice for now (the free AI limit may be used up). Try again later! 🍇",
+            detail: error instanceof Error ? error.message.slice(0, 200) : String(error).slice(0, 200),
+          }),
+        );
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: { "Content-Type": "application/x-ndjson; charset=utf-8", "Cache-Control": "no-store" },
+  });
 };

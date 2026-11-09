@@ -67,7 +67,8 @@ export default function Settings({ user, onGetApp, theme, setTheme, onLoggedOut,
         <ul className="ticks small">
           <li>Your email and a scrambled (hashed) password, kept by Supabase.</li>
           <li>Your favourite grape and secret message. Only your account can read them (row-level security).</li>
-          <li>Grape Bot chats aren't saved anywhere; they disappear when you clear the chat or log out.</li>
+          <li>Logged in: your Grape Bot chat (last 40 messages), so it shows on all your devices. Only your account can read it. "Clear chat" deletes it.</li>
+          <li>Logged out: chats aren't saved anywhere and disappear when you close the app.</li>
           <li>On this device only: your theme choice and dismissed tips.</li>
         </ul>
       </details>

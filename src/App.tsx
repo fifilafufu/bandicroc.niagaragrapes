@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuthAndFavourite } from "./lib/useAuthAndFavourite";
 import { detect, dismissTip, tipDismissed, useInstall } from "./lib/install";
 import { useOnline, useTheme } from "./lib/prefs";
+import { useChatHistory } from "./lib/useChatHistory";
 import Home from "./components/Home";
 import Chat, { GREETING, type Msg } from "./components/Chat";
 import MyGrapes from "./components/MyGrapes";
@@ -18,11 +19,15 @@ export default function App() {
   const [showTip, setShowTip] = useState(() => isPhone() && !tipDismissed());
   // Kept here so the conversation survives switching tabs; "Clear chat" and logging out reset it.
   const [chat, setChat] = useState<Msg[]>([GREETING]);
+  // A question asked from elsewhere (e.g. tapping a grape in the gallery), sent when the chat opens.
+  const [autoAsk, setAutoAsk] = useState<string | null>(null);
   const auth = useAuthAndFavourite();
   const { installed } = useInstall();
   const [theme, setTheme] = useTheme();
   const online = useOnline();
   const contentRef = useRef<HTMLElement>(null);
+  // Logged in: the chat is saved to the account and synced to the user's other devices.
+  useChatHistory(auth.user, chat, setChat);
 
   // Logging out (on this device, or the session ending) clears this device's chat.
   const hadUser = useRef(false);
@@ -64,8 +69,22 @@ export default function App() {
       )}
 
       <main ref={contentRef} className={`content ${tab === "chat" ? "flush" : ""}`}>
-        {tab === "home" && <Home onChat={() => setTab("chat")} onMyGrapes={() => setTab("mine")} />}
-        {tab === "chat" && <Chat favourite={auth.favourite} loggedIn={!!auth.user} messages={chat} setMessages={setChat} />}
+        {tab === "home" && <Home
+            onChat={() => setTab("chat")}
+            onMyGrapes={() => setTab("mine")}
+            onAsk={(q) => {
+              setAutoAsk(q);
+              setTab("chat");
+            }}
+          />}
+        {tab === "chat" && <Chat
+            favourite={auth.favourite}
+            loggedIn={!!auth.user}
+            messages={chat}
+            setMessages={setChat}
+            autoAsk={autoAsk}
+            onAutoAsked={() => setAutoAsk(null)}
+          />}
         {tab === "mine" && <MyGrapes {...auth} />}
         {tab === "settings" && (
           <Settings

@@ -9,7 +9,8 @@
     "build": "tsc -b && tsc -p functions && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "deploy": "npm run build && wrangler pages deploy dist"
+    "deploy": "npm run build && wrangler pages deploy dist",
+    "test:bot": "node scripts/test-bot.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",

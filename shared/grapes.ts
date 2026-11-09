@@ -104,18 +104,36 @@ export const GENERAL_FACTS = [
   "Plant: a grape is botanically a berry, growing in clusters of 15–300 on woody vines of the genus Vitis. Table grapes are usually large, seedless and thin-skinned; wine grapes are picked very sweet (about 24% sugar). The most widely planted variety is believed to be Sultana (Thompson Seedless).",
   "Nutrition: raw grapes are 81% water and 18% carbohydrates; 100 g has about 69 kcal and some vitamin K.",
   "Culture: Dionysus (Roman Bacchus) was the Greek god of wine-making and fertility. In Spain people eat twelve grapes at midnight on New Year's Eve, one per bell strike, for luck in each month (popularised in 1909).",
+  "Colours: ripe grapes can be crimson, black, dark blue, yellow, green, orange or pink. \"White\" grapes are actually green; they descend from purple grapes, with two genes switched off that make the purple pigment (anthocyanins). So it's not just white, black and Cotton Candy: there are thousands of varieties.",
 ];
 
-// Extra Wikipedia articles for common general topics (all checked to exist). Matched on the question's words.
-export const TOPICS: { wiki: string; keywords: string[] }[] = [
+// Extra Wikipedia articles for common topics (all checked to exist), matched on the question's words.
+// `facts` are checked sentences from that article, always given to the bot when the topic comes up.
+export const TOPICS: { wiki: string; keywords: string[]; facts?: string }[] = [
+  {
+    wiki: "Grape toxicity in dogs",
+    keywords: ["dog", "puppy", "puppies", "pet", "pies", "psa", "psy", "psu", "piesek", "szczeni"],
+    facts:
+      "SAFETY: grapes and raisins are toxic to dogs. Eating them can cause sudden kidney failure. A dog that eats grapes or raisins should see a vet straight away. Always say this clearly when dogs or pets come up.",
+  },
+  {
+    wiki: "Vinotherapy",
+    keywords: ["bath", "spa", "skincare", "beauty", "face mask", "cosmetic", "kąpiel", "wanna", "skór", "kosmety"],
+    facts:
+      "Vinotherapy is a real beauty treatment where wine-making leftovers (grape pips and pulp) are rubbed into the skin; the pulp is claimed to exfoliate. It is not a bath in grape juice: juice is sugary and sticky and would stain.",
+  },
+  { wiki: "Grape seed oil", keywords: ["oil", "olej"], facts: "Grape seed oil is pressed from grape seeds, a wine-making by-product; it is a light-tasting cooking oil with a smoke point around 216 °C, used in salad dressings and mayonnaise." },
+  { wiki: "Vinegar", keywords: ["vinegar", "ocet", "octu"], facts: "Vinegar's name comes from Old French for 'sour wine'; wine vinegar is made by fermenting wine further with acetic acid bacteria." },
   { wiki: "Winemaking", keywords: ["wine is made", "wine made", "made into wine", "make wine", "making wine", "winemaking", "ferment", "robi się wino", "produkcja wina"] },
   { wiki: "Raisin", keywords: ["raisin", "currant", "dried grape", "rodzyn"] },
-  { wiki: "Viticulture", keywords: ["vineyard", "grow grapes", "growing grapes", "plant grapes", "prune", "vine", "uprawa", "winnic"] },
+  { wiki: "Viticulture", keywords: ["vineyard", "grow grapes", "growing grapes", "plant grapes", "prune", "grapevine", "vines", "uprawa", "winnic"] },
   { wiki: "Grape juice", keywords: ["juice", "sok", "soku"] },
   { wiki: "Twelve Grapes", keywords: ["new year", "twelve grapes", "12 grapes", "sylwester", "nowy rok"] },
   { wiki: "Dionysus", keywords: ["dionysus", "bacchus", "god of wine", "myth", "bóg wina"] },
   { wiki: "History of wine", keywords: ["history", "ancient", "oldest", "historia", "starożyt"] },
 ];
+
+export const findTopicByWiki = (title: string) => TOPICS.find((t) => t.wiki === title) ?? null;
 
 export const wikiUrl = (title: string) => `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 

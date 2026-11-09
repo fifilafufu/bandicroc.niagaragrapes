@@ -192,3 +192,39 @@ The **📲 Get app** button leaves the top bar (less cramped on phones) and live
 
 ### Testing before calling it "ready for the world"
 I'll go through a checklist on the live link: private window, logged out, empty submits, a 1,000-character secret, the "stranger" route through the tabs, and phone size. Testing on a real iPhone and Android still needs your testers.
+
+---
+
+## Phase 4: fixes from first tester feedback (proposed 2026-11-09)
+
+### What testers said (2 people, first use, app in English)
+- 👍 Easy to tap, easy to navigate, clear graphics, they liked the icons. "There's no app like this."
+- 👍 Learned something: grapes come from (Western) Asia, and there are more kinds than "white, black and cotton candy".
+- 👎 Grape Bot couldn't answer **"where are grapes from"**. ✅ *Fixed and live*: general questions now use checked facts (origin, history, where grown).
+- 👎 Grape Bot couldn't answer **"can I take a bath in grape juice"**. Wanted more advanced chat.
+
+### Re-test on the live bot (after the "where from" fix)
+| Question | Result |
+|---|---|
+| can i take a bath in grape juice | Vague; doesn't really answer, misses that grape spa treatments (vinotherapy) exist |
+| can dogs eat grapes | ❌ Refused ("I only know about grapes, not animals"). **Grapes are toxic to dogs**, so this must be answered |
+| what colours do grapes come in | ✅ Good answer |
+
+### Proposed fixes
+
+**A. Grape Bot answers more (priority)**
+1. **Wider "on-topic":** anything that involves grapes counts: pets, cooking, gardening, health, beauty/spa, silly "what if" questions. Silly ones get a playful but factual answer (e.g. bath: grape spa treatments exist, but a juice bath is sticky, sugary and stains). Truly unrelated questions are still politely declined.
+2. **Safety facts:** grapes and raisins are toxic to dogs (Wikipedia "Grape toxicity in dogs"), always given to the bot when pets come up.
+3. **More topic articles:** Vinotherapy, Grape toxicity in dogs, grape colours/types, grape-seed oil, vinegar.
+4. **Tester question list:** a fixed set of ~20 tricky questions (the testers' ones plus likely ones in English and Polish), re-run after every Grape Bot change so old problems don't come back.
+
+**B. Content testers enjoyed learning**
+5. **"Types & colours" section on the home page:** green/white, red/pink, black/purple; table vs wine; seedless. Plus a small **grape gallery** of the 12 grapes with Wikipedia photos and colour tags.
+6. **"Did you know?" card** on the home page with a rotating checked fact (e.g. "Grapes first come from Western Asia").
+
+**C. Advanced chat features (pick any; all free)**
+7. Follow-up question chips after each answer · grape photos in answers · copy/share an answer · 🎤 voice input.
+8. Bigger: replies that appear word by word · chat history synced across devices · grape quiz mode.
+
+**D. Language**
+9. Testers were Polish using the English app. The Polish UI switch (postponed earlier) is worth reconsidering. Grape Bot already answers in Polish.

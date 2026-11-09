@@ -1,6 +1,21 @@
 import { useState } from "react";
 import { wikiUrl } from "../../shared/grapes";
 import { readPref, writePref } from "../lib/prefs";
+import GrapeGallery from "./GrapeGallery";
+
+// Short checked facts for the "Did you know?" card.
+const DID_YOU_KNOW = [
+  "Grapes first come from the Middle East / Western Asia, where people started growing them 6,000–8,000 years ago.",
+  "\"White\" grapes are actually green: they're purple grapes with two pigment genes switched off.",
+  "Grapes and raisins are toxic to dogs. Never share them with your dog!",
+  "China grows the most grapes in the world: 19% of the 72.5 million tonnes grown in 2023.",
+  "The oldest known winery, Areni-1 in Armenia, is about 6,000 years old (c. 4100 BCE).",
+  "In Spain, people eat 12 grapes at midnight on New Year's Eve, one for luck in each month.",
+  "A bunch can hold anywhere from 15 to 300 grapes.",
+  "Ripe grapes can be crimson, black, dark blue, yellow, green, orange or pink.",
+  "Vinotherapy is a real beauty treatment that uses grape pips and pulp from wine-making.",
+  "The most widely planted grape is believed to be the Sultana, also called Thompson Seedless.",
+];
 
 // Every fact below was checked against the linked Wikipedia articles (November 2026).
 const STATS = [
@@ -19,6 +34,15 @@ const SECTIONS: Section[] = [
     body: [
       "Botanically, a grape is a berry. It grows in bunches of 15 to 300 on woody vines of the genus Vitis.",
       "Most grapes we eat and drink come from one species, Vitis vinifera, native to the Mediterranean and Central Asia. North America has its own wild species, like Vitis labrusca (the family of Concord and Niagara).",
+    ],
+    wiki: [{ label: "Grape", title: "Grape" }],
+  },
+  {
+    emoji: "🎨",
+    title: "Types & colours",
+    body: [
+      "Not just white and black! Ripe grapes can be crimson, black, dark blue, yellow, green, orange or pink. \"White\" grapes are really green: they're purple grapes with the pigment genes switched off.",
+      "There are thousands of varieties. The big split is table grapes (for eating, often seedless) and wine grapes. Below are 12 to meet.",
     ],
     wiki: [{ label: "Grape", title: "Grape" }],
   },
@@ -86,7 +110,8 @@ const SECTIONS: Section[] = [
 
 const WELCOME_KEY = "welcome-dismissed";
 
-export default function Home({ onChat, onMyGrapes }: { onChat: () => void; onMyGrapes: () => void }) {
+export default function Home({ onChat, onMyGrapes, onAsk }: { onChat: () => void; onMyGrapes: () => void; onAsk: (q: string) => void }) {
+  const [fact, setFact] = useState(() => Math.floor(Math.random() * DID_YOU_KNOW.length));
   const [welcome, setWelcome] = useState(() => readPref(WELCOME_KEY) !== "1");
   const closeWelcome = () => {
     setWelcome(false);
@@ -132,6 +157,14 @@ export default function Home({ onChat, onMyGrapes }: { onChat: () => void; onMyG
         </div>
       </section>
 
+      <section className="card dyk" aria-live="polite">
+        <p className="eyebrow">💡 Did you know?</p>
+        <p className="dyk-text">{DID_YOU_KNOW[fact]}</p>
+        <button className="link" onClick={() => setFact((f) => (f + 1) % DID_YOU_KNOW.length)}>
+          Another fact →
+        </button>
+      </section>
+
       <section className="stats" aria-label="Grapes in numbers">
         {STATS.map((s) => (
           <div key={s.label} className="stat card">
@@ -141,23 +174,10 @@ export default function Home({ onChat, onMyGrapes }: { onChat: () => void; onMyG
         ))}
       </section>
 
-      {SECTIONS.map((s) => (
-        <article key={s.title} className="card topic">
-          <h2>
-            <span aria-hidden="true">{s.emoji}</span> {s.title}
-          </h2>
-          {s.body.map((p) => (
-            <p key={p}>{p}</p>
-          ))}
-          <p className="sources-line">
-            {s.wiki.map((w) => (
-              <a key={w.label} href={wikiUrl(w.title)} target="_blank" rel="noreferrer">
-                📖 {w.label}
-              </a>
-            ))}
-          </p>
-        </article>
-      ))}
+      {SECTIONS.map((s) => [
+        <Topic key={s.title} s={s} />,
+        s.title === "Types & colours" ? <GrapeGallery key="gallery" onAsk={onAsk} /> : null,
+      ])}
 
       <article className="card spotlight">
         <div>
@@ -178,5 +198,25 @@ export default function Home({ onChat, onMyGrapes }: { onChat: () => void; onMyG
         </div>
       </article>
     </div>
+  );
+}
+
+function Topic({ s }: { s: Section }) {
+  return (
+    <article className="card topic">
+      <h2>
+        <span aria-hidden="true">{s.emoji}</span> {s.title}
+      </h2>
+      {s.body.map((p) => (
+        <p key={p}>{p}</p>
+      ))}
+      <p className="sources-line">
+        {s.wiki.map((w) => (
+          <a key={w.label} href={wikiUrl(w.title)} target="_blank" rel="noreferrer">
+            📖 {w.label}
+          </a>
+        ))}
+      </p>
+    </article>
   );
 }
