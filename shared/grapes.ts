@@ -15,14 +15,14 @@ export const GRAPES: Grape[] = [
     wiki: "Niagara (grape)",
     keywords: ["niagara"],
     facts:
-      "Pale greenish-white, large and juicy. Ripe Niagara grapes are SWEET, with a strong sweet aroma and a musky \"foxy\" flavour (Vitis labrusca). Slip-skin with seeds. Eaten fresh, and used for white grape juice, jelly and sweet wines. Only unripe grapes, or the skin on its own, taste tart.",
+      "Pale greenish-white, large and juicy. Ripe Niagara grapes are SWEET, with a strong sweet aroma and a musky \"foxy\" flavour (Vitis labrusca; in Polish: piżmowy, not \"muskularny\"). Slip-skin with seeds. Eaten fresh, and used for white grape juice, jelly and sweet wines. Only unripe grapes, or the skin on its own, taste tart.",
   },
   {
     name: "Concord",
     wiki: "Concord grape",
     keywords: ["concord"],
     facts:
-      "Dark blue-purple, highly aromatic, large seeds. Sweet, musky \"foxy\" flavour: the classic taste of grape juice and grape jelly. The skin is more tart than the flesh.",
+      "Dark blue-purple, highly aromatic, large seeds. Sweet, musky \"foxy\" flavour (Polish: piżmowy): the classic taste of grape juice and grape jelly. The skin is more tart than the flesh.",
   },
   {
     name: "Catawba",
@@ -118,7 +118,7 @@ export const TOPICS: { wiki: string; keywords: string[]; facts?: string }[] = [
   },
   {
     wiki: "Vinotherapy",
-    keywords: ["bath", "spa", "skincare", "beauty", "face mask", "cosmetic", "kąpiel", "wanna", "skór", "kosmety"],
+    keywords: ["bath", "spa treatment", "day spa", "the spa", "a spa", "skincare", "beauty", "face mask", "cosmetic", "kąpiel", "wanna", "skór", "kosmety"],
     facts:
       "Vinotherapy is a real beauty treatment where wine-making leftovers (grape pips and pulp) are rubbed into the skin; the pulp is claimed to exfoliate. It is not a bath in grape juice: juice is sugary and sticky and would stain.",
   },
