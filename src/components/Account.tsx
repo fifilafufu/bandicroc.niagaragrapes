@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import type { Secret } from "../lib/useAuthAndFavourite";
 import { GRAPES, findGrape, wikiUrl } from "../../shared/grapes";
 import GrapeCard from "./GrapeCard";
 
@@ -9,9 +10,13 @@ type Props = {
   favourite: string | null;
   ready: boolean;
   saveFavourite: (grape: string) => Promise<string | null>;
+  secret: Secret | null;
+  secretMissing: boolean;
+  saveSecret: (message: string) => Promise<string | null>;
 };
 
-export default function Account({ user, favourite, ready, saveFavourite }: Props) {
+export default function Account(props: Props) {
+  const { user, ready } = props;
   if (!supabase) {
     return (
       <section className="card">
@@ -21,7 +26,7 @@ export default function Account({ user, favourite, ready, saveFavourite }: Props
     );
   }
   if (!ready) return <p className="muted center">Loading…</p>;
-  return user ? <Profile user={user} favourite={favourite} saveFavourite={saveFavourite} /> : <LoginForm />;
+  return user ? <Profile {...props} user={user} /> : <LoginForm />;
 }
 
 function LoginForm() {
@@ -117,9 +122,9 @@ function ChangePassword() {
   }
 
   return (
-    <section className="card">
-      <h2>Forgot your password?</h2>
-      <p className="muted">
+    <section>
+      <h3>🔑 Forgot your password?</h3>
+      <p className="muted small">
         Passwords are stored scrambled, so they can't be shown, not even to us. Set a new one while you're logged in.
       </p>
       <form className="form" onSubmit={submit}>
@@ -133,7 +138,70 @@ function ChangePassword() {
   );
 }
 
-function Profile({ user, favourite, saveFavourite }: { user: User; favourite: string | null; saveFavourite: Props["saveFavourite"] }) {
+// A private note that only this account can read, synced live to every device it's logged in on.
+function SecretMessage({ secret, missing, save }: { secret: Secret | null; missing: boolean; save: Props["saveSecret"] }) {
+  const saved = secret?.message ?? "";
+  const [draft, setDraft] = useState<string | null>(null); // null = not editing, show the synced text
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const value = draft ?? saved;
+  const changed = draft !== null && draft !== saved;
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const error = await save(value);
+    setBusy(false);
+    if (error) setMsg({ ok: false, text: error });
+    else {
+      setDraft(null);
+      setMsg({ ok: true, text: "Saved. Your other devices update live." });
+    }
+  }
+
+  return (
+    <section className="card">
+      <h2>🤫 Secret message</h2>
+      {missing ? (
+        <p className="notice">
+          Not set up yet: run <code>supabase/secret_messages.sql</code> in Supabase's SQL Editor once.
+        </p>
+      ) : (
+        <>
+          <p className="muted small">Only you can read this. It syncs to every device you're logged in on.</p>
+          <form onSubmit={submit}>
+            <textarea
+              value={value}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                setMsg(null);
+              }}
+              placeholder="Write something only you will see…"
+              maxLength={1000}
+              aria-label="Secret message"
+            />
+            <div className="secret-meta">
+              <span className="muted small">
+                {changed
+                  ? "Unsaved changes"
+                  : secret?.updatedAt
+                    ? `Last saved ${new Date(secret.updatedAt).toLocaleString()}`
+                    : "Nothing saved yet"}
+              </span>
+              <button className="primary small-btn" disabled={busy || !changed}>
+                {busy ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </form>
+          {msg && <p className={msg.ok ? "success" : "notice"}>{msg.text}</p>}
+        </>
+      )}
+    </section>
+  );
+}
+
+function Profile(props: Omit<Props, "ready" | "user"> & { user: User }) {
+  const { user, favourite, saveFavourite } = props;
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -146,10 +214,8 @@ function Profile({ user, favourite, saveFavourite }: { user: User; favourite: st
   return (
     <div className="stack">
       <section className="card">
-        <h2>Your favourite grape</h2>
-        <p className="muted">
-          Saved to your account. Change it here and your other devices update live.
-        </p>
+        <h2>🍇 Your favourite grape</h2>
+        <p className="muted small">Saved to your account. Change it here and your other devices update live.</p>
         <div className="grape-grid">
           {GRAPES.map(({ name }) => (
             <button
@@ -168,28 +234,35 @@ function Profile({ user, favourite, saveFavourite }: { user: User; favourite: st
 
       {findGrape(favourite) && <GrapeCard grape={findGrape(favourite)!} />}
 
+      <SecretMessage secret={props.secret} missing={props.secretMissing} save={props.saveSecret} />
+
       <section className="card">
-        <h2>Learn about each grape</h2>
-        <p className="muted">Every grape here has a Wikipedia article. Grape Bot reads them too.</p>
+        <h2>📖 Learn about each grape</h2>
+        <p className="muted small">Every grape here has a Wikipedia article. Grape Bot reads them too.</p>
         <ul className="wiki-list">
           {GRAPES.map((g) => (
             <li key={g.name}>
               <a href={wikiUrl(g.wiki)} target="_blank" rel="noreferrer">
-                📖 {g.name}
+                {g.name}
               </a>
             </li>
           ))}
         </ul>
       </section>
 
-      <ChangePassword />
-
-      <section className="card">
-        <p className="muted">Logged in as {user.email}</p>
-        <button className="secondary" onClick={() => supabase?.auth.signOut()}>
-          Log out
-        </button>
-      </section>
+      <details className="card settings">
+        <summary>⚙️ Account settings</summary>
+        <div className="settings-body">
+          <ChangePassword />
+          <section>
+            <h3>👋 Log out</h3>
+            <p className="muted small">Logged in as {user.email}</p>
+            <button className="danger-btn" onClick={() => supabase?.auth.signOut()}>
+              Log out
+            </button>
+          </section>
+        </div>
+      </details>
     </div>
   );
 }

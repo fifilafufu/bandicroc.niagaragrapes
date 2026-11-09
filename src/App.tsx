@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuthAndFavourite } from "./lib/useAuthAndFavourite";
 import { detect, dismissTip, tipDismissed, useInstall } from "./lib/install";
 import Home from "./components/Home";
-import Chat from "./components/Chat";
+import Chat, { GREETING, type Msg } from "./components/Chat";
 import Account from "./components/Account";
 import InstallSheet from "./components/InstallSheet";
 
@@ -13,6 +13,8 @@ const isPhone = () => ["ios", "android"].includes(detect().os);
 export default function App() {
   const [tab, setTab] = useState<Tab>("home");
   const [sheetOpen, setSheetOpen] = useState(false);
+  // Kept here so the conversation survives switching tabs; "Clear chat" resets it.
+  const [chat, setChat] = useState<Msg[]>([GREETING]);
   const [showTip, setShowTip] = useState(() => isPhone() && !tipDismissed());
   const auth = useAuthAndFavourite();
   const { installed } = useInstall();
@@ -39,9 +41,9 @@ export default function App() {
         )}
       </header>
 
-      <main className="content">
+      <main className={`content ${tab === "chat" ? "flush" : ""}`}>
         {tab === "home" && <Home onChat={() => setTab("chat")} onGetApp={installed ? null : openSheet} />}
-        {tab === "chat" && <Chat favourite={auth.favourite} loggedIn={!!auth.user} />}
+        {tab === "chat" && <Chat favourite={auth.favourite} loggedIn={!!auth.user} messages={chat} setMessages={setChat} />}
         {tab === "account" && <Account {...auth} />}
       </main>
 
@@ -76,7 +78,7 @@ export default function App() {
 function TabButton(props: { active: boolean; onClick: () => void; icon: string; label: string }) {
   return (
     <button className={`tab ${props.active ? "active" : ""}`} onClick={props.onClick} aria-current={props.active}>
-      <span aria-hidden="true">{props.icon}</span>
+      <span className="icon" aria-hidden="true">{props.icon}</span>
       <span>{props.label}</span>
     </button>
   );

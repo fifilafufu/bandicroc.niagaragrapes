@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 type Source = { title: string; url: string };
-type Msg = { role: "user" | "assistant"; content: string; sources?: Source[] };
+export type Msg = { role: "user" | "assistant"; content: string; sources?: Source[] };
 
-const GREETING: Msg = { role: "assistant", content: "Hi! I'm Grape Bot, your grape tutor. Ask me anything about grapes, and I'll answer from Wikipedia. 🍇" };
+export const GREETING: Msg = {
+  role: "assistant",
+  content: "Hi! I'm Grape Bot, your grape tutor. Ask me anything about grapes, and I'll answer from Wikipedia. 🍇",
+};
 const SUGGESTIONS = [
   "Where do Niagara grapes come from?",
   "How are Concord and Niagara different?",
@@ -11,11 +14,19 @@ const SUGGESTIONS = [
   "What is Riesling used for?",
 ];
 
-export default function Chat({ favourite, loggedIn }: { favourite: string | null; loggedIn: boolean }) {
-  const [messages, setMessages] = useState<Msg[]>([GREETING]);
+type Props = {
+  favourite: string | null;
+  loggedIn: boolean;
+  messages: Msg[];
+  setMessages: React.Dispatch<React.SetStateAction<Msg[]>>;
+};
+
+export default function Chat({ favourite, loggedIn, messages, setMessages }: Props) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
+  const generation = useRef(0);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -24,10 +35,12 @@ export default function Chat({ favourite, loggedIn }: { favourite: string | null
   async function send(text: string) {
     const content = text.trim();
     if (!content || busy) return;
+    const gen = generation.current;
     const next = [...messages, { role: "user" as const, content }];
     setMessages(next);
     setInput("");
     setBusy(true);
+    let reply: Msg;
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -38,19 +51,22 @@ export default function Chat({ favourite, loggedIn }: { favourite: string | null
         }),
       });
       const data = (await res.json().catch(() => ({}))) as { reply?: string; sources?: Source[] };
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          content: data.reply || "Something went wrong on the vine. Try again? 🍇",
-          sources: Array.isArray(data.sources) ? data.sources : [],
-        },
-      ]);
+      reply = {
+        role: "assistant",
+        content: data.reply || "Something went wrong on the vine. Try again? 🍇",
+        sources: Array.isArray(data.sources) ? data.sources : [],
+      };
     } catch {
-      setMessages((m) => [...m, { role: "assistant", content: "I can't reach the vineyard. Are you offline? 🍇" }]);
-    } finally {
-      setBusy(false);
+      reply = { role: "assistant", content: "I can't reach the vineyard. Are you offline? 🍇" };
     }
+    if (gen === generation.current) setMessages((m) => [...m, reply]);
+    setBusy(false);
+  }
+
+  function clearChat() {
+    generation.current += 1;
+    setBusy(false);
+    setMessages([GREETING]);
   }
 
   const onSubmit = (e: FormEvent) => {
@@ -60,6 +76,17 @@ export default function Chat({ favourite, loggedIn }: { favourite: string | null
 
   return (
     <div className="chat">
+      <div className="chat-head">
+        <img src="/favicon.svg" alt="" width={36} height={36} />
+        <div className="who">
+          <b>Grape Bot</b>
+          <span>Grape tutor · answers from Wikipedia</span>
+        </div>
+        <button className="clear-btn" onClick={clearChat} disabled={messages.length <= 1 && !busy}>
+          🧹 Clear chat
+        </button>
+      </div>
+
       <div className="messages" aria-live="polite">
         {messages.map((m, i) => (
           <div key={i} className={`bubble ${m.role}`}>
@@ -82,7 +109,7 @@ export default function Chat({ favourite, loggedIn }: { favourite: string | null
             <span />
           </div>
         )}
-        {messages.length === 1 && (
+        {messages.length === 1 && !busy && (
           <div className="suggestions">
             {SUGGESTIONS.map((s) => (
               <button key={s} className="chip" onClick={() => send(s)}>
@@ -98,7 +125,7 @@ export default function Chat({ favourite, loggedIn }: { favourite: string | null
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Say something to Grape Bot…"
+          placeholder="Ask Grape Bot about grapes…"
           maxLength={500}
           aria-label="Message"
         />
