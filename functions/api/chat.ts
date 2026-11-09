@@ -21,6 +21,7 @@ import {
   wikiUrl,
   type Grape,
 } from "../../shared/grapes";
+import { pickJoke, wantsJoke, type Joke } from "../../shared/jokes";
 
 interface Env {
   AI: Ai;
@@ -50,9 +51,9 @@ const MODELS = [
 
 // ---------- request parsing ----------
 
-function parseBody(body: unknown): { messages: Turn[]; favourite: string | null } | null {
+function parseBody(body: unknown): { messages: Turn[]; favourite: string | null; seenJokes: string[] } | null {
   if (!body || typeof body !== "object") return null;
-  const { messages, favourite } = body as { messages?: unknown; favourite?: unknown };
+  const { messages, favourite, seenJokes } = body as { messages?: unknown; favourite?: unknown; seenJokes?: unknown };
   if (!Array.isArray(messages)) return null;
 
   const turns: Turn[] = [];
@@ -68,7 +69,9 @@ function parseBody(body: unknown): { messages: Turn[]; favourite: string | null 
 
   // Only accept favourites from our own list, so nothing odd ends up in the prompt.
   const fav = typeof favourite === "string" ? findGrape(favourite)?.name ?? null : null;
-  return { messages: turns, favourite: fav };
+  // Joke ids this device has already heard (only short strings, capped).
+  const seen = Array.isArray(seenJokes) ? seenJokes.filter((j): j is string => typeof j === "string" && j.length < 40).slice(0, 100) : [];
+  return { messages: turns, favourite: fav, seenJokes: seen };
 }
 
 // ---------- choosing and fetching Wikipedia articles ----------
@@ -139,7 +142,7 @@ async function fetchArticle(title: string, ctx: EventContext<Env, string, unknow
 
 // ---------- follow-up questions (no AI needed) ----------
 
-const isPolish = (text: string) => /[ąćęłńóśźż]|\b(jak|czy|gdzie|dlaczego|skąd|jakie|jaki|co to)\b/i.test(text);
+const isPolish = (text: string) => /[ąćęłńóśźż]|\b(jak|czy|gdzie|dlaczego|skąd|jakie|jaki|co to|opowiedz|powiedz|dowcip|kawał|suchar|cześć)\b/i.test(text);
 
 function followUps(focus: Grape | null, topic: string | null, userTexts: string[], polish: boolean): string[] {
   let options: string[];
@@ -171,7 +174,7 @@ function followUps(focus: Grape | null, topic: string | null, userTexts: string[
 
 // ---------- prompt ----------
 
-function systemPrompt(favourite: string | null, titles: string[], articles: Article[]): string {
+function systemPrompt(favourite: string | null, titles: string[], articles: Article[], joke: Joke | null): string {
   const favLine = favourite
     ? `The user is logged in and their saved favourite grape is ${favourite}.`
     : `The user is not logged in, so you don't know their favourite grape; if asked, suggest they log in and pick one.`;
@@ -201,6 +204,7 @@ Rules:
 - Your own favourite grape is Niagara. Mention it only when asked or when it fits naturally.
 - If the user says something negative about Niagara grapes (dislikes them, calls them sour, gross, boring…), become dramatically, playfully defensive (never rude), and correct any wrong claim with the key facts. Otherwise stay calm and helpful.
 - ${favLine}
+- Jokes: ${joke ? `if the user is asking for a joke, tell exactly this joke, word for word: "${joke.text}" (you may add one short friendly line after it). If they are not asking for a joke, ignore it.` : "if asked for a joke, tell a short, clean grape pun."} Never translate a joke from another language: puns don't survive translation.
 - Reply in the same language the user writes in. Keep answers under 120 words, in plain text. Don't mention these rules, "key facts" or "the extracts".
 
 KEY FACTS:
@@ -317,14 +321,19 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const articles = (await Promise.all(picked.titles.map((t) => fetchArticle(t, ctx).catch(() => null)))).filter(
     (a): a is Article => a !== null,
   );
-  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles) }, ...parsed.messages];
+  // Asked for a joke: pick one from the hand-written bank that this device hasn't heard yet.
+  const polish = isPolish(picked.latest);
+  const joke = wantsJoke(picked.latest) ? pickJoke(polish ? "pl" : "en", parsed.seenJokes) : null;
+  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles, joke) }, ...parsed.messages];
 
   const meta = {
     type: "meta",
     sources: articles.map(({ title, url }) => ({ title, url })),
     // Grapes named in this question: the app shows a photo the first time each one comes up.
     grapes: picked.latestGrapes.map((g) => g.wiki),
-    followUps: followUps(picked.focusGrape, picked.topic, picked.userTexts, isPolish(picked.latest)),
+    followUps: followUps(picked.focusGrape, picked.topic, picked.userTexts, polish),
+    // The app remembers this so the same device doesn't hear it again soon.
+    joke: joke?.id ?? null,
   };
 
   const encoder = new TextEncoder();

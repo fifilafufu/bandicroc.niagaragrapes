@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import Counter from "./Counter";
 import Quiz from "./Quiz";
 import { fetchSummary } from "../lib/wiki";
+import { readPref, writePref } from "../lib/prefs";
 import { findGrapeByWiki, wikiUrl } from "../../shared/grapes";
 
 type Source = { title: string; url: string };
@@ -28,6 +29,21 @@ const SUGGESTIONS = [
 ];
 const MAX = 500;
 
+// Jokes this device has heard, so Grape Bot tells a new one each time (see shared/jokes.ts).
+const JOKES_KEY = "jokes-heard";
+function heardJokes(): string[] {
+  try {
+    const v = JSON.parse(readPref(JOKES_KEY) ?? "[]");
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+function rememberJoke(id: string) {
+  const heard = heardJokes().filter((j) => j !== id);
+  writePref(JOKES_KEY, JSON.stringify([...heard, id].slice(-60)));
+}
+
 type Props = {
   favourite: string | null;
   loggedIn: boolean;
@@ -42,6 +58,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
   const [busy, setBusy] = useState(false);
   const [quiz, setQuiz] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const boxRef = useRef<HTMLTextAreaElement>(null);
   // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
   const generation = useRef(0);
 
@@ -79,6 +96,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
         body: JSON.stringify({
           messages: history.filter((m) => m !== GREETING).map(({ role, content }) => ({ role, content })),
           favourite: loggedIn ? favourite : null,
+          seenJokes: heardJokes(),
         }),
       });
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
@@ -101,8 +119,10 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
             sources?: Source[];
             followUps?: string[];
             grapes?: string[];
+            joke?: string | null;
           };
           if (ev.type === "meta") {
+            if (ev.joke) rememberJoke(ev.joke);
             patchLast(gen, (m) => ({ ...m, sources: ev.sources ?? [], followUps: ev.followUps ?? [] }));
             // First time a grape comes up in this chat: show its Wikipedia photo.
             for (const wiki of (ev.grapes ?? []).filter((w) => !shown.has(w)).slice(0, 2)) {
@@ -156,6 +176,14 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
     e.preventDefault();
     send(input);
   };
+
+  // The message box grows with the text (up to about 5 lines, then it scrolls inside).
+  useEffect(() => {
+    const box = boxRef.current;
+    if (!box) return;
+    box.style.height = "auto";
+    box.style.height = `${Math.min(box.scrollHeight, 132)}px`;
+  }, [input, quiz]);
 
   const lastIndex = messages.length - 1;
 
@@ -236,9 +264,18 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           </div>
 
           <form className="composer" onSubmit={onSubmit}>
-            <input
+            <textarea
+              ref={boxRef}
+              rows={1}
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                // Enter sends; Shift+Enter makes a new line. On phones the keyboard's send key does the same.
+                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                  e.preventDefault();
+                  send(input);
+                }
+              }}
               placeholder="Ask Grape Bot about grapes…"
               maxLength={MAX}
               aria-label="Message"

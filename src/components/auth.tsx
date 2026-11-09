@@ -35,8 +35,8 @@ export function PasswordInput(props: {
   );
 }
 
-export function LoginForm() {
-  const [mode, setMode] = useState<"in" | "up">("in");
+export function LoginForm({ initialMode = "in" }: { initialMode?: "in" | "up" } = {}) {
+  const [mode, setMode] = useState<"in" | "up">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);

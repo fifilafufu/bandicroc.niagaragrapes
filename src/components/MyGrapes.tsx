@@ -5,9 +5,10 @@ import type { Secret } from "../lib/useAuthAndFavourite";
 import { GRAPES, findGrape, wikiUrl } from "../../shared/grapes";
 import GrapeCard from "./GrapeCard";
 import Counter from "./Counter";
-import { LoginForm } from "./auth";
 
 const SECRET_MAX = 1000;
+
+export type Guest = { favourite: string | null; notes: string; notesAt: string | null };
 
 type Props = {
   user: User | null;
@@ -17,40 +18,80 @@ type Props = {
   secret: Secret | null;
   secretMissing: boolean;
   saveSecret: (message: string) => Promise<string | null>;
+  // Not logged in: picks and notes live only in memory until the app closes.
+  guest: Guest;
+  setGuest: React.Dispatch<React.SetStateAction<Guest>>;
+  onLogin: (mode: "in" | "up") => void;
+  // Tells the app a guest just saved something, so it can ask them to log in.
+  onGuestSaved: (what: string) => void;
 };
 
 export default function MyGrapes(props: Props) {
-  const { user, ready } = props;
-  if (!supabase) return <p className="notice">Saving isn't available right now.</p>;
-  if (!ready) return <p className="muted center">Loading…</p>;
+  const { user, ready, guest, setGuest } = props;
+  if (supabase && !ready) return <p className="muted center">Loading…</p>;
 
+  if (user)
+    return (
+      <div className="stack">
+        <Picks
+          favourite={props.favourite}
+          saveFavourite={props.saveFavourite}
+          secret={props.secret}
+          secretMissing={props.secretMissing}
+          saveSecret={props.saveSecret}
+        />
+        <LearnList />
+      </div>
+    );
+
+  // Guest mode: everything works, but nothing is saved.
   return (
     <div className="stack">
-      {user ? <SignedIn {...props} user={user} /> : <SignedOut />}
+      <section className="card guest-banner" role="note">
+        <span aria-hidden="true">⏳</span>
+        <div>
+          <b>You're not logged in</b>
+          <p className="muted small">
+            You can pick a favourite and write notes, but they disappear when you close the app.
+            {supabase ? " Log in to keep them on all your devices." : " Saving isn't available right now."}
+          </p>
+          {supabase && (
+            <div className="hero-actions left">
+              <button className="primary small-btn" onClick={() => props.onLogin("in")}>
+                🔑 Log in to save
+              </button>
+              <button className="link" onClick={() => props.onLogin("up")}>
+                Create a free account
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+      <Picks
+        guest
+        favourite={guest.favourite}
+        saveFavourite={async (grape) => {
+          setGuest((g) => ({ ...g, favourite: grape }));
+          props.onGuestSaved("Your favourite grape");
+          return null;
+        }}
+        secret={{ message: guest.notes, updatedAt: guest.notesAt }}
+        secretMissing={false}
+        saveSecret={async (message) => {
+          setGuest((g) => ({ ...g, notes: message, notesAt: new Date().toISOString() }));
+          props.onGuestSaved("Your note");
+          return null;
+        }}
+      />
       <LearnList />
     </div>
   );
 }
 
-function SignedOut() {
-  return (
-    <>
-      <section className="card intro">
-        <h2>🧺 Your grapes, on every device</h2>
-        <ul className="ticks">
-          <li>Pick your favourite grape and read about it</li>
-          <li>Keep private 📝 notes about grapes</li>
-          <li>Log in on your phone and computer: they stay in sync</li>
-        </ul>
-        <p className="muted small">Free. Just an email and a password. Grape Bot and the grape pages work without an account.</p>
-      </section>
-      <LoginForm />
-    </>
-  );
-}
+type PicksProps = Pick<Props, "favourite" | "saveFavourite" | "secret" | "secretMissing" | "saveSecret"> & { guest?: boolean };
 
-function SignedIn(props: Props & { user: User }) {
-  const { favourite, saveFavourite } = props;
+function Picks(props: PicksProps) {
+  const { favourite, saveFavourite, guest } = props;
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,7 +132,11 @@ function SignedIn(props: Props & { user: User }) {
           <span>🍇 Favourite grape</span>
           <span className={`fav-choice ${favourite ? "" : "none"}`}>{favourite ?? "Pick one below"}</span>
         </summary>
-        <p className="muted small">Saved to your account. Change it here and your other devices update live.</p>
+        <p className="muted small">
+          {guest
+            ? "Kept until you close the app. Log in to save it to your account."
+            : "Saved to your account. Change it here and your other devices update live."}
+        </p>
         <div className="grape-grid">
           {GRAPES.map(({ name }) => (
             <button
@@ -108,7 +153,7 @@ function SignedIn(props: Props & { user: User }) {
         {error && <p className="notice" role="alert">{error}</p>}
       </details>
 
-      <SecretMessage secret={props.secret} missing={props.secretMissing} save={props.saveSecret} />
+      <SecretMessage secret={props.secret} missing={props.secretMissing} save={props.saveSecret} guest={guest} />
 
       {findGrape(favourite) && <GrapeCard grape={findGrape(favourite)!} />}
     </>
@@ -117,7 +162,7 @@ function SignedIn(props: Props & { user: User }) {
 
 // "Notes about grapes": a private notebook only this account can read, synced live to every device.
 // (Stored in the secret_messages table, its original name.)
-function SecretMessage({ secret, missing, save }: { secret: Secret | null; missing: boolean; save: Props["saveSecret"] }) {
+function SecretMessage({ secret, missing, save, guest }: { secret: Secret | null; missing: boolean; save: Props["saveSecret"]; guest?: boolean }) {
   const saved = secret?.message ?? "";
   const [draft, setDraft] = useState<string | null>(null); // null = not editing, show the synced text
   const [busy, setBusy] = useState(false);
@@ -134,7 +179,7 @@ function SecretMessage({ secret, missing, save }: { secret: Secret | null; missi
     if (error) setMsg({ ok: false, text: error });
     else {
       setDraft(null);
-      setMsg({ ok: true, text: value.trim() ? "Saved ✓ Your other devices update live." : "Cleared ✓" });
+      setMsg({ ok: true, text: !value.trim() ? "Cleared ✓" : guest ? "Kept for now ✓ Log in to save it for good." : "Saved ✓ Your other devices update live." });
     }
   }
 
@@ -145,7 +190,11 @@ function SecretMessage({ secret, missing, save }: { secret: Secret | null; missi
         <p className="muted">Notes aren't available right now.</p>
       ) : (
         <>
-          <p className="muted small">Your private grape notebook: tastings, favourites to try, facts you learned. Only you can read it, and it syncs to every device you're logged in on.</p>
+          <p className="muted small">
+            {guest
+              ? "Your grape notebook: tastings, favourites to try, facts you learned. Not logged in, so it's kept only until you close the app."
+              : "Your private grape notebook: tastings, favourites to try, facts you learned. Only you can read it, and it syncs to every device you're logged in on."}
+          </p>
           <form onSubmit={submit}>
             <textarea
               className="secret-box"
@@ -163,7 +212,7 @@ function SecretMessage({ secret, missing, save }: { secret: Secret | null; missi
                 {changed
                   ? "Unsaved changes"
                   : secret?.updatedAt
-                    ? `Saved ${new Date(secret.updatedAt).toLocaleString()}`
+                    ? `${guest ? "Kept" : "Saved"} ${new Date(secret.updatedAt).toLocaleString()}`
                     : "Nothing saved yet"}
               </span>
               <Counter length={value.length} max={SECRET_MAX} always />

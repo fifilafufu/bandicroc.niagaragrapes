@@ -574,3 +574,170 @@ button.fav-pill { border: 0; cursor: pointer; font: inherit; font-size: 0.85rem;
 .swatches { grid-template-columns: repeat(4, 1fr); }
 @media (min-width: 560px) { .swatches { grid-template-columns: repeat(7, 1fr); } }
 .swatch span { overflow-wrap: normal; hyphens: manual; }
+
+/* ---------- Tester feedback round (Phase 6) ---------- */
+
+/* Top and bottom bars never scroll away: the app is pinned to the screen and only the middle scrolls.
+   (Stops phones from scrolling the whole page, which hid the bars and the way to other sections.) */
+html, body { overflow: hidden; overscroll-behavior: none; }
+.app { position: fixed; inset: 0; height: auto; }
+.topbar, .tabbar { flex-shrink: 0; position: relative; z-index: 5; }
+.content { min-height: 0; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.topbar { padding-left: 12px; padding-right: 12px; gap: 8px; }
+.brand-btn { display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 0; cursor: pointer; min-width: 0; }
+.brand { white-space: nowrap; }
+.fav-pill { max-width: 30%; }
+@media (max-width: 400px) {
+  .brand { display: none; }
+  .fav-pill { max-width: 38%; }
+}
+
+/* Account button (top right) */
+.account { position: relative; margin-left: auto; flex-shrink: 0; }
+.fav-pill + .account { margin-left: 0; }
+.account-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  max-width: 170px;
+  padding: 3px 10px 3px 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+.account-btn.out { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.account-btn[aria-expanded="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+.avatar {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+.account-btn.out .avatar { background: rgba(255, 255, 255, 0.25); }
+.account-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.caret-down { font-size: 0.7rem; opacity: 0.7; }
+@media (max-width: 360px) { .account-name { max-width: 70px; } }
+.account-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: min(270px, calc(100vw - 24px));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  padding: 6px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  animation: pop 0.15s ease-out;
+}
+.account-menu button {
+  text-align: left;
+  border: 0;
+  background: none;
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.account-menu button:hover, .account-menu button:focus-visible { background: var(--accent-soft); }
+.account-menu button.danger { color: var(--danger); }
+.account-menu button.strong { background: var(--accent); color: var(--accent-text); margin-bottom: 2px; }
+.account-who { display: flex; gap: 10px; align-items: center; padding: 8px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.account-who div { min-width: 0; display: flex; flex-direction: column; }
+.account-who b, .account-who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.big-avatar { width: 40px; height: 40px; font-size: 1.1rem; }
+.account-note { padding: 6px 10px 8px; margin: 0; }
+
+/* Guest mode in My Grapes */
+.guest-banner { display: flex; gap: 12px; align-items: flex-start; border-color: #c99a2e; background: color-mix(in srgb, #f2c14e 14%, var(--surface)); }
+.guest-banner > span { font-size: 1.6rem; line-height: 1; }
+.guest-banner p { margin: 2px 0 8px; }
+.guest-banner .link { padding: 0; }
+
+/* Login sheet and "log in to save" popup */
+.login-sheet { position: relative; }
+.login-sheet .corner { position: absolute; top: 8px; right: 8px; z-index: 1; }
+.login-sheet > .card { box-shadow: none; border: 0; padding: 4px 0 0; }
+.sheet-backdrop { z-index: 30; }
+.save-prompt { text-align: center; }
+.save-prompt p.muted { max-width: 38ch; margin: 0 auto 14px; }
+
+/* Grape Bot message box grows with the text */
+.composer { align-items: flex-end; }
+.composer textarea {
+  flex: 1;
+  min-height: 44px;
+  max-height: 132px;
+  resize: none;
+  border-radius: 22px;
+  padding: 10px 16px;
+  line-height: 1.4;
+  overflow-y: auto;
+}
+.composer .primary { flex-shrink: 0; min-height: 44px; }
+.composer .counter { right: 104px; bottom: 0; }
+
+/* Quiz levels */
+.quiz-levels { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.quiz-level {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+  cursor: pointer;
+  min-height: 64px;
+}
+.quiz-level:hover { border-color: var(--accent); }
+.quiz-level > span:last-child { display: flex; flex-direction: column; }
+.quiz-level.pro { border-color: #8a5bb5; background: color-mix(in srgb, #8a5bb5 10%, var(--surface-2)); }
+.lvl-emoji { font-size: 1.8rem; }
+.quiz-verdict { font-size: 1.05rem; max-width: 34ch; margin: 4px auto 14px; }
+.link.inline { padding: 0; font-weight: 700; font-size: inherit; }
+
+/* World map */
+.world-map { width: 100%; height: auto; display: block; margin: 8px 0 4px; }
+.world-map path { stroke: var(--surface); stroke-width: 0.5; cursor: pointer; transition: opacity 0.15s; }
+.world-map path.none { fill: var(--border); }
+.world-map path.picked { stroke: var(--text); stroke-width: 1.4; }
+.world-map path:hover { opacity: 0.8; }
+.map-skeleton { aspect-ratio: 2 / 1; border-radius: 12px; background: var(--surface-2); margin: 8px 0; }
+.map-readout { min-height: 1.5em; margin: 4px 0 8px; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 0.75rem; color: var(--muted); margin-bottom: 10px; }
+.map-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.map-legend i { width: 14px; height: 10px; border-radius: 3px; display: inline-block; }
+.map-legend i.none { background: var(--border); }
+.map-top { list-style: none; padding: 0; margin: 0 0 8px; display: flex; flex-direction: column; gap: 4px; }
+.map-top button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: none;
+  padding: 4px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-align: left;
+}
+.map-top button.on { background: var(--accent-soft); }
+.map-top i { height: 10px; border-radius: 999px; display: block; }
+.map-top b { font-size: 0.8rem; }
