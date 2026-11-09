@@ -57,10 +57,29 @@ function parseBody(body: unknown): { messages: Turn[]; favourite: string | null 
   return { messages: turns, favourite: fav };
 }
 
+// Tried in order, so a retired model doesn't take Grape Bot down.
+const FALLBACK_MODELS = [
+  "@cf/meta/llama-3.1-8b-instruct",
+  "@cf/meta/llama-3.2-3b-instruct",
+  "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+];
+
 async function askWorkersAI(env: Env, messages: { role: string; content: string }[]): Promise<string> {
-  const model = (env.WORKERS_AI_MODEL || "@cf/meta/llama-3.1-8b-instruct") as Parameters<Ai["run"]>[0];
-  const result = (await env.AI.run(model, { messages, max_tokens: 200 } as never)) as { response?: string };
-  return result?.response?.trim() ?? "";
+  if (!env.AI) throw new Error("Workers AI binding 'AI' is missing on this Pages project");
+  const models = [...new Set([env.WORKERS_AI_MODEL, ...FALLBACK_MODELS].filter(Boolean) as string[])];
+  let lastError: unknown;
+  for (const model of models) {
+    try {
+      const result = (await env.AI.run(model as Parameters<Ai["run"]>[0], { messages, max_tokens: 200 } as never)) as {
+        response?: string;
+      };
+      return result?.response?.trim() ?? "";
+    } catch (error) {
+      lastError = error;
+      console.error(`Workers AI model ${model} failed:`, error);
+    }
+  }
+  throw lastError;
 }
 
 async function askOpenRouter(env: Env, messages: { role: string; content: string }[]): Promise<string> {
@@ -108,7 +127,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   } catch (error) {
     console.error("Grape Bot error:", error);
     return json(
-      { reply: "I'm all out of grape juice for now (the free AI limit may be used up). Try again later! 🍇" },
+      {
+        reply: "I'm all out of grape juice for now (the free AI limit may be used up). Try again later! 🍇",
+        // Short reason for debugging (no secrets): shows up in the network tab.
+        error: error instanceof Error ? error.message.slice(0, 200) : String(error).slice(0, 200),
+      },
       200,
     );
   }

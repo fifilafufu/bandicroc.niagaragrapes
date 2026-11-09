@@ -7,6 +7,11 @@ create table if not exists public.favourites (
   updated_at timestamptz not null default now()
 );
 
+-- Let logged-in users reach the table through the Data API (works even when
+-- "Automatically expose new tables" is off). Logged-out visitors get nothing.
+grant select, insert, update, delete on public.favourites to authenticated;
+revoke all on public.favourites from anon;
+
 -- Row-level security: the database itself blocks access to other users' rows.
 alter table public.favourites enable row level security;
 
