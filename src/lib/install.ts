@@ -146,15 +146,17 @@ export function guideFor(os: OS, browser: Browser): Guide {
   }
 
   if (os === "android") {
-    if (browser === "duckduckgo" || browser === "other") return notSupported("Chrome");
-    if (browser === "firefox")
-      return { label, supported: true, steps: ["Tap the menu ⋮ (top or bottom right).", "Tap “Install” or “Add to Home screen”."] };
+    // Only Chrome, Edge and Samsung Internet reliably install a real full-screen app on Android.
+    // DuckDuckGo, Brave and others often just make a home-screen shortcut that opens the browser.
+    if (browser !== "chrome" && browser !== "edge" && browser !== "samsung") return notSupported("Chrome");
     return {
       label,
       supported: true,
       steps: [
+        "Already have a Niagara Grapes icon that opens with the browser bar? Long-press it → Remove, first.",
         "Tap the menu ⋮ (top right; in Samsung Internet it's ≡ at the bottom).",
-        "Tap “Install app” or “Add to Home screen”, then “Install”.",
+        "Tap “Install app” (or “Add to Home screen”).",
+        "If it asks “Install” or “Create shortcut”, choose INSTALL. A shortcut opens in the browser; Install opens full screen.",
       ],
     };
   }

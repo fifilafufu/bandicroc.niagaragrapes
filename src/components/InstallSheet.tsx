@@ -65,7 +65,8 @@ export default function InstallSheet({ onClose }: { onClose: () => void }) {
         ) : (
           <>
             <p>
-              <b>{guide.label}</b> can't install apps from websites.
+              <b>{guide.label}</b> can't install this as a real full-screen app. At most it makes a shortcut that opens
+              the browser.
             </p>
             <ol className="steps">
               <li>Tap “Copy link” below.</li>
