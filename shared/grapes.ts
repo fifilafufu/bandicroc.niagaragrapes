@@ -108,16 +108,21 @@ export const GENERAL_FACTS = [
 
 // Extra Wikipedia articles for common general topics (all checked to exist). Matched on the question's words.
 export const TOPICS: { wiki: string; keywords: string[] }[] = [
-  { wiki: "Winemaking", keywords: ["wine is made", "make wine", "making wine", "winemaking", "ferment", "wino", "robi się wino"] },
+  { wiki: "Winemaking", keywords: ["wine is made", "wine made", "made into wine", "make wine", "making wine", "winemaking", "ferment", "robi się wino", "produkcja wina"] },
   { wiki: "Raisin", keywords: ["raisin", "currant", "dried grape", "rodzyn"] },
   { wiki: "Viticulture", keywords: ["vineyard", "grow grapes", "growing grapes", "plant grapes", "prune", "vine", "uprawa", "winnic"] },
-  { wiki: "Grape juice", keywords: ["juice", "sok"] },
+  { wiki: "Grape juice", keywords: ["juice", "sok", "soku"] },
   { wiki: "Twelve Grapes", keywords: ["new year", "twelve grapes", "12 grapes", "sylwester", "nowy rok"] },
   { wiki: "Dionysus", keywords: ["dionysus", "bacchus", "god of wine", "myth", "bóg wina"] },
   { wiki: "History of wine", keywords: ["history", "ancient", "oldest", "historia", "starożyt"] },
 ];
 
 export const wikiUrl = (title: string) => `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
+
+// Whole-word (or word-start) match, so "wino" doesn't match inside "winogrona".
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+export const mentions = (text: string, keyword: string) =>
+  new RegExp(`(^|[^\\p{L}])${escapeRegExp(keyword)}`, "u").test(text);
 
 export const findGrape = (name: string | null | undefined) =>
   GRAPES.find((g) => g.name.toLowerCase() === (name ?? "").toLowerCase()) ?? null;

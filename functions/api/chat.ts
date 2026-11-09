@@ -4,7 +4,7 @@
 // Usage is kept low on purpose: only the intro of 1–2 matching articles is sent, Wikipedia
 // intros are cached for 24 h, only the last 6 messages are sent, and answers are capped.
 
-import { GRAPES, GENERAL_FACTS, GENERAL_GRAPE_ARTICLE, TOPICS, findGrape, findGrapeByWiki, wikiUrl } from "../../shared/grapes";
+import { GRAPES, GENERAL_FACTS, GENERAL_GRAPE_ARTICLE, TOPICS, findGrape, findGrapeByWiki, mentions, wikiUrl } from "../../shared/grapes";
 
 interface Env {
   AI: Ai;
@@ -63,7 +63,7 @@ function pickArticles(messages: Turn[], favourite: string | null): string[] {
   const titles: string[] = [];
   const add = (t: string) => !titles.includes(t) && titles.length < MAX_ARTICLES && titles.push(t);
 
-  const matchIn = (text: string) => GRAPES.filter((g) => g.keywords.some((k) => text.includes(k)));
+  const matchIn = (text: string) => GRAPES.filter((g) => g.keywords.some((k) => mentions(text, k)));
 
   // Grapes named in the latest question; if none, the previous question (follow-ups like "where is it grown?").
   let matches = matchIn(latest);
@@ -77,7 +77,7 @@ function pickArticles(messages: Turn[], favourite: string | null): string[] {
   }
 
   // General topics (wine-making, raisins, history, New Year…) get their own article.
-  TOPICS.filter((t) => t.keywords.some((k) => latest.includes(k))).forEach((t) => add(t.wiki));
+  TOPICS.filter((t) => t.keywords.some((k) => mentions(latest, k))).forEach((t) => add(t.wiki));
 
   if (!titles.length) add(GENERAL_GRAPE_ARTICLE);
   return titles;
