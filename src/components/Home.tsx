@@ -2,6 +2,9 @@ import { useState } from "react";
 import { wikiUrl } from "../../shared/grapes";
 import { readPref, writePref } from "../lib/prefs";
 import GrapeGallery from "./GrapeGallery";
+import ColourCompare from "./visuals/ColourCompare";
+import GrapeAnatomy from "./visuals/GrapeAnatomy";
+import UsesTree from "./visuals/UsesTree";
 
 // Short checked facts for the "Did you know?" card.
 const DID_YOU_KNOW = [
@@ -174,10 +177,14 @@ export default function Home({ onChat, onMyGrapes, onAsk }: { onChat: () => void
         ))}
       </section>
 
-      {SECTIONS.map((s) => [
-        <Topic key={s.title} s={s} />,
-        s.title === "Types & colours" ? <GrapeGallery key="gallery" onAsk={onAsk} /> : null,
-      ])}
+      {SECTIONS.map((s) => {
+        // Some topics are shown as pictures and numbers instead of text.
+        if (s.title === "Types & colours")
+          return [<ColourCompare key="colours" />, <GrapeGallery key="gallery" onAsk={onAsk} />];
+        if (s.title === "What we use them for") return <UsesTree key="uses" />;
+        if (s.title === "What is a grape?") return [<Topic key={s.title} s={s} />, <GrapeAnatomy key="anatomy" />];
+        return <Topic key={s.title} s={s} />;
+      })}
 
       <article className="card spotlight">
         <div>

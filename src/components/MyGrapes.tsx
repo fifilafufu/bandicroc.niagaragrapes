@@ -39,7 +39,7 @@ function SignedOut() {
         <h2>🧺 Your grapes, on every device</h2>
         <ul className="ticks">
           <li>Pick your favourite grape and read about it</li>
-          <li>Keep a private 🤫 secret message</li>
+          <li>Keep private 📝 notes about grapes</li>
           <li>Log in on your phone and computer: they stay in sync</li>
         </ul>
         <p className="muted small">Free. Just an email and a password. Grape Bot and the grape pages work without an account.</p>
@@ -75,16 +75,21 @@ function SignedIn(props: Props & { user: User }) {
     <>
       <details
         className="card collapsible"
-        open={pickerOpen}
+        open={!favourite || pickerOpen}
         onToggle={(e) => {
           const open = (e.currentTarget as HTMLDetailsElement).open;
           if (open !== pickerOpen) touched.current = true;
           setPickerOpen(open);
         }}
       >
-        <summary>
+        <summary
+          onClick={(e) => {
+            // Nothing picked yet: keep the choices visible.
+            if (!favourite) e.preventDefault();
+          }}
+        >
           <span>🍇 Favourite grape</span>
-          <span className={`fav-choice ${favourite ? "" : "none"}`}>{favourite ?? "Tap to pick"}</span>
+          <span className={`fav-choice ${favourite ? "" : "none"}`}>{favourite ?? "Pick one below"}</span>
         </summary>
         <p className="muted small">Saved to your account. Change it here and your other devices update live.</p>
         <div className="grape-grid">
@@ -110,7 +115,8 @@ function SignedIn(props: Props & { user: User }) {
   );
 }
 
-// A private note only this account can read, synced live to every device it's logged in on.
+// "Notes about grapes": a private notebook only this account can read, synced live to every device.
+// (Stored in the secret_messages table, its original name.)
 function SecretMessage({ secret, missing, save }: { secret: Secret | null; missing: boolean; save: Props["saveSecret"] }) {
   const saved = secret?.message ?? "";
   const [draft, setDraft] = useState<string | null>(null); // null = not editing, show the synced text
@@ -134,12 +140,12 @@ function SecretMessage({ secret, missing, save }: { secret: Secret | null; missi
 
   return (
     <section className="card">
-      <h2>🤫 Secret message</h2>
+      <h2>📝 Notes about grapes</h2>
       {missing ? (
-        <p className="muted">The secret message isn't available right now.</p>
+        <p className="muted">Notes aren't available right now.</p>
       ) : (
         <>
-          <p className="muted small">Only you can read this. It syncs to every device you're logged in on.</p>
+          <p className="muted small">Your private grape notebook: tastings, favourites to try, facts you learned. Only you can read it, and it syncs to every device you're logged in on.</p>
           <form onSubmit={submit}>
             <textarea
               className="secret-box"
@@ -148,9 +154,9 @@ function SecretMessage({ secret, missing, save }: { secret: Secret | null; missi
                 setDraft(e.target.value);
                 setMsg(null);
               }}
-              placeholder="Write something only you will see…"
+              placeholder="e.g. Tried Cotton Candy grapes today: really do taste like candy! Next: find Muscat…"
               maxLength={SECRET_MAX}
-              aria-label="Secret message"
+              aria-label="Notes about grapes"
             />
             <div className="secret-meta">
               <span className="muted small">
