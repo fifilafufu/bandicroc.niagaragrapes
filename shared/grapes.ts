@@ -92,6 +92,38 @@ export const GRAPES: Grape[] = [
   },
 ];
 
+// Added so every grape skin colour has a real example (facts from each Wikipedia article).
+GRAPES.push(
+  {
+    name: "Shine Muscat",
+    wiki: "Shine Muscat",
+    keywords: ["shine muscat"],
+    facts:
+      "Yellowish-green Japanese table grape, registered in 2006, bred from Muscat of Alexandria and the very sugary American grape Steuben. Large and sweet with a muscat aroma; with treatment it grows seedless and the whole skin can be eaten.",
+  },
+  {
+    name: "Scuppernong",
+    wiki: "Scuppernong",
+    keywords: ["scuppernong", "muscadine"],
+    facts:
+      "A large muscadine grape (Vitis rotundifolia) native to the southern United States. Usually greenish or bronze (the closest a grape gets to orange), round and larger than common grapes, with a thick, tough skin.",
+  },
+  {
+    name: "Gewürztraminer",
+    wiki: "Gewürztraminer",
+    keywords: ["gewürztraminer", "gewurztraminer", "gewürz", "gewurz", "traminer"],
+    facts:
+      "Aromatic wine grape with a pink to red skin, yet used for white wines. High natural sugar; its usually off-dry wines smell strongly of lychees (they share the same aroma compounds). Grows best in cooler climates.",
+  },
+  {
+    name: "Kyoho",
+    wiki: "Kyoho (grape)",
+    keywords: ["kyoho"],
+    facts:
+      "Japanese table grape, blackish-purple to almost black, with very sweet, juicy flesh, mild acidity and large bitter seeds. Slip-skin like Concord, with some Concord-like flavour; usually peeled and eaten as a dessert. Popular in Japan, Taiwan, China and Korea.",
+  },
+);
+
 export const GENERAL_GRAPE_ARTICLE = "Grape";
 
 // Checked facts about grapes in general (from the full Wikipedia "Grape", "History of wine" and

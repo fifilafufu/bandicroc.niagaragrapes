@@ -45,7 +45,7 @@ const SECTIONS: Section[] = [
     title: "Types & colours",
     body: [
       "Not just white and black! Ripe grapes can be crimson, black, dark blue, yellow, green, orange or pink. \"White\" grapes are really green: they're purple grapes with the pigment genes switched off.",
-      "There are thousands of varieties. The big split is table grapes (for eating, often seedless) and wine grapes. Below are 12 to meet.",
+      "There are thousands of varieties. The big split is table grapes (for eating, often seedless) and wine grapes. Meet some of them below.",
     ],
     wiki: [{ label: "Grape", title: "Grape" }],
   },
@@ -180,7 +180,7 @@ export default function Home({ onChat, onMyGrapes, onAsk }: { onChat: () => void
       {SECTIONS.map((s) => {
         // Some topics are shown as pictures and numbers instead of text.
         if (s.title === "Types & colours")
-          return [<ColourCompare key="colours" />, <GrapeGallery key="gallery" onAsk={onAsk} />];
+          return [<ColourCompare key="colours" onAsk={onAsk} />, <GrapeGallery key="gallery" onAsk={onAsk} />];
         if (s.title === "What we use them for") return <UsesTree key="uses" />;
         if (s.title === "What is a grape?") return [<Topic key={s.title} s={s} />, <GrapeAnatomy key="anatomy" />];
         return <Topic key={s.title} s={s} />;

@@ -1,19 +1,37 @@
+import { useEffect, useState } from "react";
 import Bunch from "./Bunch";
-import { wikiUrl } from "../../../shared/grapes";
+import { findGrape, wikiUrl } from "../../../shared/grapes";
+import { fetchSummary } from "../../lib/wiki";
 
 // Facts: Wikipedia "Grape" (colours, white grapes derive from purple via two genes) and
 // "Vitis vinifera" (5,000–10,000 varieties as of 2012; more than 3,000 white cultivars).
+// One real grape for each colour (all in the gallery; colours from their Wikipedia articles).
 const COLOURS = [
-  { name: "Green", hex: "#9fc24a" },
-  { name: "Yellow", hex: "#e6cf4c" },
-  { name: "Orange", hex: "#e3913a" },
-  { name: "Pink", hex: "#e79bb0" },
-  { name: "Crimson", hex: "#b0243c" },
-  { name: "Dark blue", hex: "#2f3f7a" },
-  { name: "Black", hex: "#241a2e" },
+  { name: "Green", hex: "#9fc24a", grape: "Niagara" },
+  { name: "Yellow", hex: "#e6cf4c", grape: "Shine Muscat" },
+  { name: "Orange", hex: "#e3913a", grape: "Scuppernong", note: "bronze" },
+  { name: "Pink", hex: "#e79bb0", grape: "Gewürztraminer" },
+  { name: "Crimson", hex: "#b0243c", grape: "Red Globe" },
+  { name: "Dark blue", hex: "#2f3f7a", grape: "Concord" },
+  { name: "Black", hex: "#241a2e", grape: "Kyoho" },
 ];
 
-export default function ColourCompare() {
+export default function ColourCompare({ onAsk }: { onAsk: (question: string) => void }) {
+  const [photos, setPhotos] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancelled = false;
+    for (const c of COLOURS) {
+      const g = findGrape(c.grape);
+      if (g)
+        fetchSummary(g.wiki).then((s) => {
+          if (!cancelled && s?.thumbnail) setPhotos((p) => ({ ...p, [c.grape]: s.thumbnail!.source }));
+        });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="card visual">
       <h2>🎨 “White” vs “black” grapes</h2>
@@ -60,14 +78,27 @@ export default function ColourCompare() {
         </div>
       </div>
 
-      <div className="swatches" role="list" aria-label="Grape skin colours">
+      <h3 className="swatch-title">One grape for every colour</h3>
+      <div className="swatches" role="list" aria-label="Grape skin colours, each with an example grape">
         {COLOURS.map((c) => (
-          <div key={c.name} role="listitem">
-            <i style={{ background: c.hex }} />
-            <span>{c.name}</span>
-          </div>
+          <button
+            key={c.name}
+            role="listitem"
+            className="swatch"
+            style={{ ["--sw" as string]: c.hex }}
+            onClick={() => onAsk(`Tell me about ${c.grape} grapes`)}
+            aria-label={`${c.name}: ${c.grape}. Ask Grape Bot about it`}
+          >
+            <i>{photos[c.grape] && <img src={photos[c.grape]} alt="" />}</i>
+            <b>{c.name}</b>
+            <span>
+              {c.grape.replace("Gewürztraminer", "Gewürz­traminer")}
+              {c.note && <em> ({c.note})</em>}
+            </span>
+          </button>
         ))}
       </div>
+      <p className="muted small">Tap a colour to ask Grape Bot about that grape.</p>
 
       <p className="sources-line">
         <a href={wikiUrl("Grape")} target="_blank" rel="noreferrer">

@@ -28,6 +28,8 @@ const CASES = [
   { q: "what do concord grapes taste like", must: [/sweet|foxy|musk/i], source: "Concord grape" },
   { q: "is cabernet sauvignon a sweet white wine?", must: [/red|tannin/i] },
   { q: "what is thompson seedless", must: [/seedless|raisin|sultana/i], source: "Sultana (grape)" },
+  { q: "what colour are kyoho grapes", must: [/black|purple/i], source: "Kyoho (grape)" },
+  { q: "what does gewürztraminer smell like", must: [/lychee/i], source: "Gewürztraminer" },
   // Follow-up understanding
   { history: ["What is Pinot noir?", "Pinot noir is a red wine grape."], q: "Where is it grown?", must: [/burgundy|france|oregon|california|new zealand/i], source: "Pinot noir" },
   // Polish
