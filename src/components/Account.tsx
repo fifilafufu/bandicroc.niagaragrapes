@@ -179,6 +179,7 @@ function SecretMessage({ secret, missing, save }: { secret: Secret | null; missi
               placeholder="Write something only you will see…"
               maxLength={1000}
               aria-label="Secret message"
+              className="secret-box"
             />
             <div className="secret-meta">
               <span className="muted small">
@@ -253,9 +254,9 @@ function Profile(props: Omit<Props, "ready" | "user"> & { user: User }) {
         {error && <p className="notice">{error}</p>}
       </details>
 
-      {findGrape(favourite) && <GrapeCard grape={findGrape(favourite)!} />}
-
       <SecretMessage secret={props.secret} missing={props.secretMissing} save={props.saveSecret} />
+
+      {findGrape(favourite) && <GrapeCard grape={findGrape(favourite)!} />}
 
       <details className="card collapsible">
         <summary>

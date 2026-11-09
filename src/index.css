@@ -369,3 +369,11 @@ details.collapsible[open] > summary { margin-bottom: 8px; }
   text-overflow: ellipsis;
 }
 .fav-choice.none { background: var(--accent-soft); color: var(--accent-strong); }
+
+/* The secret message gets most of the screen; the cards around it fold up to make room. */
+.secret-box {
+  min-height: 42dvh;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  padding: 14px 16px;
+}
