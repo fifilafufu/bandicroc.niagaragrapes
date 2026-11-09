@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
+import { friendlyError } from "./errors";
 
 export type Secret = { message: string; updatedAt: string | null };
 
@@ -80,7 +81,7 @@ export function useAuthAndFavourite() {
       const { error } = await supabase
         .from("favourites")
         .upsert({ user_id: user.id, grape, updated_at: new Date().toISOString() });
-      if (error) return error.message;
+      if (error) return friendlyError(error.message);
       setFavourite(grape);
       return null;
     },
@@ -94,7 +95,7 @@ export function useAuthAndFavourite() {
       const { error } = await supabase
         .from("secret_messages")
         .upsert({ user_id: user.id, message: message.slice(0, 1000), updated_at: updatedAt });
-      if (error) return error.message;
+      if (error) return friendlyError(error.message);
       setSecret({ message, updatedAt });
       return null;
     },

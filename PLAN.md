@@ -48,7 +48,7 @@ We build one web app and make it a **PWA** (installable web app). There's one co
 | iPhone | Safari | Share → "Add to Home Screen" |
 | Windows | Edge / Chrome | Address bar → "Install" |
 
-App stores: **Apple** ($99/yr) and **Google Play** ($25) are **out**. The **Microsoft Store** is free for individual developers (confirm when signing up). It's optional, after the deadline.
+App stores: **none**. Apple ($99/yr) and Google Play ($25) are out, and the Microsoft Store was dropped (2026-11-09). Everyone installs from the browser.
 
 ## Tech stack (all free tiers)
 
@@ -144,3 +144,51 @@ Today the install hint is a small card at the bottom of the home page, and it on
 | Windows Firefox | "Can't install apps" → open in Edge or Chrome |
 
 I can test the sheet by imitating each browser in my browser pane. The real install on each phone still needs a tester to try it.
+
+---
+
+## Phase 3: grapes in general, My Grapes, Settings, "ready for the world" (proposed 2026-11-09)
+
+### New structure (4 tabs)
+
+| Tab | What's in it |
+|---|---|
+| **🍇 Grapes** (home) | About grapes in general, not just Niagara: what a grape is, **history** (one of the oldest cultivated fruits), **where they're grown**, **what they're used for** (fresh, raisins, juice, jelly, wine, vinegar, grape-seed oil), **meaning & traditions** (abundance and harvest symbols, Dionysus/Bacchus, wine in religious rites, Spain's "12 grapes" at New Year), **table vs wine grapes**. Niagara keeps a small "Grape Bot's favourite" spotlight card. Every section has a 📖 Wikipedia link, and all facts are checked against Wikipedia while building. |
+| **💬 Grape Bot** | Unchanged. |
+| **🧺 My Grapes** | Your favourite grape (folded row) + its Wikipedia card, the big 🤫 secret message, and 📖 Learn about each grape. When logged out: a short "Log in to save your favourite and your secret message" card with the login form, not a bare form. |
+| **⚙️ Settings** | The "ugly stuff": account (email, change password, log out), 📲 Get app / install help, theme (System / Light / Dark), a "What we store" privacy note, and the app version. |
+
+The **📲 Get app** button leaves the top bar (less cramped on phones) and lives in Settings, plus the one-time tip on phones.
+
+### Quality of life, checked against "works for me" vs "ready for the world"
+
+**1. Opens from a public link**
+- **Link previews:** title, description and grape image show up when the link is pasted into Messenger, WhatsApp or Discord (Open Graph tags).
+- **Share app button** in Settings: uses the phone's share sheet, or copies the link on a computer.
+- **QR code** in Settings so a tester can point their phone at your screen.
+
+**2. Works in private mode and on someone else's phone**
+- Everything except saving works **without logging in** (home page, Grape Bot, learning).
+- Private mode: login lasts until the private window closes. Nothing breaks when the browser blocks storage; this is already handled.
+- **Someone else's phone:** a clear **Log out on this device** button in Settings, and logging out also clears the chat on that device.
+- **Offline banner:** "You're offline. Grape Bot needs internet" instead of a vague error.
+
+**3. Handles an empty field and long text**
+- **Friendly errors** instead of raw Supabase messages, e.g. "Invalid login credentials" becomes "Wrong email or password."
+- **Clear field checks:** empty email, too-short password, and an email that's already registered each get their own plain message.
+- **Character counters:** chat (500) and secret message (1000) show "432 / 1000" near the limit.
+- **Long text never breaks the layout:** long words, emails and grape names wrap or shorten with "…". This will be tested with a 1,000-character message.
+- **No double-saves:** buttons are disabled while saving, with clear "Saving…" then "Saved ✓".
+
+**4. A stranger knows what to click, without instructions**
+- **Welcome card** on first visit: 3 lines ("Learn about grapes · Ask Grape Bot · Save your favourite"), dismissible.
+- **Clear tab names with icons** (Grapes · Grape Bot · My Grapes · Settings).
+- **Empty states that say what to do**, e.g. "No favourite yet: tap to pick one."
+- **Enter sends** a chat message, and the suggestion chips stay as examples.
+- **Tap targets at least 44px** (Apple/Google guidance) and readable contrast in light and dark mode.
+
+### Optional (say if you want it)
+- **Polish UI:** an English / Polski switch for all app text. Grape Bot already answers in Polish when you write in Polish.
+
+### Testing before calling it "ready for the world"
+I'll go through a checklist on the live link: private window, logged out, empty submits, a 1,000-character secret, the "stranger" route through the tabs, and phone size. Testing on a real iPhone and Android still needs your testers.

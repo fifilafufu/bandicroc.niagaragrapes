@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import Counter from "./Counter";
 
 type Source = { title: string; url: string };
 export type Msg = { role: "user" | "assistant"; content: string; sources?: Source[] };
@@ -132,6 +133,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages }: Pro
         <button className="primary" disabled={busy || !input.trim()}>
           Send
         </button>
+        <Counter length={input.length} max={500} />
       </form>
     </div>
   );

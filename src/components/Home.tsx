@@ -1,43 +1,182 @@
-const FACTS = [
-  { emoji: "🗽", title: "Born in New York", text: "Bred in 1868 in Lockport, Niagara County, by crossing Concord with Cassady." },
-  { emoji: "🍬", title: "Green-gold & sweet", text: "A white (green) grape with a sweet, foxy, candy-like flavour and slip-skin." },
-  { emoji: "🧃", title: "Juice & jelly star", text: "The leading green grape grown in the US, used for juice, jelly, wine and eating fresh." },
-  { emoji: "❄️", title: "Tough vines", text: "A hardy grape that handles cold winters around the Great Lakes." },
+import { useState } from "react";
+import { wikiUrl } from "../../shared/grapes";
+import { readPref, writePref } from "../lib/prefs";
+
+// Every fact below was checked against the linked Wikipedia articles (November 2026).
+const STATS = [
+  { value: "8,000", label: "years of growing grapes" },
+  { value: "72.5M", label: "tonnes grown in 2023" },
+  { value: "71%", label: "of grapes become wine" },
+  { value: "15–300", label: "grapes per bunch" },
 ];
 
-export default function Home({ onChat, onGetApp }: { onChat: () => void; onGetApp: (() => void) | null }) {
+type Section = { emoji: string; title: string; body: string[]; wiki: { label: string; title: string }[] };
+
+const SECTIONS: Section[] = [
+  {
+    emoji: "🌿",
+    title: "What is a grape?",
+    body: [
+      "Botanically, a grape is a berry. It grows in bunches of 15 to 300 on woody vines of the genus Vitis.",
+      "Most grapes we eat and drink come from one species, Vitis vinifera, native to the Mediterranean and Central Asia. North America has its own wild species, like Vitis labrusca (the family of Concord and Niagara).",
+    ],
+    wiki: [{ label: "Grape", title: "Grape" }],
+  },
+  {
+    emoji: "🏺",
+    title: "A very old fruit",
+    body: [
+      "People have grown grapes for about 8,000 years, starting in the Middle East.",
+      "The earliest known traces of wine come from near Tbilisi, Georgia (around 6000 BCE), and the oldest known winery, Areni-1 in Armenia, is from around 4100 BCE. Ancient Egyptians, Greeks, Phoenicians and Romans all grew grapes.",
+    ],
+    wiki: [
+      { label: "Grape", title: "Grape" },
+      { label: "History of wine", title: "History of wine" },
+    ],
+  },
+  {
+    emoji: "🌍",
+    title: "Where they grow",
+    body: [
+      "In 2023 the world grew 72.5 million tonnes of grapes. China grew the most (19%), with Italy and France also major growers.",
+      "Peru and Chile were the biggest exporters, each shipping more than half a million tonnes.",
+    ],
+    wiki: [{ label: "Grape: production", title: "Grape" }],
+  },
+  {
+    emoji: "🍷",
+    title: "What we use them for",
+    body: [
+      "About 71% of the world's grapes become wine, 27% are eaten fresh and 2% are dried into raisins, currants and sultanas.",
+      "Grapes also give us juice, jam and jelly, vinegar and grape-seed oil.",
+    ],
+    wiki: [
+      { label: "Grape", title: "Grape" },
+      { label: "Raisin", title: "Raisin" },
+    ],
+  },
+  {
+    emoji: "🍇",
+    title: "Table grapes vs wine grapes",
+    body: [
+      "Table grapes are bred for eating: usually large, seedless and thin-skinned. Wine grapes are picked very sweet, at about 24% sugar.",
+      "The most widely planted grape is believed to be the Sultana, also called Thompson Seedless.",
+    ],
+    wiki: [{ label: "Grape: table and wine grapes", title: "Grape" }],
+  },
+  {
+    emoji: "✨",
+    title: "Meaning & traditions",
+    body: [
+      "In ancient Greece, Dionysus was the god of wine-making, fruit, fertility and festivity; the Romans called him Bacchus.",
+      "In Spain, people eat twelve grapes at midnight on New Year's Eve, one for each bell strike, for luck in each coming month. The custom was popularised in 1909 by grape growers with a huge harvest to sell.",
+    ],
+    wiki: [
+      { label: "Dionysus", title: "Dionysus" },
+      { label: "Twelve Grapes", title: "Twelve Grapes" },
+    ],
+  },
+  {
+    emoji: "🥗",
+    title: "Nutrition",
+    body: ["Raw grapes are 81% water and 18% carbohydrates. 100 g has about 69 kcal and some vitamin K."],
+    wiki: [{ label: "Grape: nutrition", title: "Grape" }],
+  },
+];
+
+const WELCOME_KEY = "welcome-dismissed";
+
+export default function Home({ onChat, onMyGrapes }: { onChat: () => void; onMyGrapes: () => void }) {
+  const [welcome, setWelcome] = useState(() => readPref(WELCOME_KEY) !== "1");
+  const closeWelcome = () => {
+    setWelcome(false);
+    writePref(WELCOME_KEY, "1");
+  };
+
   return (
     <div className="stack">
-      <section className="hero card">
-        <img className="hero-grapes" src="/favicon.svg" alt="" width={84} height={84} />
-        <h1>Niagara grapes</h1>
-        <p>The sweet green grape of the Great Lakes, and Grape Bot's one true love.</p>
-        <button className="primary" onClick={onChat}>
-          💬 Ask Grape Bot
-        </button>
-      </section>
-
-      <section className="facts">
-        {FACTS.map((f) => (
-          <article key={f.title} className="card fact">
-            <span className="emoji" aria-hidden="true">{f.emoji}</span>
-            <div>
-              <h2>{f.title}</h2>
-              <p>{f.text}</p>
-            </div>
-          </article>
-        ))}
-      </section>
-
-      {onGetApp && (
-        <section className="card install">
-          <h2>Get the app</h2>
-          <p className="muted">Works on iPhone, Android and Windows. Free, no app store needed.</p>
-          <button className="primary" onClick={onGetApp}>
-            📲 Show me how
+      {welcome && (
+        <section className="card welcome" role="note">
+          <button className="close corner" onClick={closeWelcome} aria-label="Close welcome">
+            ✕
+          </button>
+          <h2>👋 Welcome!</h2>
+          <ol className="welcome-steps">
+            <li>
+              <b>Read</b> about grapes below
+            </li>
+            <li>
+              <b>Ask</b> Grape Bot anything about grapes
+            </li>
+            <li>
+              <b>Save</b> your favourite grape in My Grapes
+            </li>
+          </ol>
+          <button className="secondary" onClick={closeWelcome}>
+            Got it
           </button>
         </section>
       )}
+
+      <section className="hero card">
+        <img className="hero-grapes" src="/favicon.svg" alt="" width={84} height={84} />
+        <h1>Grapes</h1>
+        <p>One of humanity's oldest fruits: eaten fresh, dried, juiced and made into wine for about 8,000 years.</p>
+        <div className="hero-actions">
+          <button className="primary" onClick={onChat}>
+            💬 Ask Grape Bot
+          </button>
+          <button className="secondary" onClick={onMyGrapes}>
+            🧺 My Grapes
+          </button>
+        </div>
+      </section>
+
+      <section className="stats" aria-label="Grapes in numbers">
+        {STATS.map((s) => (
+          <div key={s.label} className="stat card">
+            <b>{s.value}</b>
+            <span>{s.label}</span>
+          </div>
+        ))}
+      </section>
+
+      {SECTIONS.map((s) => (
+        <article key={s.title} className="card topic">
+          <h2>
+            <span aria-hidden="true">{s.emoji}</span> {s.title}
+          </h2>
+          {s.body.map((p) => (
+            <p key={p}>{p}</p>
+          ))}
+          <p className="sources-line">
+            {s.wiki.map((w) => (
+              <a key={w.label} href={wikiUrl(w.title)} target="_blank" rel="noreferrer">
+                📖 {w.label}
+              </a>
+            ))}
+          </p>
+        </article>
+      ))}
+
+      <article className="card spotlight">
+        <div>
+          <p className="eyebrow">Grape Bot's favourite</p>
+          <h2>Niagara 💚</h2>
+          <p>
+            A sweet, green-gold American grape with a musky "foxy" flavour, bred in 1868 in Niagara County, New York, by
+            crossing Concord with Cassady. It's the leading green grape grown in the US.
+          </p>
+          <div className="hero-actions left">
+            <button className="secondary" onClick={onChat}>
+              Ask Grape Bot about it
+            </button>
+            <a href={wikiUrl("Niagara (grape)")} target="_blank" rel="noreferrer">
+              📖 Niagara (grape)
+            </a>
+          </div>
+        </div>
+      </article>
     </div>
   );
 }
