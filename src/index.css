@@ -171,3 +171,19 @@ input {
   border-top: 1px solid var(--border);
   background: var(--surface);
 }
+
+.password-field { position: relative; }
+.password-field input { padding-right: 68px; }
+.reveal {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.success { color: var(--accent); margin-top: 10px; }

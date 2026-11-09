@@ -49,13 +49,10 @@ function LoginForm() {
       <p className="muted">Your favourite grape follows you to every device you log in on.</p>
       <form className="form" onSubmit={submit}>
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-        <input
-          type="password"
-          placeholder="Password (6+ characters)"
+        <PasswordInput
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
+          onChange={setPassword}
+          placeholder="Password (6+ characters)"
           autoComplete={mode === "in" ? "current-password" : "new-password"}
         />
         <button className="primary" disabled={busy}>
@@ -66,6 +63,70 @@ function LoginForm() {
       <button className="link" onClick={() => setMode(mode === "in" ? "up" : "in")}>
         {mode === "in" ? "New here? Create an account" : "Already have an account? Log in"}
       </button>
+    </section>
+  );
+}
+
+// Password field with a show/hide button, so people can check what they typed.
+function PasswordInput(props: { value: string; onChange: (v: string) => void; placeholder: string; autoComplete: string }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="password-field">
+      <input
+        type={visible ? "text" : "password"}
+        placeholder={props.placeholder}
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+        required
+        minLength={6}
+        autoComplete={props.autoComplete}
+      />
+      <button
+        type="button"
+        className="reveal"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+      >
+        {visible ? "Hide" : "Show"}
+      </button>
+    </div>
+  );
+}
+
+// Passwords are stored scrambled (hashed), so nobody can read them back, not even the app.
+// Forgot it? While still logged in on any device, just set a new one here.
+function ChangePassword() {
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!supabase) return;
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    setBusy(false);
+    if (error) setMsg({ ok: false, text: error.message });
+    else {
+      setMsg({ ok: true, text: "New password saved. Use it next time you log in." });
+      setPassword("");
+    }
+  }
+
+  return (
+    <section className="card">
+      <h2>Forgot your password?</h2>
+      <p className="muted">
+        Passwords are stored scrambled, so they can't be shown, not even to us. Set a new one while you're logged in.
+      </p>
+      <form className="form" onSubmit={submit}>
+        <PasswordInput value={password} onChange={setPassword} placeholder="New password (6+ characters)" autoComplete="new-password" />
+        <button className="secondary" disabled={busy}>
+          {busy ? "Saving…" : "Save new password"}
+        </button>
+      </form>
+      {msg && <p className={msg.ok ? "success" : "notice"}>{msg.text}</p>}
     </section>
   );
 }
@@ -102,6 +163,8 @@ function Profile({ user, favourite, saveFavourite }: { user: User; favourite: st
         </div>
         {error && <p className="notice">{error}</p>}
       </section>
+
+      <ChangePassword />
 
       <section className="card">
         <p className="muted">Logged in as {user.email}</p>
