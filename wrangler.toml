@@ -9,5 +9,5 @@ binding = "AI"
 [vars]
 # "workers-ai" (default, free daily allowance) or "openrouter" (backup; needs the OPENROUTER_API_KEY secret)
 AI_PROVIDER = "workers-ai"
-WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
+WORKERS_AI_MODEL = "@cf/meta/llama-4-scout-17b-16e-instruct"
 OPENROUTER_MODEL = "meta-llama/llama-3.3-70b-instruct:free"

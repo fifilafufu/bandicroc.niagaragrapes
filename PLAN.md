@@ -90,3 +90,57 @@ The demo proves it by signing in as two different users. Each one sees only thei
 | 3 | (Backup only) OpenRouter API key | openrouter.ai → Keys | Only if we switch. It goes into Cloudflare's secrets, never into chat or code. |
 
 Groq, Gemini and Vercel are no longer needed. Free-tier terms can change, so if anything asks for a card, stop and tell me.
+
+---
+
+## Phase 2: educational Grape Bot (proposed 2026-11-09)
+
+### New behaviour
+- **Only grapes.** It answers real questions about grapes: varieties, growing, history, uses, nutrition, wine/juice/jelly. Off-topic questions get a polite one-line "I only know about grapes" and a grape suggestion. No more answering everything with "Grapes."
+- **Facts come from live Wikipedia.** Each answer is based on the Wikipedia article(s) for the grape(s) the question is about. The answer ends with source links, e.g. "📖 Wikipedia: Concord grape".
+- **Defensive only when the user says they dislike or hate Niagara grapes.** Otherwise it's a friendly, accurate tutor. It still mentions its love of Niagara grapes when asked its favourite.
+- **Favourite-grape cards.** On the account page, each of the 12 grapes links to its Wikipedia article. The chosen favourite shows a short Wikipedia summary with a photo.
+
+### Wikipedia articles (all checked, all exist)
+Niagara (grape), Concord grape, Catawba (grape), Delaware (grape), Cotton Candy grapes, Sultana (grape) (= Thompson Seedless), Red Globe, Muscat (grape), Chardonnay, Riesling, Pinot noir, Cabernet Sauvignon. "Grape" is used for general questions.
+
+### Keeping usage low (free daily allowance)
+| Choice | Why it saves usage |
+|---|---|
+| Send only the **intro section** of 1–2 matching articles (capped at ~1,500 characters each), not whole articles | The bot reads ~300–800 words instead of thousands |
+| Pick articles by simple name matching in our code (e.g. "concord" → Concord grape), not by asking the AI | No extra AI call per message |
+| **Cache** each Wikipedia intro for 24 h on Cloudflare | Wikipedia is fetched once a day per grape, not on every message |
+| Send only the **last 6 messages** of the chat | Long chats don't grow the cost |
+| Cap answers at ~250 tokens (a short paragraph) | Output is the expensive part |
+| Favourite cards load Wikipedia **directly in the browser** | Uses no AI allowance at all |
+
+**Model:** move from the small Llama 3.1 8B (the "kinda stupid" one) to a mid-size model (Llama 4 Scout 17B on Workers AI). It's much smarter and still cheap. Rough estimate: **~250–350 chats per day** on the free allowance. The existing fallback list (70B, then 8B) stays as a backup, and OpenRouter remains the last resort.
+
+### iPhone
+Already supported and free. Testers open the site in **Safari** → **Share** → **Add to Home Screen**. Notes for iPhone testers:
+- There's no "Install" button on iPhone (Apple doesn't allow one). The app shows these steps instead.
+- The installed app has its own storage, separate from Safari, so testers log in once inside the installed app.
+- Newer iOS versions also let Chrome and Edge add to the home screen, but Safari is the reliable route.
+
+### Easier installing ("Get the app")
+Today the install hint is a small card at the bottom of the home page, and it only knows three cases. Instead:
+
+- **A "Get app" button that's always visible** in the top bar (hidden once installed). Tapping it opens an install sheet.
+- **The sheet detects the device and browser**, then shows only the steps for that exact browser, with a picture-style hint of which button to tap (e.g. an arrow pointing to Safari's Share button at the bottom of the screen).
+- **One-tap install where the browser allows it** (Chrome, Edge, Samsung Internet, Brave on Android; Chrome and Edge on Windows). The sheet shows a big **Install** button.
+- **Honest answers where a browser can't install apps**, e.g. DuckDuckGo, Firefox on Windows, or the browsers built into Instagram and TikTok. The sheet says so plainly and gives **Copy link** plus "Open in Safari/Chrome" instructions, so the tester isn't stuck guessing.
+- **A small one-time tip on phones** ("Add Niagara Grapes to your home screen") that can be dismissed and doesn't come back.
+- **After installing**, the button disappears and the app opens full screen.
+
+| Browser | What the sheet shows |
+|---|---|
+| iPhone Safari | Share ⬆️ (bottom bar) → Add to Home Screen → Add |
+| iPhone Chrome / Edge / Brave | Share ⬆️ (address bar) → Add to Home Screen. If it's missing: Copy link → open in Safari |
+| iPhone DuckDuckGo / Firefox / in-app browsers | "This browser can't add apps" → Copy link → open in Safari |
+| Android Chrome / Edge / Samsung / Brave | **Install** button (one tap). If the browser hides it: menu ⋮ → Install app / Add to Home screen |
+| Android Firefox | menu ⋮ → Install |
+| Android DuckDuckGo | "Can't install apps" → Copy link → open in Chrome |
+| Windows Edge / Chrome / Brave | **Install** button (one tap) |
+| Windows Firefox | "Can't install apps" → open in Edge or Chrome |
+
+I can test the sheet by imitating each browser in my browser pane. The real install on each phone still needs a tester to try it.

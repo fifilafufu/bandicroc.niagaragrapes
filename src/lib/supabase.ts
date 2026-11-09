@@ -11,17 +11,3 @@ export const supabase: SupabaseClient | null =
     ? createClient(url, anonKey, { auth: { persistSession: true, autoRefreshToken: true } })
     : null;
 
-export const GRAPES = [
-  "Niagara",
-  "Concord",
-  "Catawba",
-  "Delaware",
-  "Cotton Candy",
-  "Thompson Seedless",
-  "Red Globe",
-  "Muscat",
-  "Chardonnay",
-  "Riesling",
-  "Pinot Noir",
-  "Cabernet Sauvignon",
-];

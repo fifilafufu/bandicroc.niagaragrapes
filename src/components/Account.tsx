@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import type { User } from "@supabase/supabase-js";
-import { GRAPES, supabase } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
+import { GRAPES, findGrape, wikiUrl } from "../../shared/grapes";
+import GrapeCard from "./GrapeCard";
 
 type Props = {
   user: User | null;
@@ -149,19 +151,35 @@ function Profile({ user, favourite, saveFavourite }: { user: User; favourite: st
           Saved to your account. Change it here and your other devices update live.
         </p>
         <div className="grape-grid">
-          {GRAPES.map((g) => (
+          {GRAPES.map(({ name }) => (
             <button
-              key={g}
-              className={`grape ${favourite === g ? "selected" : ""}`}
-              onClick={() => pick(g)}
+              key={name}
+              className={`grape ${favourite === name ? "selected" : ""}`}
+              onClick={() => pick(name)}
               disabled={saving !== null}
-              aria-pressed={favourite === g}
+              aria-pressed={favourite === name}
             >
-              {saving === g ? "Saving…" : g}
+              {saving === name ? "Saving…" : name}
             </button>
           ))}
         </div>
         {error && <p className="notice">{error}</p>}
+      </section>
+
+      {findGrape(favourite) && <GrapeCard grape={findGrape(favourite)!} />}
+
+      <section className="card">
+        <h2>Learn about each grape</h2>
+        <p className="muted">Every grape here has a Wikipedia article. Grape Bot reads them too.</p>
+        <ul className="wiki-list">
+          {GRAPES.map((g) => (
+            <li key={g.name}>
+              <a href={wikiUrl(g.wiki)} target="_blank" rel="noreferrer">
+                📖 {g.name}
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <ChangePassword />

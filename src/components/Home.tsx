@@ -1,13 +1,11 @@
-import InstallHelp from "./InstallHelp";
-
 const FACTS = [
   { title: "Born in New York", text: "Bred in 1868 in Lockport, Niagara County, by crossing Concord with Cassady." },
   { title: "Green-gold & sweet", text: "A white (green) grape with a sweet, foxy, candy-like flavour and slip-skin." },
-  { title: "Juice & jelly star", text: "The leading white grape for juice and jelly in the US, and great eaten fresh." },
+  { title: "Juice & jelly star", text: "The leading green grape grown in the US, used for juice, jelly, wine and eating fresh." },
   { title: "Tough vines", text: "A hardy grape that handles cold winters around the Great Lakes." },
 ];
 
-export default function Home({ onChat }: { onChat: () => void }) {
+export default function Home({ onChat, onGetApp }: { onChat: () => void; onGetApp: (() => void) | null }) {
   return (
     <div className="stack">
       <section className="hero card">
@@ -15,7 +13,7 @@ export default function Home({ onChat }: { onChat: () => void }) {
         <h1>Niagara grapes</h1>
         <p>The sweet green grape of the Great Lakes, and Grape Bot's one true love.</p>
         <button className="primary" onClick={onChat}>
-          Chat with Grape Bot
+          Ask Grape Bot
         </button>
       </section>
 
@@ -28,7 +26,15 @@ export default function Home({ onChat }: { onChat: () => void }) {
         ))}
       </section>
 
-      <InstallHelp />
+      {onGetApp && (
+        <section className="card install">
+          <h2>Get the app</h2>
+          <p className="muted">Works on iPhone, Android and Windows. Free, no app store needed.</p>
+          <button className="primary" onClick={onGetApp}>
+            📲 Show me how
+          </button>
+        </section>
+      )}
     </div>
   );
 }
