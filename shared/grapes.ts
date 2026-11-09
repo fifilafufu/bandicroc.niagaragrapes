@@ -119,7 +119,8 @@ export const TOPICS: { wiki: string; keywords: string[] }[] = [
 
 export const wikiUrl = (title: string) => `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 
-// Whole-word (or word-start) match, so "wino" doesn't match inside "winogrona".
+// Keywords match at the start of a word ("rodzyn" finds "rodzynki", "juice" doesn't match inside
+// another word). Keep keywords that aren't the start of an unrelated word: e.g. no "wino" (→ "winogrona").
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 export const mentions = (text: string, keyword: string) =>
   new RegExp(`(^|[^\\p{L}])${escapeRegExp(keyword)}`, "u").test(text);
