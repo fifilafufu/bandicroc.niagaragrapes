@@ -1,7 +1,7 @@
 {
   "name": "bandicroc.niagaragrapes",
   "private": true,
-  "version": "1.7.0",
+  "version": "1.8.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "deploy": "npm run build && wrangler pages deploy dist",
-    "test:bot": "node scripts/test-bot.mjs"
+    "test:bot": "node scripts/test-bot.mjs",
+    "test:wine": "node scripts/test-wine.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",

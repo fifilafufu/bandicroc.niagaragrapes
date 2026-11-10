@@ -6,6 +6,8 @@ const ITEMS: { page: Page; label: string }[] = [
   { page: "stats", label: "📊 Statistics" },
   { page: "taste", label: "👅 Taste" },
   { page: "biology", label: "🌱 Biology" },
+  { page: "winemaking", label: "🍷 Winemaking" },
+  { page: "basics", label: "🥂 Wine basics" },
 ];
 
 export default function LearnNav({ page, go }: { page: Page; go: (p: Page) => void }) {

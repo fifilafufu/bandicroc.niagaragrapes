@@ -200,6 +200,7 @@ export default function Home({ onChat, onMyGrapes, onAsk, go }: Props) {
           return [
             <Topic key={s.title} s={s} />,
             <MoreCard key="bio" icon="🌱" title="Biology" text="Grape species, inside a grape, and the vine's year from budbreak to harvest." onOpen={() => go("biology")} />,
+            <MoreCard key="wine" icon="🍷" title="Winemaking & wine basics" text="How red, white, rosé and sparkling wine are made, and what acidity, tannin and body mean." onOpen={() => go("winemaking")} />,
             <MoreCard key="taste" icon="👅" title="Taste" text="Why some grapes taste “foxy”, and which grape tastes of pepper, lychee or grass." onOpen={() => go("taste")} />,
           ];
         return <Topic key={s.title} s={s} />;

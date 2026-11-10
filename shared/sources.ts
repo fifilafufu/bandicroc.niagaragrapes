@@ -76,6 +76,46 @@ export const SOURCES = {
     url: "https://www.vivc.de/",
     checked: "2026-11-10",
   },
+  "oiv-code": {
+    id: "oiv-code",
+    publisher: "OIV",
+    title: "International Code of Oenological Practices",
+    year: 2025,
+    url: "https://www.oiv.int/standards/international-code-of-oenological-practices",
+    checked: "2026-11-10",
+  },
+  "oiv-sugar-alcohol": {
+    id: "oiv-sugar-alcohol",
+    publisher: "OIV",
+    title: "Resolution OENO 466-2012: sugar (g/L) × 0.05943 = potential alcohol (% vol)",
+    year: 2012,
+    url: "https://www.oiv.int/node/3299/download/pdf",
+    checked: "2026-11-10",
+  },
+  "eu-2019-33": {
+    id: "eu-2019-33",
+    publisher: "EU",
+    title: "Regulation 2019/33, Annex III: sweetness terms for wine labels",
+    year: 2019,
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019R0033",
+    checked: "2026-11-10",
+  },
+  "awri-mlf-red": {
+    id: "awri-mlf-red",
+    publisher: "AWRI",
+    title: "Fact sheet: malolactic fermentation in red wine",
+    year: 2024,
+    url: "https://www.awri.com.au/files/attachment/mlf-in-red-wine",
+    checked: "2026-11-10",
+  },
+  "vt-balance": {
+    id: "vt-balance",
+    publisher: "Virginia Tech Enology",
+    title: "Vintner's Corner: wine balance",
+    year: 2002,
+    url: "https://enology.fst.vt.edu/VC/Jan-Feb02.html",
+    checked: "2026-11-10",
+  },
 } satisfies Record<string, Source>;
 
 export type SourceId = keyof typeof SOURCES;

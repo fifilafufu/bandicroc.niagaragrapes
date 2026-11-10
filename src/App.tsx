@@ -21,6 +21,8 @@ const QuizzesPage = lazy(() => import("./components/QuizzesPage"));
 const StatsPage = lazy(() => import("./components/learn/StatsPage"));
 const TastePage = lazy(() => import("./components/learn/TastePage"));
 const BiologyPage = lazy(() => import("./components/learn/BiologyPage"));
+const WinemakingPage = lazy(() => import("./components/learn/WinemakingPage"));
+const WineBasicsPage = lazy(() => import("./components/learn/WineBasicsPage"));
 
 // The main sections, in tab order. "Make Your Wine" joins between Grapes and Quizzes when it's built.
 const TABS: { page: Page; icon: string; label: string }[] = [
@@ -152,6 +154,8 @@ export default function App() {
           {page === "stats" && <StatsPage />}
           {page === "taste" && <TastePage onAsk={ask} />}
           {page === "biology" && <BiologyPage />}
+          {page === "winemaking" && <WinemakingPage />}
+          {page === "basics" && <WineBasicsPage />}
           {page === "quizzes" && <QuizzesPage user={auth.user} onLogin={() => setLogin("in")} />}
           {page === "chat" && (
             <Chat
