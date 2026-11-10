@@ -31,8 +31,9 @@ Build steps in order. Tick a step (`- [x]`) only when its "Done when" checks pas
 - [x] **5.9 Quizzes.** Categories: varieties, biology, statistics, growing, winemaking, wine basics. Types: multiple choice, name the grape from a real photo, put winemaking steps in order (tap to order), match words to meanings, tap the right part of a diagram, number guesses. Questions built from the app's data where possible.
   - Done when: each category has at least one round; every answer links its source; scores sync as before.
   - Built: six categories with a Newbie / Pro switch (your level's questions come first), all six question types, 227 questions (about 140 built from `varietyData.json`, `grow.ts`, `winemaking.ts`, `wineBasics.ts`, `growthCycle.ts`, `species.ts`, `grapeUses.ts` and `wine.ts`). Scores are saved per category (`cat:varieties` …); old per-level scores stay in the table but are no longer shown. Score sync confirmed by the user on 2026-11-10.
-- [ ] **5.10 Grape Bot sources.** The bot answers from the curated data (varieties, growing, winemaking, wine basics) and shows source chips sent by the server; `scripts/test-bot.mjs` updated.
+- [x] **5.10 Grape Bot sources.** The bot answers from the curated data (varieties, growing, winemaking, wine basics) and shows source chips sent by the server; `scripts/test-bot.mjs` updated.
   - Done when: `npm run test:bot` passes against the dev server; no source link in an answer comes from the AI's own text.
+  - Built: `server/grapeBot/knowledge.ts` picks VIVC passports and resistance scores, Grow Your Grape traits, the general Minnesota Extension care, winemaking steps and wine-basics parts that fit the question; the server builds every source chip from `shared/sources.ts`, VIVC or Wikipedia. Variety helpers moved to `shared/varieties.ts`. The test was run against the live site instead (local Workers AI needs a Cloudflare login): 32/32 passed on 2026-11-10, with no links in answer text and only known source links.
 
 ## Phase 6: Polish language (approved 2026-11-10)
 
