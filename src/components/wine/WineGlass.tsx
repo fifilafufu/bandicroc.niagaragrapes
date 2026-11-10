@@ -46,7 +46,7 @@ export default function WineGlass({ core, rim, rimWidth, pressureBar, label }: P
         {bubbles.map((b, i) => (
           <circle
             key={i}
-            className="bubble"
+            className="fizz"
             cx={b.x}
             cy={148}
             r={b.size}

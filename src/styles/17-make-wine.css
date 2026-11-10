@@ -6,7 +6,8 @@
 }
 .wine-glass { width: 100%; max-width: 220px; height: auto; display: block; margin: 0 auto; }
 .glass-outline { fill: none; stroke: var(--muted); stroke-width: 2.5; stroke-linejoin: round; }
-.bubble { fill: rgba(255, 255, 255, 0.75); animation: rise 3s linear infinite; }
+/* "fizz", not "bubble": .bubble is the chat message class, and sharing it made chat messages float. */
+.fizz { fill: rgba(255, 255, 255, 0.75); animation: rise 3s linear infinite; }
 @keyframes rise {
   0% { transform: translateY(0); opacity: 0; }
   10% { opacity: 0.9; }
@@ -14,7 +15,7 @@
   100% { transform: translateY(-78px); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .bubble { animation: none; opacity: 0.7; transform: translateY(-30px); }
+  .fizz { animation: none; opacity: 0.7; transform: translateY(-30px); }
 }
 .wine-style { text-align: center; font-size: 1.15rem; font-weight: 800; margin: 6px 0 0; text-transform: capitalize; }
 .center { text-align: center; }

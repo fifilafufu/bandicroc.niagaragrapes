@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import Counter from "./Counter";
 import AnswerTools from "./AnswerTools";
 import { wikiUrl } from "../../shared/grapes";
@@ -24,14 +24,32 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
   // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
   const generation = useRef(0);
 
-  // Keep the newest message in view by scrolling only the message list (never the page around it),
-  // and only when the reader is already near the bottom, so reading older messages isn't interrupted.
+  // Scrolling (only the message list, never the page around it):
+  // - opening the chat shows the newest messages;
+  // - while an answer comes in, the list follows it only until your question reaches the top, so the
+  //   start of the answer never slides out of view;
+  // - as soon as you touch, scroll or use the wheel on the list, it stops moving by itself.
   const listRef = useRef<HTMLDivElement>(null);
-  const stick = useRef(true);
-  useEffect(() => {
+  const question = useRef<number | null>(null); // index of the question being answered
+  const userScrolled = useRef(false);
+  useLayoutEffect(() => {
     const el = listRef.current;
-    if (el && stick.current) el.scrollTop = el.scrollHeight;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, []);
+  useLayoutEffect(() => {
+    const el = listRef.current;
+    const i = question.current;
+    if (!el || i === null) return;
+    const bubble = el.querySelectorAll<HTMLElement>(".bubble")[i];
+    if (bubble && !userScrolled.current) {
+      const questionTop = bubble.getBoundingClientRect().top - el.getBoundingClientRect().top + el.scrollTop - 8;
+      el.scrollTop = Math.min(el.scrollHeight - el.clientHeight, questionTop);
+    }
+    if (!busy) question.current = null; // answer finished: stop following
   }, [messages, busy]);
+  const stopFollowing = () => {
+    userScrolled.current = true;
+  };
 
   // Update the reply being written (always the last message).
   const patchLast = (gen: number, fn: (m: Msg) => Msg) => {
@@ -44,9 +62,10 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
   };
 
   async function send(text: string) {
-    stick.current = true; // your own message always scrolls into view
     const content = text.trim().slice(0, MAX);
     if (!content || busy) return;
+    question.current = messages.length; // your new question: bring it and its answer into view
+    userScrolled.current = false;
     const gen = generation.current;
     const history = [...messages, { role: "user" as const, content }];
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -92,6 +111,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
 
   function clearChat() {
     generation.current += 1;
+    question.current = null;
     setBusy(false);
     setMessages([GREETING]);
   }
@@ -128,10 +148,9 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
             className="messages"
             aria-live="polite"
             ref={listRef}
-            onScroll={(e) => {
-              const el = e.currentTarget;
-              stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-            }}
+            onWheel={stopFollowing}
+            onTouchStart={stopFollowing}
+            onPointerDown={stopFollowing}
           >
             {messages.map((m, i) => (
               <div key={i} className={`bubble ${m.role} ${m.pending && !m.content ? "typing" : ""}`}>
