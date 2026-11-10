@@ -41,13 +41,17 @@ type Props = {
 export default function Chat({ favourite, loggedIn, messages, setMessages, autoAsk, onAutoAsked, onQuiz }: Props) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const endRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLTextAreaElement>(null);
   // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
   const generation = useRef(0);
 
+  // Keep the newest message in view by scrolling only the message list (never the page around it),
+  // and only when the reader is already near the bottom, so reading older messages isn't interrupted.
+  const listRef = useRef<HTMLDivElement>(null);
+  const stick = useRef(true);
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    const el = listRef.current;
+    if (el && stick.current) el.scrollTop = el.scrollHeight;
   }, [messages, busy]);
 
   // Update the reply being written (always the last message).
@@ -61,6 +65,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
   };
 
   async function send(text: string) {
+    stick.current = true; // your own message always scrolls into view
     const content = text.trim().slice(0, MAX);
     if (!content || busy) return;
     const gen = generation.current;
@@ -180,7 +185,15 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
         </button>
       </div>
 
-          <div className="messages" aria-live="polite">
+          <div
+            className="messages"
+            aria-live="polite"
+            ref={listRef}
+            onScroll={(e) => {
+              const el = e.currentTarget;
+              stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+            }}
+          >
             {messages.map((m, i) => (
               <div key={i} className={`bubble ${m.role} ${m.pending && !m.content ? "typing" : ""}`}>
                 {m.pending && !m.content ? (
@@ -242,7 +255,6 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
                 )}
               </div>
             )}
-            <div ref={endRef} />
           </div>
 
           <form className="composer" onSubmit={onSubmit}>

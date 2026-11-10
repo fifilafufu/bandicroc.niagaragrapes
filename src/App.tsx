@@ -83,6 +83,24 @@ export default function App() {
     }
   }, [user, secret, guest, saveFavourite, saveSecret]);
 
+  // The title bar slides away while scrolling down and comes back when scrolling up (or at the top).
+  const topbarRef = useRef<HTMLElement>(null);
+  const [barHidden, setBarHidden] = useState(false);
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    let last = el.scrollTop;
+    const onScroll = () => {
+      const y = el.scrollTop;
+      if (Math.abs(y - last) < 8) return; // ignore tiny jitters
+      setBarHidden(y > last && y > 80);
+      last = y;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+  useEffect(() => setBarHidden(false), [page]);
+
   // A new section starts at the top.
   useEffect(() => {
     contentRef.current?.scrollTo({ top: 0 });
@@ -106,7 +124,12 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
+      <header
+        className="topbar"
+        ref={topbarRef}
+        style={barHidden ? { marginTop: -(topbarRef.current?.offsetHeight ?? 60) } : undefined}
+        aria-hidden={barHidden || undefined}
+      >
         <button className="brand-btn" onClick={() => go("home")} aria-label="Grapes home">
           <img src="/favicon.svg" alt="" width={28} height={28} />
           <span className="brand">Grapes</span>
