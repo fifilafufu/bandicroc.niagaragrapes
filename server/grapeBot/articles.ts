@@ -30,7 +30,7 @@ export function pickArticles(messages: Turn[], favourite: string | null) {
   topics.forEach((t) => add(t.wiki));
   if (!titles.length) add(GENERAL_GRAPE_ARTICLE);
 
-  return { titles, latestGrapes, focusGrape: grapes[0] ?? null, topic: topics[0]?.wiki ?? null, latest, userTexts };
+  return { titles, latestGrapes, grapes, focusGrape: grapes[0] ?? null, topic: topics[0]?.wiki ?? null, latest, userTexts };
 }
 
 export function trimToSentence(text: string, max: number): string {

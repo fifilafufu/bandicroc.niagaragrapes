@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { wikiUrl, type Grape } from "../../shared/grapes";
 import { fetchSummary, type Summary } from "../lib/wiki";
-import { photoOf } from "../lib/varieties";
+import { photoOf } from "../../shared/varieties";
 import PhotoCredit from "./PhotoCredit";
 
 // A short Wikipedia summary of one grape, with its checked Commons photo and credit.

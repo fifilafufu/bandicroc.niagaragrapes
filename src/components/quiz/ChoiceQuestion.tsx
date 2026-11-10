@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ChoiceQ } from "../../../shared/quiz/types";
-import { photoOf } from "../../lib/varieties";
+import { photoOf } from "../../../shared/varieties";
 import PhotoCredit from "../PhotoCredit";
 
 // Pick one answer. Photo questions show a real, credited Commons photo above the options.

@@ -1,11 +1,12 @@
-// POST /api/chat: Grape Bot, an educational grape tutor grounded in live Wikipedia and checked facts.
+// POST /api/chat: Grape Bot, an educational grape tutor grounded in the app's curated data, checked
+// facts and live Wikipedia.
 // Runs on Cloudflare Pages Functions. The prompt and any API keys stay on the server.
 //
 // Usage is kept low on purpose: only the intro of 1–2 matching articles is sent, Wikipedia
 // intros are cached for 24 h, only the last 6 messages are sent, and answers are capped.
 //
 // The reply streams as newline-delimited JSON so words appear as they're written:
-//   {"type":"meta","sources":[…],"grapes":[…],"followUps":[…]}
+//   {"type":"meta","sources":[…],"grapes":[…],"followUps":[…]}   (sources are chosen here, never by the AI)
 //   {"type":"text","text":"…"}   (many)
 //   {"type":"done","model":"…"}  or  {"type":"error","text":"…"}
 //
@@ -15,10 +16,11 @@ import { findGrapeByWiki } from "../../shared/grapes";
 import { SOURCES } from "../../shared/sources";
 import { pickJoke, wantsJoke } from "../../shared/jokes";
 import { fetchArticle, pickArticles } from "../../server/grapeBot/articles";
+import { curatedKnowledge } from "../../server/grapeBot/knowledge";
 import { followUps, isPolish, systemPrompt } from "../../server/grapeBot/prompt";
 import { streamAnswer } from "../../server/grapeBot/providers";
 import { parseBody } from "../../server/grapeBot/request";
-import type { Article, Env } from "../../server/grapeBot/settings";
+import { MAX_CHIPS, type Article, type Chip, type Env } from "../../server/grapeBot/settings";
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {
@@ -44,17 +46,19 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   // Asked for a joke: pick one from the hand-written bank that this device hasn't heard yet.
   const polish = isPolish(picked.latest);
   const joke = wantsJoke(picked.latest) ? pickJoke(polish ? "pl" : "en", parsed.seenJokes) : null;
-  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles, joke) }, ...parsed.messages];
+  const appData = curatedKnowledge(picked.latest, picked.grapes);
+  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles, appData.notes, joke) }, ...parsed.messages];
+
+  // Source links: the Wikipedia articles read, the app data used, and the OIV figures for general questions.
+  const chips: Chip[] = [
+    ...appData.chips,
+    ...articles.map(({ title, url }) => ({ title, url })),
+    ...(picked.titles.some((t) => findGrapeByWiki(t) !== null) ? [] : [{ title: "OIV: grapes in 2024", url: SOURCES["oiv-2024"].url, data: true }]),
+  ];
 
   const meta = {
     type: "meta",
-    sources: [
-      ...articles.map(({ title, url }) => ({ title, url })),
-      // General questions are also answered from the checked OIV figures, so cite them.
-      ...(picked.titles.some((t) => findGrapeByWiki(t) !== null)
-        ? []
-        : [{ title: "OIV: grapes in 2024", url: SOURCES["oiv-2024"].url, data: true }]),
-    ],
+    sources: chips.filter((c, i) => chips.findIndex((d) => d.url === c.url) === i).slice(0, MAX_CHIPS),
     // Grapes named in this question: the app shows a photo the first time each one comes up.
     grapes: picked.latestGrapes.map((g) => g.wiki),
     followUps: followUps(picked.focusGrape, picked.topic, picked.userTexts, polish),

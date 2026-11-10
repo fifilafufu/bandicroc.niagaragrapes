@@ -1,6 +1,6 @@
 import { findGrapeByWiki } from "../../shared/grapes";
 import { readPref, writePref } from "./prefs";
-import { photoOf } from "./varieties";
+import { photoOf } from "../../shared/varieties";
 import { GREETING, type Msg } from "./chatMessages";
 
 // Talking to Grape Bot's server function (functions/api/chat.ts). The reply streams as one JSON

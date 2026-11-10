@@ -10,12 +10,16 @@ export interface Env {
 
 export type Turn = { role: "user" | "assistant"; content: string };
 export type Article = { title: string; url: string; text: string };
+// A source link shown under an answer. data: a data source (OIV, VIVC, an extension service), not Wikipedia.
+export type Chip = { title: string; url: string; data?: boolean };
 
 export const MAX_TURNS = 6;
 export const MAX_CHARS = 500;
 export const MAX_ARTICLES = 2;
 export const MAX_ARTICLE_CHARS = 1500;
 export const MAX_ANSWER_TOKENS = 300;
+export const MAX_DATA_GRAPES = 2; // grapes whose app data goes into one prompt
+export const MAX_CHIPS = 6; // source links under one answer
 export const WIKI_CACHE_SECONDS = 60 * 60 * 24;
 export const USER_AGENT = "bandicroc-niagaragrapes/1.0 (https://bandicroc-niagaragrapes.pages.dev)";
 

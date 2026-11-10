@@ -1,4 +1,4 @@
-import { photoOf } from "../../lib/varieties";
+import { photoOf } from "../../../shared/varieties";
 import PhotoCredit from "../PhotoCredit";
 import SourceLine from "../SourceLine";
 import GrapeAnatomy from "../visuals/GrapeAnatomy";

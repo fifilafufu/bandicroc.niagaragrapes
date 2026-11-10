@@ -1,11 +1,10 @@
 // Checked data for each grape in the app: its VIVC passport (official name, number, colour class,
-// species, origin, parents) and a real Wikimedia Commons photo with author and licence.
-// Built by scripts/build-varieties.mjs; see that file for how each value was found.
+// species, origin, parents), VIVC disease-resistance scores and a real Wikimedia Commons photo with
+// author and licence. Built by scripts/build-varieties.mjs; see that file for how each value was found.
+// Used by the app, the quizzes and Grape Bot.
 
-import data from "../../shared/varietyData.json";
-import type { DiseaseKey } from "../../shared/diseases";
-
-export { DISEASE_NAMES, resistanceWord, type DiseaseKey } from "../../shared/diseases";
+import data from "./varietyData.json";
+import type { DiseaseKey } from "./diseases";
 
 export type Photo = {
   file: string;
@@ -29,10 +28,11 @@ export type Vivc = {
 export type Resistance = Partial<Record<DiseaseKey, { score: number; studies: number }>>;
 export type VarietyInfo = { wiki: string; vivc: Vivc | null; photo: Photo | null; resistance?: Resistance | null };
 
-const VARIETIES = data.varieties as unknown as Record<string, VarietyInfo>;
+const BY_NAME = data.varieties as unknown as Record<string, VarietyInfo>;
+export const VARIETIES: [string, VarietyInfo][] = Object.entries(BY_NAME);
 export const VARIETIES_CHECKED: string = data.checked;
 
-export const varietyInfo = (name: string | null | undefined): VarietyInfo | null => (name ? (VARIETIES[name] ?? null) : null);
+export const varietyInfo = (name: string | null | undefined): VarietyInfo | null => (name ? (BY_NAME[name] ?? null) : null);
 export const photoOf = (name: string | null | undefined) => varietyInfo(name)?.photo ?? null;
 
 // VIVC's colour classes in plain English.
@@ -53,4 +53,17 @@ export function speciesLabel(species: string | null): string | null {
   if (s.includes("ROTUNDIFOLIA")) return "Muscadinia rotundifolia (muscadine)";
   if (s.includes("LABRUSCA")) return "Vitis labrusca";
   return species.charAt(0) + species.slice(1).toLowerCase();
+}
+
+// VIVC writes names in capitals: "UNITED STATES OF AMERICA" → "United States of America".
+const SMALL = new Set(["of", "de", "des", "du", "la", "le", "x"]);
+export function niceCase(s: string): string {
+  return s
+    .replace(/\s+LINNE\b/g, "")
+    .toLowerCase()
+    .split(" ")
+    .map((w, i) => (i > 0 && SMALL.has(w) ? w : w.replace(/\p{L}/u, (c) => c.toUpperCase())))
+    .join(" ")
+    .replace(/ x /g, " × ")
+    .replace(/Vitis (\p{L}+)/gu, (_, sp: string) => `Vitis ${sp.toLowerCase()}`);
 }

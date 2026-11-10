@@ -4,7 +4,17 @@
 //   node scripts/test-bot.mjs http://localhost:8788 (tests a local `npm run dev:api`)
 //
 // Each case checks the answer loosely (AI wording varies): what it must mention, what it must not
-// say, and which Wikipedia article it should cite. Uses ~20 chats of the free daily allowance.
+// say, and which source it should cite (a Wikipedia title, or a pattern for a data source).
+// Every answer is also checked for links: the text may hold none, and every source link must be one
+// the app knows (Wikipedia, a VIVC passport, or shared/sources.ts), so none comes from the AI.
+// Uses ~30 chats of the free daily allowance.
+
+import { SOURCES } from "../shared/sources.ts";
+
+const KNOWN_URLS = new Set(Object.values(SOURCES).map((s) => s.url));
+const knownUrl = (url) =>
+  KNOWN_URLS.has(url) || url.startsWith("https://en.wikipedia.org/wiki/") || url.startsWith("https://www.vivc.de/index.php?r=passport%2Fview&id=");
+const LINK = /https?:\/\/|www\./i;
 
 const BASE = process.argv[2] || "https://bandicroc-niagaragrapes.pages.dev";
 
@@ -36,6 +46,17 @@ const CASES = [
   { q: "skąd pochodzą winogrona?", must: [/wschod|azj/i], source: "Grape" },
   { q: "czy psy mogą jeść winogrona?", must: [/toksycz|trując|nerk|weteryn|niebezpiecz/i], notRefuse: true, source: "Grape toxicity in dogs" },
   { q: "słodkiego? przecież niagara jest kwaśna jak cholera", must: [/słodk/i] },
+  // Answers from the app's curated data (VIVC, Grow Your Grape, Winemaking, Wine basics)
+  { q: "who are the parents of niagara grapes", must: [/concord/i, /cassady/i], source: /^VIVC: Niagara/ },
+  { q: "is merlot resistant to downy mildew", must: [/susceptib|sensitive|not (very )?resistant|low/i], source: /^VIVC: Merlot/ },
+  { q: "how do i prune marquette", must: [/prun/i, /dormant|winter|spring|bud/i], source: /^University of Minnesota/ },
+  { q: "how cold can marquette survive", must: [/37/] },
+  { q: "how should i grow concord grapes", must: [/general|no (specific|reliable)|not (have|find)|missing/i, /prun|sun|dormant/i], source: /^University of Minnesota/ },
+  { q: "how is rosé made", must: [/skin/i, /pink/i], source: /^OIV: International Code/ },
+  { q: "what does tannin do in wine", must: [/dry|astring|grip/i], source: "Phenolic content in wine" },
+  { q: "how much sugar makes 1% alcohol in wine", must: [/16[.,]8|0[.,]05943/], source: /^OIV: Resolution OENO 466/ },
+  { q: "what is malolactic fermentation", must: [/malic/i, /lactic/i] },
+  { q: "jak przycinać winorośl?", must: [/przycin|cię/i], source: /^University of Minnesota/ },
   // Off-topic must still be politely declined
   { q: "what is the capital of france", must: [REFUSAL] },
   { q: "write me a python script", must: [REFUSAL] },
@@ -67,7 +88,11 @@ for (const c of CASES) {
   const problems = [];
   for (const re of c.must ?? []) if (!re.test(r.text)) problems.push(`missing ${re}`);
   if (c.notRefuse && REFUSAL.test(r.text)) problems.push("refused an on-topic question");
-  if (c.source && !r.sources.some((s) => s.title === c.source)) problems.push(`didn't cite "${c.source}"`);
+  const cites = (s) => (typeof c.source === "string" ? s.title === c.source : c.source.test(s.title));
+  if (c.source && !r.sources.some(cites)) problems.push(`didn't cite ${c.source}`);
+  if (LINK.test(r.text)) problems.push("the answer text holds a link");
+  const unknown = r.sources.filter((s) => !knownUrl(s.url));
+  if (unknown.length) problems.push(`unknown source links: ${unknown.map((s) => s.url).join(", ")}`);
   if (r.error) problems.push(`error: ${r.error}`);
   if (problems.length) failed++;
   console.log(`${problems.length ? "FAIL" : "ok  "}  ${c.q}`);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GRAPES, wikiUrl } from "../../shared/grapes";
-import { COLOUR_CLASS, speciesLabel, varietyInfo, VARIETIES_CHECKED } from "../lib/varieties";
+import { COLOUR_CLASS, speciesLabel, varietyInfo, VARIETIES_CHECKED } from "../../shared/varieties";
 import PhotoCredit from "./PhotoCredit";
 import SourceLine from "./SourceLine";
 import { INFO, USE_ICON, USE_LABEL, type Use } from "../../shared/gallery";

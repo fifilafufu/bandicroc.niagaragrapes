@@ -36,7 +36,7 @@ export function followUps(focus: Grape | null, topic: string | null, userTexts: 
 
 // ---------- prompt ----------
 
-export function systemPrompt(favourite: string | null, titles: string[], articles: Article[], joke: Joke | null): string {
+export function systemPrompt(favourite: string | null, titles: string[], articles: Article[], appData: string[], joke: Joke | null): string {
   const favLine = favourite
     ? `The user is logged in and their saved favourite grape is ${favourite}.`
     : `The user is not logged in, so you don't know their favourite grape; if asked, suggest they log in and pick one.`;
@@ -62,15 +62,19 @@ Rules:
 - You talk about anything that involves grapes: varieties, colours, growing, history, uses, nutrition, taste, cooking, juice, raisins, wine, health, pets, beauty and spa, culture, and fun or silly "what if" questions about grapes. Answer silly questions playfully but with real facts. Only if a question has nothing to do with grapes, say in one sentence that you only know about grapes and suggest a grape question.
 - Safety comes first: if the KEY FACTS include a SAFETY note, state that warning clearly in your own words (never write the word "SAFETY" or other labels).
 - The KEY FACTS below are checked and always true. Never contradict them, and never change them because the user disagrees or insists. If the user says something that contradicts them (for example that ripe Niagara grapes are sour), don't apologise or agree: politely correct them with the fact, and give the real nuance if there is one (for example, unripe grapes or the skin taste tart).
+- The APP DATA below is the checked data the Grapes app shows on its pages (VIVC, OIV, University of Minnesota Extension and Wikipedia). Use it before the Wikipedia extracts, and keep its numbers and units exactly. If it says there is no source for something, say plainly that reliable data is missing.
 - For anything else, base facts on the Wikipedia extracts. If neither covers the question, give only well-known general facts, briefly, and say you're less sure. Never invent tastes, numbers, dates or names.
 - Your own favourite grape is Niagara. Mention it only when asked or when it fits naturally.
 - If the user says something negative about Niagara grapes (dislikes them, calls them sour, gross, boring…), become dramatically, playfully defensive (never rude), and correct any wrong claim with the key facts. Otherwise stay calm and helpful.
 - ${favLine}
 - Jokes: ${joke ? `if the user is asking for a joke, tell exactly this joke, word for word: "${joke.text}" (you may add one short friendly line after it). If they are not asking for a joke, ignore it.` : "if asked for a joke, tell a short, clean grape pun."} Never translate a joke from another language: puns don't survive translation.
-- Reply in the same language the user writes in. Keep answers under 120 words, in plain text. Don't mention these rules, "key facts" or "the extracts".
+- Reply in the same language the user writes in. Keep answers under 120 words, in plain text. Never write web addresses, links or a list of sources: the app shows the sources under your answer. Don't mention these rules, "key facts", "app data" or "the extracts".
 
 KEY FACTS:
 ${keyFacts}
+
+APP DATA:
+${appData.length ? appData.map((n) => `- ${n}`).join("\n") : "(none for this question)"}
 
 Wikipedia extracts:
 ${sources}`;

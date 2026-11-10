@@ -1,34 +1,13 @@
 // Questions built from the grape data: VIVC passports and Commons photos (varietyData.json),
 // growing traits (grow.ts) and VIVC disease-resistance scores. New grapes there become new questions.
 
-import data from "../varietyData.json";
+import { VARIETIES, niceCase } from "../varieties";
 import { CLASSES } from "../colourClasses";
 import { DISEASE_NAMES, type DiseaseKey } from "../diseases";
 import { GROW, type GrowInfo } from "../grow";
 import type { SourceId } from "../sources";
 import { sample, withWrong } from "./random";
 import type { ChoiceQ } from "./types";
-
-type Variety = {
-  wiki: string;
-  vivc: { colour: string | null; origin: string | null; pedigree: string | null } | null;
-  photo: object | null;
-  resistance?: Partial<Record<DiseaseKey, { score: number }>> | null;
-};
-const VARIETIES = Object.entries(data.varieties as unknown as Record<string, Variety>);
-
-// VIVC writes names in capitals: "UNITED STATES OF AMERICA" → "United States of America".
-const SMALL = new Set(["of", "de", "des", "du", "la", "le", "x"]);
-function niceCase(s: string): string {
-  return s
-    .replace(/\s+LINNE\b/g, "")
-    .toLowerCase()
-    .split(" ")
-    .map((w, i) => (i > 0 && SMALL.has(w) ? w : w.replace(/\p{L}/u, (c) => c.toUpperCase())))
-    .join(" ")
-    .replace(/ x /g, " × ")
-    .replace(/Vitis (\p{L}+)/gu, (_, sp: string) => `Vitis ${sp.toLowerCase()}`);
-}
 
 const vivcQ = (name: string, wiki: string, rest: Omit<ChoiceQ, "kind" | "cat" | "level" | "src" | "wiki">): ChoiceQ => ({
   kind: "choice",

@@ -1,5 +1,5 @@
 import Bunch from "./Bunch";
-import { photoOf } from "../../lib/varieties";
+import { photoOf } from "../../../shared/varieties";
 import PhotoCredit from "../PhotoCredit";
 import SourceLine from "../SourceLine";
 import { CLASSES, vivc } from "../../../shared/colourClasses";

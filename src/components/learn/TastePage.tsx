@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AROMA_FAMILIES, GRAPE_AROMAS, grapesWithAroma } from "../../../shared/aromas";
-import { photoOf } from "../../lib/varieties";
+import { photoOf } from "../../../shared/varieties";
 import PhotoCredit from "../PhotoCredit";
 import SourceLine from "../SourceLine";
 

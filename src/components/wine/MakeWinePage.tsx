@@ -4,7 +4,7 @@ import { SIM_GRAPES, TABLE_ONLY, simGrape, type SimGrape } from "../../../shared
 import { brixToSugar, defaultInputs, describe, makeWine, MODEL_VERSION, SKIN_STEPS, skinLabel, type Inputs } from "../../../shared/wineSim";
 import { abvFromSugar } from "../../../shared/wine";
 import { useSavedWines, type SavedWine } from "../../lib/useSavedWines";
-import { photoOf } from "../../lib/varieties";
+import { photoOf } from "../../../shared/varieties";
 import SourceLine from "../SourceLine";
 import WineGlass from "./WineGlass";
 import { Range, Segmented } from "./Controls";
