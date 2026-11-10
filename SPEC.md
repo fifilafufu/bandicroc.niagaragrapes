@@ -39,7 +39,7 @@ Layout rules: the Grapes/Games button row stays pinned while scrolling; the titl
 | `favourites` | favourite grape (by name) | 1 per user |
 | `secret_messages` | private notes | 1000 characters |
 | `chat_history` | Grape Bot chat | last 40 messages |
-| `quiz_results` | quiz scores (level, score, total, time) | newest 200 |
+| `quiz_results` | quiz scores (category, score, total, time) | newest 200 |
 | `saved_wines` | Make Your Wine settings + result + model version | newest 50 |
 
 SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe to run again).
@@ -56,6 +56,7 @@ SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe 
 | `shared/grapeUses.ts` | OIV uses and production figures |
 | `shared/aromas.ts`, `shared/growthCycle.ts`, `shared/winemaking.ts`, `shared/wineBasics.ts`, `shared/grow.ts` | page content with sources (grow.ts: growing traits per grape, empty where no source) |
 | `shared/wine.ts`, `shared/wineSim.ts`, `shared/simGrapes.ts` | the wine model and simulator data |
+| `shared/quiz/` | quiz questions: hand-written (`bank.ts`, `numbers.ts`) and built from the data files above (`fromVarieties.ts`, `fromPages.ts`), each with its source |
 | `src/data/worldMap.json` | FAO production per country (built by `scripts/build-map.mjs`) |
 
 Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape Bot runs on Cloudflare Workers AI, with OpenRouter free models as backup.

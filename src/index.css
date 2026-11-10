@@ -7,7 +7,7 @@
 @import "./styles/06-chat.css";
 @import "./styles/07-install-sheet.css";
 @import "./styles/08-buttons-home-settings.css";
-@import "./styles/09-gallery-chat-quiz.css";
+@import "./styles/09-gallery-chat.css";
 @import "./styles/10-diagrams.css";
 @import "./styles/11-app-shell-account-sheets.css";
 @import "./styles/12-charts.css";
@@ -18,3 +18,4 @@
 @import "./styles/17-make-wine.css";
 @import "./styles/18-ui-fixes.css";
 @import "./styles/19-grow.css";
+@import "./styles/20-quiz.css";

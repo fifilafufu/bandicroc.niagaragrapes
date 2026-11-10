@@ -1,16 +1,26 @@
+import { useState } from "react";
+import { CATEGORIES } from "../../shared/quiz/categories";
+import type { Category, Level } from "../../shared/quiz/types";
 import { accountsAvailable, type User } from "../lib/account";
-import Quiz from "./Quiz";
-import { LEVELS, type Level } from "../lib/quiz";
+import { saveLevel, savedLevel } from "../lib/quiz";
 import { summary, useQuizResults } from "../lib/useQuizResults";
+import QuizPicker from "./quiz/QuizPicker";
+import QuizRound from "./quiz/QuizRound";
 
 // The Quizzes section. Scores are saved to the account when logged in (see useQuizResults).
 export default function QuizzesPage({ user, onLogin }: { user: User | null; onLogin: () => void }) {
   const { results, add, synced } = useQuizResults(user);
+  const [cat, setCat] = useState<Category | null>(null);
+  const [level, setLevelState] = useState<Level>(savedLevel);
+  const setLevel = (l: Level) => {
+    setLevelState(l);
+    saveLevel(l);
+  };
 
-  const scores: Partial<Record<Level, string>> = {};
-  for (const l of LEVELS) {
-    const s = summary(results, `level:${l.id}`);
-    if (s) scores[l.id] = `Best ${s.best.score} / ${s.best.total} · ${s.rounds} ${s.rounds === 1 ? "round" : "rounds"}`;
+  const scores: Partial<Record<Category, string>> = {};
+  for (const c of CATEGORIES) {
+    const s = summary(results, `cat:${c.id}`);
+    if (s) scores[c.id] = `Best ${s.best.score} / ${s.best.total} · ${s.rounds} ${s.rounds === 1 ? "round" : "rounds"}`;
   }
 
   return (
@@ -32,7 +42,18 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
           )
         )}
       </section>
-      <Quiz scores={scores} onFinish={(level, score, total) => add(`level:${level}`, score, total)} />
+      {cat ? (
+        <QuizRound
+          key={`${cat}-${level}`}
+          cat={cat}
+          level={level}
+          onFinish={(score, total) => add(`cat:${cat}`, score, total)}
+          onBack={() => setCat(null)}
+          onPro={() => setLevel("pro")}
+        />
+      ) : (
+        <QuizPicker level={level} onLevel={setLevel} onPick={setCat} scores={scores} />
+      )}
     </div>
   );
 }

@@ -113,25 +113,6 @@ html, body { overflow: hidden; overscroll-behavior: none; }
 .composer .primary { flex-shrink: 0; min-height: 44px; }
 .composer .counter { right: 104px; bottom: 0; }
 
-/* Quiz levels */
-.quiz-levels { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-.quiz-level {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  text-align: left;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--surface-2);
-  cursor: pointer;
-  min-height: 64px;
-}
-.quiz-level:hover { border-color: var(--accent); }
-.quiz-level > span:last-child { display: flex; flex-direction: column; }
-.quiz-level.pro { border-color: #8a5bb5; background: color-mix(in srgb, #8a5bb5 10%, var(--surface-2)); }
-.lvl-emoji { font-size: 1.8rem; }
-.quiz-verdict { font-size: 1.05rem; max-width: 34ch; margin: 4px auto 14px; }
 .link.inline { padding: 0; font-weight: 700; font-size: inherit; }
 
 /* World map */

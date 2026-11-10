@@ -4,7 +4,6 @@
 .tip { order: 9; }
 .page-title { margin: 0 0 4px; font-size: 1.4rem; }
 .loading { padding: 40px 0; }
-.quiz-best { font-size: 0.78rem; font-weight: 700; color: var(--accent-strong); margin-top: 2px; }
 
 /* Wide screens (Windows, tablets in landscape): the tabs move to the top, under the title bar. */
 @media (min-width: 900px) {

@@ -4,7 +4,7 @@
 create table if not exists public.quiz_results (
   id        uuid primary key,                       -- made by the app, so a score is never saved twice
   user_id   uuid not null references auth.users (id) on delete cascade,
-  quiz      text not null check (char_length(quiz) between 1 and 40),  -- e.g. "level:newbie"
+  quiz      text not null check (char_length(quiz) between 1 and 40),  -- e.g. "cat:varieties"
   score     smallint not null check (score >= 0),
   total     smallint not null check (total between 1 and 100),
   taken_at  timestamptz not null default now(),
