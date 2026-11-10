@@ -40,7 +40,7 @@
 .quiz-number-value { font-size: 1.8rem; font-weight: 800; margin: 0; text-align: center; }
 .quiz-number-value .muted { font-size: 1rem; font-weight: 600; }
 .quiz-number-row { display: flex; gap: 8px; align-items: center; }
-.quiz-number-row input { flex: 1; min-width: 0; accent-color: var(--accent); height: 44px; }
+.quiz-number-row input { flex: 1; min-width: 0; height: 44px; }
 .quiz-number-row button { width: 44px; padding: 0; flex-shrink: 0; font-size: 1.2rem; }
 .quiz-range-ends { display: flex; justify-content: space-between; margin: -4px 52px 4px; }
 .quiz-number-result { font-weight: 700; margin: 4px 0 0; }

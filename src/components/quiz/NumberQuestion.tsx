@@ -2,6 +2,7 @@ import { useState } from "react";
 import { num } from "../../../shared/i18n/countries";
 import type { NumberQ } from "../../../shared/quiz/types";
 import { useLang } from "../../lib/lang";
+import RangeInput from "../RangeInput";
 
 const decimals = (step: number) => step.toString().split(".")[1]?.length ?? 0;
 
@@ -28,7 +29,7 @@ export default function NumberQuestion({ q, onAnswer }: { q: NumberQ; onAnswer: 
         <button className="secondary" onClick={() => setValue((v) => snap(v - q.step))} disabled={checked} aria-label={t("quiz.less")}>
           −
         </button>
-        <input type="range" min={q.min} max={q.max} step={q.step} value={value} onChange={(e) => setValue(Number(e.target.value))} disabled={checked} aria-label={t("quiz.guessIn", { unit: q.unit })} />
+        <RangeInput min={q.min} max={q.max} step={q.step} value={value} onChange={(e) => setValue(Number(e.target.value))} disabled={checked} aria-label={t("quiz.guessIn", { unit: q.unit })} />
         <button className="secondary" onClick={() => setValue((v) => snap(v + q.step))} disabled={checked} aria-label={t("quiz.more")}>
           +
         </button>

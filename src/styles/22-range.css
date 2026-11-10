@@ -1,0 +1,62 @@
+/* Sliders (RangeInput). The browser's own slider stops the knob short of the bar's ends, so the bar
+   looks unfinished at the maximum. Here the knob travels the full width and the green fill ends at
+   the knob's centre: --fill (0 to 1) is set by RangeInput. */
+input[type="range"] {
+  --thumb: 22px;
+  --bar: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: var(--bar);
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--accent) 0 calc(var(--thumb) / 2 + var(--fill, 0) * (100% - var(--thumb))), var(--border) 0);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--thumb);
+  height: var(--thumb);
+  margin-top: calc((var(--bar) - var(--thumb)) / 2);
+  border: 3px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+input[type="range"]::-moz-range-track {
+  height: var(--bar);
+  border-radius: 999px;
+  background: var(--border);
+}
+input[type="range"]::-moz-range-progress {
+  height: var(--bar);
+  border-radius: 999px;
+  background: var(--accent);
+}
+input[type="range"]::-moz-range-thumb {
+  width: var(--thumb);
+  height: var(--thumb);
+  box-sizing: border-box;
+  border: 3px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+input[type="range"]:focus {
+  outline: none;
+}
+input[type="range"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+input[type="range"]:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

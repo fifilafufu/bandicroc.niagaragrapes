@@ -1,4 +1,5 @@
 // The two kinds of control Make Your Wine uses: a row of choices and a labelled slider.
+import RangeInput from "../RangeInput";
 
 export function Segmented<T extends string | number>({ value, options, onChange, label }: { value: T; options: { v: T; label: string }[]; onChange: (v: T) => void; label: string }) {
   return (
@@ -19,7 +20,7 @@ export function Range(props: { label: string; value: number; min: number; max: n
         {props.label} <b>{props.show}</b>
         {props.hint && <span className="muted small"> · {props.hint}</span>}
       </span>
-      <input type="range" min={props.min} max={props.max} step={props.step ?? 1} value={props.value} onChange={(e) => props.onChange(+e.target.value)} />
+      <RangeInput min={props.min} max={props.max} step={props.step ?? 1} value={props.value} onChange={(e) => props.onChange(+e.target.value)} />
     </label>
   );
 }

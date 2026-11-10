@@ -6,6 +6,7 @@ import { useLang } from "../../lib/lang";
 import { BALANCE_NOTE_PL, PARTS_PL, SWEETNESS_PL } from "../../../shared/i18n/pl/wine";
 import { num } from "../../../shared/i18n/countries";
 import type { Lang } from "../../../shared/i18n";
+import RangeInput from "../RangeInput";
 
 // A part's text in the chosen language; icon and sources stay the same.
 const partText = (p: (typeof PARTS)[number], lang: Lang) => (lang === "pl" ? { ...p, ...PARTS_PL[p.id] } : p);
@@ -59,7 +60,7 @@ function Slider({ label, value, onChange, hint }: { label: string; value: number
         {label} <b>{value}</b>
         {hint && <span className="muted small"> {hint}</span>}
       </span>
-      <input type="range" min={0} max={100} value={value} onChange={(e) => onChange(+e.target.value)} />
+      <RangeInput min={0} max={100} value={value} onChange={(e) => onChange(+e.target.value)} />
     </label>
   );
 }
@@ -124,19 +125,19 @@ function SugarToAlcohol() {
           <span>
             {t("wb.sugarIn")} <b>{sugar} g/L</b>
           </span>
-          <input type="range" min={120} max={320} step={5} value={sugar} onChange={(e) => setSugar(+e.target.value)} />
+          <RangeInput min={120} max={320} step={5} value={sugar} onChange={(e) => setSugar(+e.target.value)} />
         </label>
         <label className="slider">
           <span>
             {t("wb.fermented")} <b>{pct}%</b>
           </span>
-          <input type="range" min={0} max={100} value={pct} onChange={(e) => setPct(+e.target.value)} />
+          <RangeInput min={0} max={100} value={pct} onChange={(e) => setPct(+e.target.value)} />
         </label>
         <label className="slider">
           <span>
             {t("wb.acidityTa")} <b>{num(ta, lang)} g/L</b> <span className="muted small">{t("wb.asTartaric")}</span>
           </span>
-          <input type="range" min={3} max={12} step={0.5} value={ta} onChange={(e) => setTa(+e.target.value)} />
+          <RangeInput min={3} max={12} step={0.5} value={ta} onChange={(e) => setTa(+e.target.value)} />
         </label>
       </div>
       <div className="big-numbers" aria-live="polite">
