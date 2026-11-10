@@ -23,7 +23,7 @@ export const STATS_TITLE_PL = "🌍 Winogrona na świecie w liczbach";
 
 // Same order as STATS in shared/overview.ts.
 export const STATS_PL = [
-  { value: "8000", label: "lat, odkąd ludzie zaczęli uprawiać winogrona (zachodnia Azja)" },
+  { value: "8 tys.", label: "lat, odkąd ludzie zaczęli uprawiać winogrona (zachodnia Azja)" },
   { value: "77,7 mln", label: "ton winogron zebranych na całym świecie w 2024 roku (OIV)" },
   { value: "47%", label: "światowych winogron wytłoczonych na wino i soki (OIV 2024)" },
   { value: "15–300", label: "winogron w jednym gronie" },
