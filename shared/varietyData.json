@@ -21,6 +21,12 @@
     "licence": "CC BY-SA 2.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 7,
+     "studies": 1
+    }
    }
   },
   "Concord": {
@@ -43,6 +49,24 @@
     "licence": "Public domain",
     "licenceUrl": null,
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 7,
+     "studies": 5
+    },
+    "blackRot": {
+     "score": 3,
+     "studies": 3
+    },
+    "downy": {
+     "score": 7,
+     "studies": 1
+    },
+    "powdery": {
+     "score": 5.5,
+     "studies": 4
+    }
    }
   },
   "Catawba": {
@@ -65,6 +89,24 @@
     "licence": "Public domain",
     "licenceUrl": null,
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 7,
+     "studies": 5
+    },
+    "blackRot": {
+     "score": 4,
+     "studies": 1
+    },
+    "downy": {
+     "score": 7,
+     "studies": 1
+    },
+    "powdery": {
+     "score": 7,
+     "studies": 5
+    }
    }
   },
   "Delaware": {
@@ -87,6 +129,20 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 4,
+     "studies": 2
+    },
+    "downy": {
+     "score": 5,
+     "studies": 1
+    },
+    "powdery": {
+     "score": 3.5,
+     "studies": 2
+    }
    }
   },
   "Cotton Candy": {
@@ -101,7 +157,8 @@
     "licence": "CC BY-SA 4.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "aiGenerated": false
-   }
+   },
+   "resistance": null
   },
   "Thompson Seedless": {
    "wiki": "Sultana (grape)",
@@ -123,6 +180,24 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 1.5,
+     "studies": 6
+    },
+    "botrytis": {
+     "score": 7,
+     "studies": 1
+    },
+    "downy": {
+     "score": 1,
+     "studies": 1
+    },
+    "powdery": {
+     "score": 1,
+     "studies": 7
+    }
    }
   },
   "Red Globe": {
@@ -145,7 +220,8 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "aiGenerated": false
-   }
+   },
+   "resistance": null
   },
   "Muscat": {
    "wiki": "Muscat (grape)",
@@ -159,7 +235,8 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "aiGenerated": false
-   }
+   },
+   "resistance": null
   },
   "Chardonnay": {
    "wiki": "Chardonnay",
@@ -181,6 +258,28 @@
     "licence": "Public domain",
     "licenceUrl": null,
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 7,
+     "studies": 1
+    },
+    "blackRot": {
+     "score": 2,
+     "studies": 2
+    },
+    "botrytis": {
+     "score": 2,
+     "studies": 2
+    },
+    "downy": {
+     "score": 2.5,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 1.5,
+     "studies": 6
+    }
    }
   },
   "Riesling": {
@@ -203,6 +302,28 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 7,
+     "studies": 6
+    },
+    "blackRot": {
+     "score": 4,
+     "studies": 1
+    },
+    "downy": {
+     "score": 2.5,
+     "studies": 2
+    },
+    "phomopsis": {
+     "score": 4,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 2,
+     "studies": 6
+    }
    }
   },
   "Pinot Noir": {
@@ -225,6 +346,24 @@
     "licence": "Public domain",
     "licenceUrl": null,
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 5,
+     "studies": 5
+    },
+    "botrytis": {
+     "score": 3,
+     "studies": 1
+    },
+    "downy": {
+     "score": 1.5,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 1.5,
+     "studies": 4
+    }
    }
   },
   "Cabernet Sauvignon": {
@@ -247,6 +386,28 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 7,
+     "studies": 1
+    },
+    "blackRot": {
+     "score": 2,
+     "studies": 2
+    },
+    "downy": {
+     "score": 1,
+     "studies": 1
+    },
+    "phomopsis": {
+     "score": 1,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 1,
+     "studies": 5
+    }
    }
   },
   "Shine Muscat": {
@@ -269,7 +430,8 @@
     "licence": "CC BY-SA 4.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "aiGenerated": false
-   }
+   },
+   "resistance": null
   },
   "Scuppernong": {
    "wiki": "Scuppernong",
@@ -291,6 +453,20 @@
     "licence": "CC0",
     "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
     "aiGenerated": false
+   },
+   "resistance": {
+    "blackRot": {
+     "score": 1,
+     "studies": 1
+    },
+    "downy": {
+     "score": 9,
+     "studies": 1
+    },
+    "pierces": {
+     "score": 2,
+     "studies": 1
+    }
    }
   },
   "Gewürztraminer": {
@@ -313,6 +489,32 @@
     "licence": "Public domain",
     "licenceUrl": null,
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 5,
+     "studies": 1
+    },
+    "blackRot": {
+     "score": 3,
+     "studies": 1
+    },
+    "botrytis": {
+     "score": 5,
+     "studies": 1
+    },
+    "downy": {
+     "score": 1,
+     "studies": 1
+    },
+    "phomopsis": {
+     "score": 4,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 1.5,
+     "studies": 4
+    }
    }
   },
   "Kyoho": {
@@ -335,6 +537,20 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 7,
+     "studies": 1
+    },
+    "downy": {
+     "score": 5,
+     "studies": 1
+    },
+    "powdery": {
+     "score": 6,
+     "studies": 1
+    }
    }
   },
   "Pinot Gris": {
@@ -357,6 +573,16 @@
     "licence": "CC BY-SA 4.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 5,
+     "studies": 3
+    },
+    "powdery": {
+     "score": 2,
+     "studies": 3
+    }
    }
   },
   "Merlot": {
@@ -379,6 +605,24 @@
     "licence": "CC BY 2.0",
     "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 4,
+     "studies": 2
+    },
+    "downy": {
+     "score": 1,
+     "studies": 1
+    },
+    "phomopsis": {
+     "score": 2.5,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 1.5,
+     "studies": 4
+    }
    }
   },
   "Sauvignon Blanc": {
@@ -401,6 +645,28 @@
     "licence": "CC BY-SA 2.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 5,
+     "studies": 2
+    },
+    "blackRot": {
+     "score": 1,
+     "studies": 1
+    },
+    "downy": {
+     "score": 2,
+     "studies": 1
+    },
+    "phomopsis": {
+     "score": 2.5,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 2,
+     "studies": 3
+    }
    }
   },
   "Syrah": {
@@ -423,6 +689,28 @@
     "licence": "CC BY 2.0",
     "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 5,
+     "studies": 2
+    },
+    "blackRot": {
+     "score": 1.5,
+     "studies": 2
+    },
+    "downy": {
+     "score": 3,
+     "studies": 1
+    },
+    "phomopsis": {
+     "score": 2.5,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 2.5,
+     "studies": 2
+    }
    }
   },
   "Tempranillo": {
@@ -445,7 +733,8 @@
     "licence": "Public domain",
     "licenceUrl": null,
     "aiGenerated": false
-   }
+   },
+   "resistance": null
   },
   "Grenache": {
    "wiki": "Grenache",
@@ -467,6 +756,32 @@
     "licence": "Public domain",
     "licenceUrl": null,
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 4,
+     "studies": 2
+    },
+    "blackRot": {
+     "score": 1,
+     "studies": 2
+    },
+    "botrytis": {
+     "score": 3,
+     "studies": 2
+    },
+    "downy": {
+     "score": 1,
+     "studies": 2
+    },
+    "phomopsis": {
+     "score": 4,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 1.5,
+     "studies": 6
+    }
    }
   },
   "Solaris": {
@@ -489,7 +804,8 @@
     "licence": "CC0",
     "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
     "aiGenerated": false
-   }
+   },
+   "resistance": null
   },
   "Regent": {
    "wiki": "Regent (grape)",
@@ -511,6 +827,16 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "downy": {
+     "score": 6.5,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 3,
+     "studies": 4
+    }
    }
   },
   "Marquette": {
@@ -533,7 +859,8 @@
     "licence": "CC BY-SA 3.0",
     "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "aiGenerated": false
-   }
+   },
+   "resistance": null
   },
   "Seyval Blanc": {
    "wiki": "Seyval blanc",
@@ -555,6 +882,24 @@
     "licence": "CC BY 2.0",
     "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "anthracnose": {
+     "score": 8.5,
+     "studies": 2
+    },
+    "blackRot": {
+     "score": 6.5,
+     "studies": 2
+    },
+    "downy": {
+     "score": 6,
+     "studies": 2
+    },
+    "powdery": {
+     "score": 3,
+     "studies": 9
+    }
    }
   },
   "Vidal Blanc": {
@@ -577,6 +922,20 @@
     "licence": "CC BY 2.0",
     "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
     "aiGenerated": false
+   },
+   "resistance": {
+    "blackRot": {
+     "score": 3,
+     "studies": 1
+    },
+    "downy": {
+     "score": 6,
+     "studies": 3
+    },
+    "powdery": {
+     "score": 7,
+     "studies": 6
+    }
    }
   }
  }

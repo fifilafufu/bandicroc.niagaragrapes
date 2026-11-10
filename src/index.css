@@ -1042,3 +1042,12 @@ html, body { overflow: hidden; overscroll-behavior: none; }
 .calendar li { display: grid; grid-template-columns: 96px 1fr; gap: 10px; font-size: 0.88rem; padding: 6px 8px; border-radius: 10px; background: var(--surface-2); }
 .calendar li.own { background: var(--accent-soft); }
 .cal-months { font-weight: 700; color: var(--accent-strong); }
+.res-bars { list-style: none; padding: 0; margin: 6px 0; display: flex; flex-direction: column; gap: 6px; }
+.res-bars li { display: grid; grid-template-columns: 1fr 90px auto; grid-template-areas: "name track score" "name track count"; column-gap: 8px; align-items: center; font-size: 0.85rem; }
+.res-bars li > span:first-child { grid-area: name; }
+.res-bars .res-track { grid-area: track; height: 10px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; }
+.res-bars .res-track i { display: block; height: 100%; border-radius: 999px; background: var(--muted); }
+.res-bars li.res-resistant .res-track i { background: var(--accent); }
+.res-bars li.res-susceptible .res-track i { background: var(--danger); }
+.res-bars b { grid-area: score; font-size: 0.8rem; white-space: nowrap; }
+.res-bars li > span:last-child { grid-area: count; }

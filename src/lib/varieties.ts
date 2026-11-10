@@ -21,7 +21,22 @@ export type Vivc = {
   pedigree: string | null;
   url: string;
 };
-export type VarietyInfo = { wiki: string; vivc: Vivc | null; photo: Photo | null };
+// VIVC disease-resistance scores, OIV 1 to 9 scale (1 = very susceptible, 9 = very resistant):
+// the median of all studies VIVC lists, and how many studies there were.
+export type DiseaseKey = "downy" | "powdery" | "blackRot" | "botrytis" | "anthracnose" | "phomopsis" | "pierces";
+export type Resistance = Partial<Record<DiseaseKey, { score: number; studies: number }>>;
+export type VarietyInfo = { wiki: string; vivc: Vivc | null; photo: Photo | null; resistance?: Resistance | null };
+
+export const DISEASE_NAMES: Record<DiseaseKey, string> = {
+  downy: "Downy mildew",
+  powdery: "Powdery mildew",
+  blackRot: "Black rot",
+  botrytis: "Botrytis bunch rot",
+  anthracnose: "Anthracnose",
+  phomopsis: "Phomopsis (excoriose)",
+  pierces: "Pierce's disease",
+};
+export const resistanceWord = (score: number) => (score <= 3 ? "susceptible" : score < 7 ? "medium" : "resistant");
 
 const VARIETIES = data.varieties as unknown as Record<string, VarietyInfo>;
 export const VARIETIES_CHECKED: string = data.checked;

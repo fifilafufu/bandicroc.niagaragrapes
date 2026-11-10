@@ -116,15 +116,52 @@ async function commonsPhoto(file) {
 
 // ---------- build ----------
 
+// ---------- VIVC resistance scores ----------
+// VIVC collects disease-resistance scores from many studies on the OIV 1 to 9 scale
+// (OIV descriptor 452 and following: 1 = heavily attacked, very susceptible; 9 = no symptoms, very
+// resistant). We keep the middle value (median) of all studies per disease, and how many there were.
+
+const DISEASES = [
+  ["downy", /^Downy mildew/i],
+  ["powdery", /^Powdery mildew/i],
+  ["blackRot", /^Black rot .*euvitis/i], // the form that attacks ordinary grapevines
+  ["botrytis", /^Botrytis/i],
+  ["anthracnose", /^Anthracnose/i],
+  ["phomopsis", /^Excoriose/i],
+  ["pierces", /^Pierce/i],
+];
+
+async function resistance(id) {
+  const html = await (await get(`https://www.vivc.de/index.php?r=passport%2Fdegreeresist&id=${id}`)).text();
+  const scores = {};
+  for (const [, row] of html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)) {
+    const cells = [...row.matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/g)].map((m) => text(m[1]));
+    if (cells.length < 2) continue;
+    const hit = DISEASES.find(([, re]) => re.test(cells[0]));
+    if (!hit) continue;
+    const values = cells.slice(1).map(Number).filter((n) => n >= 1 && n <= 9);
+    (scores[hit[0]] ??= []).push(...values);
+  }
+  const out = {};
+  for (const [key, values] of Object.entries(scores)) {
+    if (!values.length) continue;
+    const s = [...values].sort((a, b) => a - b);
+    const mid = s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
+    out[key] = { score: mid, studies: values.length };
+  }
+  return Object.keys(out).length ? out : null;
+}
+
 const out = {};
 for (const v of VARIETIES) {
   const vivc = v.vivcId ? await passportById(v.vivcId) : v.vivc.length ? await vivcPassport(v.vivc).catch((e) => (console.error(v.name, e.message), null)) : null;
   const file = v.photo ?? (await leadImage(v.wiki));
   const photo = file ? await commonsPhoto(file).catch(() => null) : null;
   if (photo?.aiGenerated) console.error(`!! ${v.name}: ${file} is in an AI-generated category, refused`);
-  out[v.name] = { wiki: v.wiki, vivc, photo: photo && !photo.aiGenerated ? photo : null };
+  const res = vivc ? await resistance(vivc.id).catch(() => null) : null;
+  out[v.name] = { wiki: v.wiki, vivc, photo: photo && !photo.aiGenerated ? photo : null, resistance: res };
   console.log(
-    `${v.name.padEnd(18)} VIVC ${vivc ? `${vivc.id} ${vivc.primeName} ${vivc.colour}` : "-"}  |  ${photo ? `${photo.licence} · ${photo.author.slice(0, 30)} · ${file}` : "no photo"}`,
+    `${v.name.padEnd(18)} VIVC ${vivc ? `${vivc.id} ${vivc.primeName} ${vivc.colour}` : "-"}  |  ${photo ? `${photo.licence} · ${photo.author.slice(0, 30)} · ${file}` : "no photo"}  |  ${res ? Object.entries(res).map(([k, r]) => `${k} ${r.score}(${r.studies})`).join(" ") : "no resistance data"}`,
   );
 }
 

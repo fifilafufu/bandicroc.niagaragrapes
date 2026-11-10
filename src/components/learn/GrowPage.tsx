@@ -2,7 +2,7 @@ import { useState } from "react";
 import { GRAPES } from "../../../shared/grapes";
 import { GENERAL_CALENDAR, GENERAL_DISEASE, GENERAL_PRUNING, GROW, rootstockAdvice } from "../../../shared/grow";
 import { MONTHS } from "../../../shared/growthCycle";
-import { photoOf, speciesLabel, varietyInfo } from "../../lib/varieties";
+import { DISEASE_NAMES, photoOf, resistanceWord, speciesLabel, varietyInfo, type DiseaseKey } from "../../lib/varieties";
 import PhotoCredit from "../PhotoCredit";
 import SourceLine from "../SourceLine";
 import VineDiagram from "../grow/VineDiagram";
@@ -51,8 +51,11 @@ export default function GrowPage({ favourite }: { favourite: string | null }) {
   // Calendar: general tasks plus this grape's own notes (only from its sourced traits).
   const own: { months: [number, number]; task: string }[] = [];
   if (g?.frostRisk) own.push({ months: [3, 5], task: `Frost risk: ${g.frostRisk}` });
+  const res = v?.resistance ?? null;
+  const weak = res ? (Object.keys(res) as DiseaseKey[]).filter((k) => res[k]!.score <= 3) : [];
+  if (weak.length) own.push({ months: [4, 10], task: `Most at risk from (VIVC scores): ${weak.map((k) => DISEASE_NAMES[k].toLowerCase()).join(", ")}. Inspect often.` });
   // Only when a source calls it susceptible (Marquette, for example, resists black rot).
-  if (/susceptible[^.]*black rot/i.test(g?.diseases ?? "")) own.push({ months: [5, 7], task: "Black rot window (bloom to about 6 weeks after): this grape is susceptible." });
+  if (/susceptible[^.]*black rot/i.test(g?.diseases ?? "") || weak.includes("blackRot")) own.push({ months: [5, 7], task: "Black rot window (bloom to about 6 weeks after): this grape is susceptible." });
   if (g?.diseases) own.push({ months: [4, 10], task: `Disease notes: ${g.diseases}` });
   if (g?.ripening === "early") own.push({ months: [8, 9], task: "Early ripener: check ripeness sooner than for most grapes." });
   if (g?.ripening === "late") own.push({ months: [10, 10], task: "Late ripener: needs a long enough season; harvest comes later." });
@@ -69,7 +72,7 @@ export default function GrowPage({ favourite }: { favourite: string | null }) {
             {GRAPES.map((x) => (
               <option key={x.name} value={x.name}>
                 {x.name}
-                {GROW[x.name] ? "" : " (little data)"}
+                {GROW[x.name] || varietyInfo(x.name)?.resistance ? "" : " (little data)"}
               </option>
             ))}
           </select>
@@ -92,6 +95,10 @@ export default function GrowPage({ favourite }: { favourite: string | null }) {
         <h2>📋 At a glance</h2>
         <div className="facts">
           <Fact label="Cold hardiness" value={g?.cold?.text} />
+          <Fact
+            label="Disease risk (VIVC scores)"
+            value={weak.length ? `Susceptible to ${weak.map((k) => DISEASE_NAMES[k].toLowerCase()).join(", ")}` : res ? `None of the ${Object.keys(res).length} ${Object.keys(res).length === 1 ? "disease" : "diseases"} scored is a weak spot` : undefined}
+          />
           <Fact label="Budbreak" value={g?.budding} />
           <Fact label="Ripening" value={g?.ripening} />
           <Fact label="Vigour" value={g?.vigour} />
@@ -117,9 +124,44 @@ export default function GrowPage({ favourite }: { favourite: string | null }) {
 
       <section className="card">
         <h2>🦠 Diseases</h2>
-        <p>
-          <b>This grape:</b> {g?.diseases ?? NONE}
-        </p>
+        {res ? (
+          <>
+            <p className="muted small">Resistance scores collected by VIVC from research studies, on the OIV scale: 1 = very susceptible, 9 = very resistant.</p>
+            <ul className="res-bars">
+              {(Object.keys(DISEASE_NAMES) as DiseaseKey[])
+                .filter((k) => res[k])
+                .map((k) => {
+                  const r = res[k]!;
+                  return (
+                    <li key={k} className={`res-${resistanceWord(r.score)}`}>
+                      <span>{DISEASE_NAMES[k]}</span>
+                      <span className="res-track" aria-hidden="true">
+                        <i style={{ width: `${(r.score / 9) * 100}%` }} />
+                      </span>
+                      <b>
+                        {r.score} {resistanceWord(r.score)}
+                      </b>
+                      <span className="muted small">
+                        {r.studies} {r.studies === 1 ? "study" : "studies"}
+                      </span>
+                    </li>
+                  );
+                })}
+            </ul>
+            {v?.vivc && (
+              <SourceLine ids={["vivc"]} wiki={[]} />
+            )}
+          </>
+        ) : (
+          <p className="muted small">No resistance scores in VIVC for this grape.</p>
+        )}
+        {g?.diseases ? (
+          <p>
+            <b>Other sources say:</b> {g.diseases}
+          </p>
+        ) : (
+          !res && <p>{NONE} on this grape's diseases.</p>
+        )}
         <p>
           <b>Roots and phylloxera:</b> {rootstockAdvice(name, v?.vivc?.species)}
         </p>
