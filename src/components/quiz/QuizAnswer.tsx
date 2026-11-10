@@ -9,7 +9,9 @@ export default function QuizAnswer({ q, right, last, onNext }: { q: Question; ri
   const next = useRef<HTMLButtonElement>(null);
   // Bring the explanation and the next button into view as soon as the answer shows.
   useEffect(() => {
-    next.current?.scrollIntoView({ block: "end" });
+    // Smooth, unless the phone asks for less motion.
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    next.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "end" });
   }, []);
   return (
     <div className="quiz-why" role="status">
