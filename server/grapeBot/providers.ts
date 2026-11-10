@@ -1,19 +1,19 @@
 // The AI providers. Each one streams the answer as text chunks: Cloudflare Workers AI first
-// (falling back through MODELS), or OpenRouter when AI_PROVIDER is "openrouter".
+// (falling back through MODELS), then OpenRouter as an automatic backup when its key is set.
 
 import { MAX_ANSWER_TOKENS, MODELS, type Env } from "./settings";
 
-export type Chunks = AsyncGenerator<string, void, unknown>;
+type Chunks = AsyncGenerator<string, void, unknown>;
 
 // Pull the text out of one streamed event, whichever shape the model uses.
-export function chunkText(data: unknown): string {
+function chunkText(data: unknown): string {
   const d = data as { response?: unknown; choices?: { delta?: { content?: string }; message?: { content?: string } }[] };
   if (typeof d?.response === "string") return d.response;
   const c = d?.choices?.[0]?.delta?.content ?? d?.choices?.[0]?.message?.content;
   return typeof c === "string" ? c : "";
 }
 
-export async function* readSSE(stream: ReadableStream<Uint8Array>): Chunks {
+async function* readSSE(stream: ReadableStream<Uint8Array>): Chunks {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -39,7 +39,7 @@ export async function* readSSE(stream: ReadableStream<Uint8Array>): Chunks {
 }
 
 // Starts the first model that accepts the request; falls back to the next on error.
-export async function streamWorkersAI(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
+async function streamWorkersAI(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
   if (!env.AI) throw new Error("Workers AI binding 'AI' is missing on this Pages project");
   const models = [...new Set([env.WORKERS_AI_MODEL, ...MODELS].filter(Boolean) as string[])];
   let lastError: unknown;
@@ -69,7 +69,20 @@ export async function streamWorkersAI(env: Env, messages: { role: string; conten
   throw lastError;
 }
 
-export async function streamOpenRouter(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
+// Picks the provider: Workers AI first and, when none of its models can answer (for example the free
+// daily allowance is used up), OpenRouter if its key is set. AI_PROVIDER = "openrouter" swaps the order.
+export async function streamAnswer(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
+  const order = env.AI_PROVIDER === "openrouter" ? [streamOpenRouter, streamWorkersAI] : [streamWorkersAI, streamOpenRouter];
+  try {
+    return await order[0](env, messages);
+  } catch (first) {
+    if (!env.OPENROUTER_API_KEY) throw first; // no backup configured
+    console.error("Main AI failed, trying the backup:", first);
+    return await order[1](env, messages);
+  }
+}
+
+async function streamOpenRouter(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
   if (!env.OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY is not set");
   const model = env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {

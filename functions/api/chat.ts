@@ -16,7 +16,7 @@ import { SOURCES } from "../../shared/sources";
 import { pickJoke, wantsJoke } from "../../shared/jokes";
 import { fetchArticle, pickArticles } from "../../server/grapeBot/articles";
 import { followUps, isPolish, systemPrompt } from "../../server/grapeBot/prompt";
-import { streamOpenRouter, streamWorkersAI } from "../../server/grapeBot/providers";
+import { streamAnswer } from "../../server/grapeBot/providers";
 import { parseBody } from "../../server/grapeBot/request";
 import type { Article, Env } from "../../server/grapeBot/settings";
 
@@ -70,8 +70,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       controller.enqueue(line(meta));
       let wrote = false;
       try {
-        const { model, chunks } =
-          env.AI_PROVIDER === "openrouter" ? await streamOpenRouter(env, messages) : await streamWorkersAI(env, messages);
+        const { model, chunks } = await streamAnswer(env, messages);
         for await (const text of chunks) {
           wrote = true;
           controller.enqueue(line({ type: "text", text }));
