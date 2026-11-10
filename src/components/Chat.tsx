@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "re
 import Counter from "./Counter";
 import AnswerTools from "./AnswerTools";
 import { wikiUrl } from "../../shared/grapes";
-import { GREETING, SUGGESTIONS, type Msg } from "../lib/chatMessages";
+import { GREETING, plainAnswer, SUGGESTIONS, type Msg } from "../lib/chatMessages";
 import { askGrapeBot, photosFor, rememberJoke } from "../lib/grapeBot";
 
 const MAX = 500;
@@ -181,9 +181,9 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
                         </span>
                       </span>
                     ))}
-                    {m.content}
+                    {m.role === "assistant" ? plainAnswer(m.content) : m.content}
                     {m.pending && <span className="caret" aria-hidden="true" />}
-                    {m.role === "assistant" && !m.pending && m !== GREETING && <AnswerTools text={m.content} />}
+                    {m.role === "assistant" && !m.pending && m !== GREETING && <AnswerTools text={plainAnswer(m.content)} />}
                     {m.sources && m.sources.length > 0 && !m.pending && (
                       <div className="sources">
                         {m.sources.map((s) => (

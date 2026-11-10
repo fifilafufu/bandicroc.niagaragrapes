@@ -14,6 +14,10 @@ export type Msg = {
   id?: string;
 };
 
+// The AI sometimes writes Markdown (**bold**, # headings) although it is asked for plain text.
+// Answers are shown as plain text, so the marks are taken out instead of showing as stars.
+export const plainAnswer = (text: string) => text.replace(/\*\*|__/g, "").replace(/^#{1,6}\s+/gm, "");
+
 export const GREETING: Msg = {
   role: "assistant",
   content: "Hi! I'm Grape Bot, your grape tutor. Ask me anything about grapes, and I'll answer from checked facts and Wikipedia. 🍇",
