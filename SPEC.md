@@ -60,6 +60,19 @@ SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe 
 
 Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape Bot runs on Cloudflare Workers AI, with OpenRouter free models as backup.
 
+## Code structure
+
+| Folder | Role | May import |
+|---|---|---|
+| `functions/` | Backend: Cloudflare Pages Functions (Grape Bot, AI calls, secrets) | `shared/` |
+| `src/components/` | Frontend screens: drawing and taps only | `src/lib/`, `shared/` |
+| `src/lib/` | Frontend data layer: Supabase, server calls, routing, device storage, hooks | `shared/` |
+| `src/styles/` | Styles, one file per feature | none |
+| `shared/` | Plain data and pure logic for both sides (no React, no DOM, no network) | `shared/` |
+| `scripts/` | Data build scripts and tests (run by hand) | `shared/` |
+
+Supabase is reached only from `src/lib/`, protected by row-level security. Full rules: `CLAUDE.md` → Code structure rules.
+
 ## Data standard
 
 - Facts trace to a source: OIV, VIVC, FAO, AWRI, the EU, university extension services, then Wikipedia.

@@ -16,6 +16,17 @@ Rules:
 - When a step or fix is done, end the message with what I should see and exactly how to test it, as numbered steps I can follow in the app.
 - Questions for the user: always ask with the AskUserQuestion tool (multiple-choice popup), never as a list in text. One clear question per item, 2 options each; the user types their own answer in "Other" when needed.
 
+## Code structure rules
+Frontend, backend and data stay separate, and imports only flow one way: screens → `src/lib/` → `shared/`.
+- **`functions/` is the backend** (Cloudflare Pages Functions: Grape Bot, secrets, AI calls). It may import `shared/`, never `src/`.
+- **`src/` is the frontend.** Components only draw the screen and handle taps. They never call Supabase or `fetch` directly: every database or server call goes through a function or hook in `src/lib/`.
+- **`shared/` is plain data and pure logic** used by both sides: no React, no DOM, no network calls.
+- **Content is data, not code.** Facts, lists, numbers and their sources live in `shared/` data files, never typed inside a component.
+- **No copy-paste.** When the same logic appears twice, make one helper and use it in both places.
+- **Small, focused files.** One component per file; split any file that grows past about 250 lines. Styles are split by feature in `src/styles/`, not appended to one big file.
+- **No dead code.** Remove unused files, exports and commented-out code in the same change.
+- Check before committing: no file in `src/components/` imports `supabase` or calls `fetch`; nothing in `shared/` imports from `src/`.
+
 ## Documentation rules
 - All project docs (README.md, SPEC.md, PLAN.md, CLAUDE.md) are in English only.
 - Do not update README.md during a phase.
