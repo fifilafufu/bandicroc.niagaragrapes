@@ -1,3 +1,5 @@
+import { useLang } from "../../lib/lang";
+
 type Props = {
   title: string;
   score: number;
@@ -11,26 +13,25 @@ type Props = {
 
 // The end of a round: score, Grape Bot's verdict, and what to do next.
 export default function QuizEnd({ title, score, total, verdict, offerPro, onAgain, onBack, onPro }: Props) {
+  const { t } = useLang();
   return (
     <div className="quiz">
       <section className="card quiz-card center">
         <p className="quiz-big">{verdict.emoji}</p>
         <p className="eyebrow">{title}</p>
-        <h2>
-          You got {score} / {total}
-        </h2>
+        <h2>{t("quiz.got", { score, total })}</h2>
         <p className="quiz-verdict">{verdict.text}</p>
         <div className="hero-actions">
           <button className="primary" onClick={onAgain}>
-            Play again
+            {t("quiz.again")}
           </button>
           {offerPro && (
             <button className="secondary" onClick={onPro}>
-              Try 🍷 Pro
+              {t("quiz.tryPro")}
             </button>
           )}
           <button className="secondary" onClick={onBack}>
-            Other quizzes
+            {t("quiz.others")}
           </button>
         </div>
       </section>

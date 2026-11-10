@@ -8,6 +8,7 @@ import { readPref, writePref } from "./prefs";
 import { questionsFor } from "../../shared/quiz";
 import { shuffle } from "../../shared/quiz/random";
 import type { Category, Level, Question } from "../../shared/quiz/types";
+import type { Lang } from "../../shared/i18n";
 
 export const ROUND_SIZE = 8;
 const SAME_KIND_PER_ROUND = 2; // at most 2 photo questions, 2 VIVC colour questions, … per round
@@ -46,8 +47,8 @@ function takeMixed(list: Question[], n: number, already: Question[] = []): Quest
 
 // A fresh round: unseen questions of your level first, then unseen ones of the other level, then
 // (once the category runs out) ones you've seen. Answer options are shuffled too.
-export function newRound(cat: Category, level: Level, n = ROUND_SIZE): Question[] {
-  const all = questionsFor(cat);
+export function newRound(cat: Category, level: Level, lang: Lang, n = ROUND_SIZE): Question[] {
+  const all = questionsFor(cat, lang);
   const seen = new Set(readSeen(cat));
   const fresh = shuffle(all.filter((q) => !seen.has(q.id)));
   const order = [...fresh.filter((q) => q.level === level), ...fresh.filter((q) => q.level !== level), ...shuffle(all.filter((q) => seen.has(q.id)))];
@@ -63,54 +64,12 @@ function shuffleOptions(q: Question): Question {
 }
 
 // Call once a round is on screen. When the whole category has been seen, the cycle starts again.
+// Question ids are the same in every language, so the count is too.
 export function markSeen(cat: Category, round: Question[]) {
-  const all = questionsFor(cat).length;
+  const all = questionsFor(cat, "en").length;
   let seen = new Set(readSeen(cat));
   if (seen.size >= all) seen = new Set();
   round.forEach((q) => seen.add(q.id));
   if (seen.size >= all) seen = new Set(round.map((q) => q.id));
   writePref(seenKey(cat), JSON.stringify([...seen]));
-}
-
-// Quirky but kind: what Grape Bot says about your score.
-export function scoreMessage(score: number, total: number, level: Level): { emoji: string; text: string } {
-  const pick = (list: string[]) => list[Math.floor(Math.random() * list.length)];
-  const r = score / total;
-  if (score === 0)
-    return {
-      emoji: "🥺",
-      text: pick([
-        "I don't think you've read the page… :( It's okay, the grapes still like you.",
-        "Zero?! Did you answer with your eyes closed? I believe in you. Have a little read and try again 💚",
-        "Hmm, not one. Even a raisin knows a bit more… but raisins have had a lot of time to think. Try again?",
-      ]),
-    };
-  if (r < 0.375)
-    return {
-      emoji: "🌱",
-      text: pick([
-        "A tiny sprout of knowledge! Every vineyard starts with one seed. Give it another go?",
-        "Not quite ripe yet. A quick look at the Grapes tab and you'll be juicier next time.",
-      ]),
-    };
-  if (r < 0.625)
-    return {
-      emoji: "🍇",
-      text: pick(["Halfway to grape greatness! Not bad at all.", "Solid! You know your grapes better than most people at the supermarket."]),
-    };
-  if (r < 1)
-    return {
-      emoji: "✨",
-      text: pick([
-        "So close! Just a grape or two away from perfect.",
-        level === "pro" ? "Impressive. Dionysus is nodding slowly at you." : "Great job! You might be ready for Pro: Dionysus mode.",
-      ]),
-    };
-  return {
-    emoji: "🏆",
-    text:
-      level === "pro"
-        ? "Perfect in Dionysus mode?! The god of wine himself raises a glass (of grape juice) to you. 🍷"
-        : "Perfect! You're no newbie anymore. Try Pro: Dionysus mode next?",
-  };
 }

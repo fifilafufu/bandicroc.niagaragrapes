@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { num } from "../../../shared/i18n/countries";
 import type { NumberQ } from "../../../shared/quiz/types";
+import { useLang } from "../../lib/lang";
 
 const decimals = (step: number) => step.toString().split(".")[1]?.length ?? 0;
-const show = (n: number, step: number) => n.toFixed(decimals(step)).replace("-", "−");
 
 // Guess a number with a slider (and − / + for fine steps). Close enough counts as right.
 export default function NumberQuestion({ q, onAnswer }: { q: NumberQ; onAnswer: (right: boolean) => void }) {
+  const { lang, t } = useLang();
+  const show = (n: number, step: number) => num(n, lang, decimals(step)).replace("-", "−");
   const snap = (n: number) => Math.min(q.max, Math.max(q.min, Math.round(n / q.step) * q.step));
   const [value, setValue] = useState(() => snap((q.min + q.max) / 2));
   const [checked, setChecked] = useState(false);
@@ -22,11 +25,11 @@ export default function NumberQuestion({ q, onAnswer }: { q: NumberQ; onAnswer: 
         {show(value, q.step)} <span className="muted">{q.unit}</span>
       </p>
       <div className="quiz-number-row">
-        <button className="secondary" onClick={() => setValue((v) => snap(v - q.step))} disabled={checked} aria-label="Less">
+        <button className="secondary" onClick={() => setValue((v) => snap(v - q.step))} disabled={checked} aria-label={t("quiz.less")}>
           −
         </button>
-        <input type="range" min={q.min} max={q.max} step={q.step} value={value} onChange={(e) => setValue(Number(e.target.value))} disabled={checked} aria-label={`Your guess in ${q.unit}`} />
-        <button className="secondary" onClick={() => setValue((v) => snap(v + q.step))} disabled={checked} aria-label="More">
+        <input type="range" min={q.min} max={q.max} step={q.step} value={value} onChange={(e) => setValue(Number(e.target.value))} disabled={checked} aria-label={t("quiz.guessIn", { unit: q.unit })} />
+        <button className="secondary" onClick={() => setValue((v) => snap(v + q.step))} disabled={checked} aria-label={t("quiz.more")}>
           +
         </button>
       </div>
@@ -36,12 +39,12 @@ export default function NumberQuestion({ q, onAnswer }: { q: NumberQ; onAnswer: 
       </p>
       {checked ? (
         <p className={`quiz-number-result ${right ? "right" : "wrong"}`}>
-          {right ? "✓" : "✗"} The answer is {show(q.answer, q.step)} {q.unit}
-          {right ? "" : ` (within ${show(q.tolerance, q.step)} counts as right)`}.
+          {right ? "✓" : "✗"} {t("quiz.answerIs", { value: show(q.answer, q.step), unit: q.unit })}
+          {right ? "" : ` ${t("quiz.within", { t: show(q.tolerance, q.step) })}`}.
         </p>
       ) : (
         <button className="primary" onClick={check}>
-          Check
+          {t("quiz.check")}
         </button>
       )}
     </div>

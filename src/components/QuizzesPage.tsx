@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CATEGORIES } from "../../shared/quiz/categories";
 import type { Category, Level } from "../../shared/quiz/types";
 import { accountsAvailable, type User } from "../lib/account";
+import { useLang } from "../lib/lang";
 import { saveLevel, savedLevel } from "../lib/quiz";
 import { bestResult, useQuizResults } from "../lib/useQuizResults";
 import QuizRound from "./quiz/QuizRound";
@@ -9,6 +10,7 @@ import QuizScoreboard from "./quiz/QuizScoreboard";
 
 // The Quizzes section. Scores are saved to the account when logged in (see useQuizResults).
 export default function QuizzesPage({ user, onLogin }: { user: User | null; onLogin: () => void }) {
+  const { lang, t } = useLang();
   const { results, add, synced } = useQuizResults(user);
   const [cat, setCat] = useState<Category | null>(null);
   const [level, setLevelState] = useState<Level>(savedLevel);
@@ -26,18 +28,18 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
   return (
     <div className="stack">
       <section className="card">
-        <h1 className="page-title">🎯 Quizzes</h1>
-        <p className="muted">Test what you know about grapes. Every answer shows where the fact comes from.</p>
+        <h1 className="page-title">{t("quiz.title")}</h1>
+        <p className="muted">{t("quiz.intro")}</p>
         {user ? (
-          <p className="muted small">{synced ? "✓ Your scores are saved to your account." : "Your scores are saved on this device."}</p>
+          <p className="muted small">{synced ? t("quiz.savedAccount") : t("quiz.savedDevice")}</p>
         ) : (
           accountsAvailable && (
             <p className="muted small">
-              Your scores are kept on this device.{" "}
+              {t("quiz.keptDevice")}{" "}
               <button className="link inline" onClick={onLogin}>
-                Log in
+                {t("quiz.logIn")}
               </button>{" "}
-              to keep them on all your devices.
+              {t("quiz.keepAll")}
             </p>
           )
         )}
@@ -45,7 +47,7 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
       </section>
       {cat && (
         <QuizRound
-          key={`${cat}-${level}`}
+          key={`${cat}-${level}-${lang}`}
           cat={cat}
           level={level}
           onFinish={(score, total) => add(`cat:${cat}`, score, total)}

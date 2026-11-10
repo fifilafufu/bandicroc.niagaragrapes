@@ -1,16 +1,18 @@
 import { useState, type KeyboardEvent } from "react";
 import type { BerryPart, DiagramQ } from "../../../shared/quiz/types";
+import { useLang } from "../../lib/lang";
 
 // Tap the right part of a grape berry, drawn in code with no labels. After the tap, every part is
 // named and the right one lights up.
-const LABELS: Record<BerryPart, { text: string; x: number; y: number }> = {
-  stem: { text: "Stem", x: 168, y: 30 },
-  skin: { text: "Skin", x: 120, y: 70 },
-  flesh: { text: "Flesh", x: 120, y: 118 },
-  seeds: { text: "Seeds", x: 120, y: 214 },
+const LABELS: Record<BerryPart, { key: "quiz.stem" | "quiz.skin" | "quiz.flesh" | "quiz.seeds"; x: number; y: number }> = {
+  stem: { key: "quiz.stem", x: 168, y: 30 },
+  skin: { key: "quiz.skin", x: 120, y: 70 },
+  flesh: { key: "quiz.flesh", x: 120, y: 118 },
+  seeds: { key: "quiz.seeds", x: 120, y: 214 },
 };
 
 export default function DiagramQuestion({ q, onAnswer }: { q: DiagramQ; onAnswer: (right: boolean) => void }) {
+  const { t } = useLang();
   const [picked, setPicked] = useState<BerryPart | null>(null);
 
   function choose(part: BerryPart) {
@@ -22,14 +24,14 @@ export default function DiagramQuestion({ q, onAnswer }: { q: DiagramQ; onAnswer
   const tap = (part: BerryPart) => ({
     role: "button",
     tabIndex: picked ? -1 : 0,
-    "aria-label": LABELS[part].text,
+    "aria-label": t(LABELS[part].key),
     className: `part ${state(part)}`,
     onClick: () => choose(part),
     onKeyDown: (e: KeyboardEvent) => (e.key === "Enter" || e.key === " ") && choose(part),
   });
 
   return (
-    <svg viewBox="0 0 240 262" className={`quiz-diagram ${picked ? "answered" : ""}`} role="group" aria-label="A grape berry cut in half: tap a part">
+    <svg viewBox="0 0 240 262" className={`quiz-diagram ${picked ? "answered" : ""}`} role="group" aria-label={t("quiz.berry")}>
       <g {...tap("skin")}>
         <circle cx="120" cy="152" r="100" fill="var(--g-skin)" />
       </g>
@@ -49,7 +51,7 @@ export default function DiagramQuestion({ q, onAnswer }: { q: DiagramQ; onAnswer
       {picked &&
         (Object.keys(LABELS) as BerryPart[]).map((p) => (
           <text key={p} x={LABELS[p].x} y={LABELS[p].y} textAnchor="middle" className={`quiz-diagram-label ${state(p)}`}>
-            {LABELS[p].text}
+            {t(LABELS[p].key)}
           </text>
         ))}
     </svg>

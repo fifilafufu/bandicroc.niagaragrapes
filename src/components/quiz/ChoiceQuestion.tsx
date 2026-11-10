@@ -1,10 +1,12 @@
 import { useState } from "react";
 import type { ChoiceQ } from "../../../shared/quiz/types";
 import { photoOf } from "../../../shared/varieties";
+import { useLang } from "../../lib/lang";
 import PhotoCredit from "../PhotoCredit";
 
 // Pick one answer. Photo questions show a real, credited Commons photo above the options.
 export default function ChoiceQuestion({ q, onAnswer }: { q: ChoiceQ; onAnswer: (right: boolean) => void }) {
+  const { t } = useLang();
   const [picked, setPicked] = useState<number | null>(null);
   const photo = q.photo ? photoOf(q.photo) : null;
 
@@ -18,7 +20,7 @@ export default function ChoiceQuestion({ q, onAnswer }: { q: ChoiceQ; onAnswer: 
     <>
       {photo && (
         <figure className="quiz-photo">
-          <img src={photo.thumb} alt="Grapes to name" loading="eager" />
+          <img src={photo.thumb} alt={t("quiz.photoAlt")} loading="eager" />
           <figcaption>
             <PhotoCredit photo={photo} />
           </figcaption>

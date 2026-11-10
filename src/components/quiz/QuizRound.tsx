@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { CATEGORIES } from "../../../shared/quiz/categories";
+import { CATEGORIES, categoryName } from "../../../shared/quiz/categories";
+import { scoreMessage } from "../../../shared/quiz/scoreboard";
 import type { Category, Level, Question } from "../../../shared/quiz/types";
-import { markSeen, newRound, scoreMessage } from "../../lib/quiz";
+import { useLang } from "../../lib/lang";
+import { markSeen, newRound } from "../../lib/quiz";
 import ChoiceQuestion from "./ChoiceQuestion";
 import DiagramQuestion from "./DiagramQuestion";
 import NumberQuestion from "./NumberQuestion";
@@ -26,12 +28,14 @@ function Ask({ q, onAnswer }: { q: Question; onAnswer: (right: boolean) => void 
 }
 
 export default function QuizRound({ cat, level, onFinish, onBack, onPro }: Props) {
-  const [round, setRound] = useState(() => newRound(cat, level));
+  const { lang, t } = useLang();
+  const [round, setRound] = useState(() => newRound(cat, level, lang));
   const [index, setIndex] = useState(0);
   const [right, setRight] = useState<boolean | null>(null);
   const [score, setScore] = useState(0);
   const [verdict, setVerdict] = useState<ReturnType<typeof scoreMessage> | null>(null);
   const info = CATEGORIES.find((c) => c.id === cat)!;
+  const title = `${info.emoji} ${categoryName(cat, lang)}`;
 
   // Remember these questions so the next rounds skip them (safe to run twice: it only adds them).
   useEffect(() => markSeen(cat, round), [cat, round]);
@@ -44,13 +48,13 @@ export default function QuizRound({ cat, level, onFinish, onBack, onPro }: Props
     setRight(null);
     const n = index + 1;
     if (n >= round.length) {
-      setVerdict(scoreMessage(score, round.length, level));
+      setVerdict(scoreMessage(score, round.length, level, lang));
       onFinish(score, round.length);
     }
     setIndex(n);
   }
   function restart() {
-    setRound(newRound(cat, level));
+    setRound(newRound(cat, level, lang));
     setIndex(0);
     setRight(null);
     setScore(0);
@@ -58,16 +62,16 @@ export default function QuizRound({ cat, level, onFinish, onBack, onPro }: Props
   }
 
   if (verdict)
-    return <QuizEnd title={`${info.emoji} ${info.name}`} score={score} total={round.length} verdict={verdict} offerPro={level === "newbie" && score >= round.length * 0.75} onAgain={restart} onBack={onBack} onPro={onPro} />;
+    return <QuizEnd title={title} score={score} total={round.length} verdict={verdict} offerPro={level === "newbie" && score >= round.length * 0.75} onAgain={restart} onBack={onBack} onPro={onPro} />;
 
   const q = round[index];
   return (
     <div className="quiz">
       <p className="quiz-progress muted small">
         <button className="link inline" onClick={onBack}>
-          ← {info.emoji} {info.name}
+          ← {title}
         </button>{" "}
-        · Question {index + 1} of {round.length} · Score {score}
+        · {t("quiz.progress", { i: index + 1, n: round.length, score })}
       </p>
       <div className="quiz-bar" aria-hidden="true">
         <span style={{ width: `${(index / round.length) * 100}%` }} />
