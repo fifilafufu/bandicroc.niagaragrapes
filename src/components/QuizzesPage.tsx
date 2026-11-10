@@ -3,8 +3,7 @@ import { CATEGORIES } from "../../shared/quiz/categories";
 import type { Category, Level } from "../../shared/quiz/types";
 import { accountsAvailable, type User } from "../lib/account";
 import { saveLevel, savedLevel } from "../lib/quiz";
-import { summary, useQuizResults } from "../lib/useQuizResults";
-import QuizPicker from "./quiz/QuizPicker";
+import { bestResult, useQuizResults } from "../lib/useQuizResults";
 import QuizRound from "./quiz/QuizRound";
 import QuizScoreboard from "./quiz/QuizScoreboard";
 
@@ -18,13 +17,10 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
     saveLevel(l);
   };
 
-  const scores: Partial<Record<Category, string>> = {};
   const bests: Partial<Record<Category, { score: number; total: number }>> = {};
   for (const c of CATEGORIES) {
-    const s = summary(results, `cat:${c.id}`);
-    if (!s) continue;
-    bests[c.id] = s.best;
-    scores[c.id] = `Best ${s.best.score} / ${s.best.total} · ${s.rounds} ${s.rounds === 1 ? "round" : "rounds"}`;
+    const best = bestResult(results, `cat:${c.id}`);
+    if (best) bests[c.id] = best;
   }
 
   return (
@@ -45,9 +41,9 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
             </p>
           )
         )}
-        {!cat && <QuizScoreboard bests={bests} onPick={setCat} />}
+        {!cat && <QuizScoreboard bests={bests} level={level} onLevel={setLevel} onPick={setCat} />}
       </section>
-      {cat ? (
+      {cat && (
         <QuizRound
           key={`${cat}-${level}`}
           cat={cat}
@@ -56,8 +52,6 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
           onBack={() => setCat(null)}
           onPro={() => setLevel("pro")}
         />
-      ) : (
-        <QuizPicker level={level} onLevel={setLevel} onPick={setCat} scores={scores} />
       )}
     </div>
   );

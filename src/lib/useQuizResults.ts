@@ -20,10 +20,9 @@ export function useQuizResults(user: User | null) {
   return { results: items, add, synced };
 }
 
-// Best score and number of rounds for one quiz.
-export function summary(results: QuizResult[], quiz: string) {
+// Best result for one quiz, or null if it was never played.
+export function bestResult(results: QuizResult[], quiz: string): QuizResult | null {
   const mine = results.filter((r) => r.quiz === quiz);
   if (!mine.length) return null;
-  const best = mine.reduce((a, b) => (b.score / b.total > a.score / a.total ? b : a));
-  return { rounds: mine.length, best, last: mine[0] };
+  return mine.reduce((a, b) => (b.score / b.total > a.score / a.total ? b : a));
 }

@@ -1,12 +1,12 @@
 import type { Category, Level } from "./types";
 
-export const CATEGORIES: { id: Category; emoji: string; name: string; blurb: string }[] = [
-  { id: "varieties", emoji: "🍇", name: "Varieties", blurb: "Name the grape from a photo, parents, colours and where they come from." },
-  { id: "biology", emoji: "🌱", name: "Biology", blurb: "Species, the parts of a berry and the vine's year." },
-  { id: "statistics", emoji: "📊", name: "Statistics", blurb: "How many grapes the world grows, and what happens to them." },
-  { id: "growing", emoji: "✂️", name: "Growing", blurb: "Pruning, frost, diseases and caring for a vine." },
-  { id: "winemaking", emoji: "🛢️", name: "Winemaking", blurb: "Put the steps in order, from harvest to bottle." },
-  { id: "basics", emoji: "🍷", name: "Wine basics", blurb: "Acidity, sugar, alcohol, tannin and what the label says." },
+export const CATEGORIES: { id: Category; emoji: string; name: string }[] = [
+  { id: "varieties", emoji: "🍇", name: "Varieties" },
+  { id: "biology", emoji: "🌱", name: "Biology" },
+  { id: "statistics", emoji: "📊", name: "Statistics" },
+  { id: "growing", emoji: "✂️", name: "Growing" },
+  { id: "winemaking", emoji: "🛢️", name: "Winemaking" },
+  { id: "basics", emoji: "🍷", name: "Wine basics" },
 ];
 
 export const LEVELS: { id: Level; emoji: string; name: string; blurb: string }[] = [
