@@ -20,7 +20,7 @@ type Filter = (typeof FILTERS)[number]["id"];
 
 // Shown in the chosen language; grape and species names stay as they are.
 const inLang = (pl: boolean) => ({
-  use: (u: Use) => (pl ? USE_LABEL_PL[u] : USE_LABEL[u]),
+  purpose: (u: Use) => (pl ? USE_LABEL_PL[u] : USE_LABEL[u]),
   taste: (name: string) => (pl ? TASTE_PL[name] : undefined) ?? INFO[name]?.taste,
   meaning: (code: string, en: string) => (pl ? COLOUR_MEANING_PL[code] : undefined) ?? en,
   species: (label: string | null) => (pl && label ? SPECIES_PL[label] : undefined) ?? label,
@@ -80,9 +80,9 @@ export default function GrapeGallery({ onAsk }: { onAsk: (question: string) => v
                 </span>
               )}
               <span className="taste">👅 {L.taste(g.name)}</span>
-              <span className="uses" aria-label={t("gal.usedFor", { uses: (info?.uses ?? []).map(L.use).join(", ") })}>
+              <span className="uses" aria-label={t("gal.usedFor", { uses: (info?.uses ?? []).map(L.purpose).join(", ") })}>
                 {info?.uses.map((u) => (
-                  <span key={u} title={L.use(u)}>
+                  <span key={u} title={L.purpose(u)}>
                     {USE_ICON[u]}
                   </span>
                 ))}
@@ -108,7 +108,7 @@ export default function GrapeGallery({ onAsk }: { onAsk: (question: string) => v
       <p className="legend muted small">
         {(Object.keys(USE_ICON) as Use[]).map((u) => (
           <span key={u}>
-            {USE_ICON[u]} {L.use(u)}
+            {USE_ICON[u]} {L.purpose(u)}
           </span>
         ))}
       </p>
