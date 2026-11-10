@@ -26,6 +26,7 @@ button.fav-pill { border: 0; cursor: pointer; font: inherit; font-size: 0.85rem;
 .hero-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .hero-actions.left { justify-content: flex-start; align-items: center; }
 
+.stats-title { font-size: 1rem; margin: 6px 4px -2px; }
 .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 @media (min-width: 560px) { .stats { grid-template-columns: repeat(4, 1fr); } }
 .stat { padding: 12px; text-align: center; display: flex; flex-direction: column; gap: 2px; }

@@ -18,11 +18,14 @@ export const DID_YOU_KNOW = [
 ];
 
 // Checked against the linked sources (November 2026). Grape totals and uses: OIV 2024.
+// All four are world figures, not one country's.
+export const STATS_TITLE = "🌍 Grapes worldwide, in numbers";
+
 export const STATS = [
-  { value: "8,000", label: "years of growing grapes" },
-  { value: "77.7M", label: "tonnes grown in 2024 (OIV)" },
-  { value: "47%", label: "pressed for wine & juice (OIV 2024)" },
-  { value: "15–300", label: "grapes per bunch" },
+  { value: "8,000", label: "years since people first grew grapes (Western Asia)" },
+  { value: "77.7M", label: "tonnes grown in the whole world in 2024 (OIV)" },
+  { value: "47%", label: "of the world's grapes pressed for wine & juice (OIV 2024)" },
+  { value: "15–300", label: "grapes in a single bunch" },
 ];
 
 export type Section = { emoji: string; title: string; body: string[]; wiki: { label: string; title: string }[]; src?: SourceId[] };

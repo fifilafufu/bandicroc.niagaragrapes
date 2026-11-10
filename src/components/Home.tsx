@@ -6,7 +6,7 @@ import GrapeGallery from "./GrapeGallery";
 import ColourCompare from "./visuals/ColourCompare";
 import type { Page } from "../lib/route";
 import VarietiesExplainer from "./visuals/VarietiesExplainer";
-import { DID_YOU_KNOW, SECTIONS, STATS, type Section } from "../../shared/overview";
+import { DID_YOU_KNOW, SECTIONS, STATS, STATS_TITLE, type Section } from "../../shared/overview";
 
 const WELCOME_KEY = "welcome-dismissed";
 
@@ -67,7 +67,8 @@ export default function Home({ onChat, onMyGrapes, onAsk, go }: Props) {
         </button>
       </section>
 
-      <section className="stats" aria-label="Grapes in numbers">
+      <h2 className="stats-title">{STATS_TITLE}</h2>
+      <section className="stats" aria-label={STATS_TITLE}>
         {STATS.map((s) => (
           <div key={s.label} className="stat card">
             <b>{s.value}</b>
