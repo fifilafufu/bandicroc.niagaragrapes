@@ -2,7 +2,7 @@
 // kept out of Chat.tsx so the chat screen can load only when it's opened.
 
 type Source = { title: string; url: string; data?: boolean }; // data: a statistics source (OIV, FAO), not Wikipedia
-type Photo = { wiki: string; name: string; src: string };
+type Photo = { wiki: string; name: string; src: string; credit?: { author: string; licence: string; page: string } };
 
 export type Msg = {
   role: "user" | "assistant";

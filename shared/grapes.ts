@@ -80,7 +80,7 @@ export const GRAPES: Grape[] = [
   {
     name: "Pinot Noir",
     wiki: "Pinot noir",
-    keywords: ["pinot"],
+    keywords: ["pinot noir", "pinot nero", "spätburgunder", "spatburgunder"],
     facts: "Thin-skinned black wine grape, hard to grow; makes light to medium-bodied red wine with cherry, raspberry and strawberry aromas.",
   },
   {
@@ -99,7 +99,7 @@ GRAPES.push(
     wiki: "Shine Muscat",
     keywords: ["shine muscat"],
     facts:
-      "Yellowish-green Japanese table grape, registered in 2006, bred from Muscat of Alexandria and the very sugary American grape Steuben. Large and sweet with a muscat aroma; with treatment it grows seedless and the whole skin can be eaten.",
+      "Yellowish-green Japanese table grape, registered in 2006. VIVC gives its parents as Akitsu 21 × Hakunan; Wikipedia traces its ancestry to Muscat of Alexandria and the very sugary American grape Steuben. Large and sweet with a muscat aroma; with treatment it grows seedless and the whole skin can be eaten.",
   },
   {
     name: "Scuppernong",
@@ -120,7 +120,89 @@ GRAPES.push(
     wiki: "Kyoho (grape)",
     keywords: ["kyoho"],
     facts:
-      "Japanese table grape, blackish-purple to almost black, with very sweet, juicy flesh, mild acidity and large bitter seeds. Slip-skin like Concord, with some Concord-like flavour; usually peeled and eaten as a dessert. Popular in Japan, Taiwan, China and Korea.",
+      "Japanese table grape, blackish-purple to almost black, with very sweet, juicy flesh, mild acidity and large bitter seeds. Slip-skin like Concord, with some Concord-like flavour; usually peeled and eaten as a dessert. Popular in Japan, Taiwan, China and Korea. It has the most vineyard area of any grape in the world, about 365,000 ha, mostly in China (OIV, 2015 data).",
+  },
+);
+
+// Added in Part 3 (2026-11-10): classic wine grapes, a "gris" example and cold-hardy, disease-resistant
+// hybrids. Facts from each Wikipedia article; parents and colour from each VIVC passport.
+GRAPES.push(
+  {
+    name: "Pinot Gris",
+    wiki: "Pinot gris",
+    keywords: ["pinot gris", "pinot grigio", "grauburgunder"],
+    facts:
+      "A grey-pink skinned mutation of Pinot Noir (VIVC colour class: gris) used for white wine; called Pinot Grigio in Italy and Grauburgunder in Germany. Alsace-style wines are full-bodied, with low to moderate acidity, higher alcohol and an almost oily texture; Italian-style ones are lighter and more acidic. A popular grape for skin-contact (orange) wine.",
+  },
+  {
+    name: "Merlot",
+    wiki: "Merlot",
+    keywords: ["merlot"],
+    facts:
+      "Dark blue wine grape, soft and \"fleshy\", ripening earlier than Cabernet Sauvignon; the two are blended in Bordeaux, where Merlot is the most planted grape. Parents (VIVC): Magdeleine Noire des Charentes × Cabernet Franc. About 266,000 ha worldwide in 2015 (OIV).",
+  },
+  {
+    name: "Sauvignon Blanc",
+    wiki: "Sauvignon blanc",
+    keywords: ["sauvignon blanc", "fumé blanc", "fume blanc"],
+    facts:
+      "Green-skinned grape that most likely comes from the Loire Valley, France, possibly a descendant of Savagnin. Makes crisp, dry, refreshing white wine: grassy in cool climates, tropical in warm ones. In California it is sometimes sold as Fumé Blanc.",
+  },
+  {
+    name: "Syrah",
+    wiki: "Syrah",
+    keywords: ["syrah", "shiraz"],
+    facts:
+      "Also called Shiraz: the same grape. Dark-skinned; its parents are Dureza and Mondeuse Blanche (found in 1999). In moderate climates: medium to full body, high tannin, blackberry, mint and black pepper. In hot climates such as the Barossa Valley: fuller, softer tannin, jammy fruit, licorice and leather. Not the same as Petite Sirah.",
+  },
+  {
+    name: "Tempranillo",
+    wiki: "Tempranillo",
+    keywords: ["tempranillo", "tinta roriz", "aragonez", "tinto fino"],
+    facts:
+      "Black grape, the main grape of Rioja and Spain's \"noble grape\". Its name comes from temprano (early): it ripens weeks before most Spanish reds. Fairly neutral flavour, so it is often blended with Grenache. About 232,000 ha in 2015, 87% of it in Spain. Called Tinta Roriz or Aragonez in Portugal.",
+  },
+  {
+    name: "Grenache",
+    wiki: "Grenache",
+    keywords: ["grenache", "garnacha", "cannonau"],
+    facts:
+      "Called Garnacha in Spain, where it probably comes from; one of the most planted red grapes in the world. Ripens late and needs hot, dry weather. Its wines are soft and spicy with raspberry, strawberry and white pepper, and fairly high alcohol. They oxidise easily, so even young ones can show a brick-coloured rim.",
+  },
+  {
+    name: "Solaris",
+    wiki: "Solaris (grape)",
+    keywords: ["solaris"],
+    facts:
+      "White wine grape bred in 1975 at the grape-breeding institute in Freiburg, Germany, by Norbert Becker. Parents (VIVC): Merzling × Geisenheim 6493. Bred to resist fungal diseases, and hardy, so it is grown in cool northern countries such as Belgium. It has traces of hybrid grapes in its ancestry, yet the EU classifies it as Vitis vinifera.",
+  },
+  {
+    name: "Regent",
+    wiki: "Regent (grape)",
+    keywords: ["regent"],
+    facts:
+      "Dark-skinned grape for red wine, bred in Germany (VIVC parents: Diana × Chambourcin). It has both European and American vine species in its ancestry and broad resistance to the worst fungal diseases, such as downy mildew.",
+  },
+  {
+    name: "Marquette",
+    wiki: "Marquette (grape)",
+    keywords: ["marquette"],
+    facts:
+      "Red wine hybrid from the University of Minnesota, introduced in 2006 (parents MN 1094 × Ravat 262). Very cold hardy: survives about −37 °C when fully dormant. Good resistance to downy mildew, powdery mildew and black rot.",
+  },
+  {
+    name: "Seyval Blanc",
+    wiki: "Seyval blanc",
+    keywords: ["seyval"],
+    facts:
+      "White hybrid wine grape (Seyve-Villard 5276), a cross of Seibel 5656 × Rayon d'Or. Ripens early, is productive and suits cool climates; grown in England, New York's Finger Lakes and Canada. Because it has non-vinifera genes, EU rules don't allow it in \"quality wine\".",
+  },
+  {
+    name: "Vidal Blanc",
+    wiki: "Vidal blanc",
+    keywords: ["vidal"],
+    facts:
+      "White hybrid wine grape bred in France in the 1930s by Jean Louis Vidal (parents Ugni Blanc × Rayon d'Or), first meant for Cognac. Very winter-hardy, reaching high sugar in cold climates with moderate to high acidity. Grown mostly in Canada (Ontario, British Columbia, Quebec), where it is often made into ice wine, and in the eastern USA.",
   },
 );
 

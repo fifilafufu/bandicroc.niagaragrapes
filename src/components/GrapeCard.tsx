@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { wikiUrl, type Grape } from "../../shared/grapes";
 import { fetchSummary, type Summary } from "../lib/wiki";
+import { photoOf } from "../lib/varieties";
+import PhotoCredit from "./PhotoCredit";
 
+// A short Wikipedia summary of one grape, with its checked Commons photo and credit.
 export default function GrapeCard({ grape }: { grape: Grape }) {
   const [state, setState] = useState<{ wiki: string; summary: Summary | null; failed: boolean } | null>(null);
+  const photo = photoOf(grape.name);
 
   useEffect(() => {
     let cancelled = false;
@@ -21,14 +25,13 @@ export default function GrapeCard({ grape }: { grape: Grape }) {
   return (
     <section className="card grape-card">
       <h2>About {grape.name}</h2>
-      {summary?.thumbnail && (
-        <img
-          src={summary.thumbnail.source}
-          alt={grape.name}
-          width={summary.thumbnail.width}
-          height={summary.thumbnail.height}
-          loading="lazy"
-        />
+      {photo && (
+        <figure className="grape-photo">
+          <img src={photo.thumb} alt={`${grape.name} grapes`} loading="lazy" />
+          <figcaption>
+            <PhotoCredit photo={photo} />
+          </figcaption>
+        </figure>
       )}
       {summary ? (
         <p>{summary.extract}</p>

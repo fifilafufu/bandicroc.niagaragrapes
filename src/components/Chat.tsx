@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Counter from "./Counter";
-import { fetchSummary } from "../lib/wiki";
 import { readPref, writePref } from "../lib/prefs";
 import { findGrapeByWiki, wikiUrl } from "../../shared/grapes";
-
+import { photoOf } from "../lib/varieties";
 import { GREETING, type Msg } from "../lib/chatMessages";
 
 const SUGGESTIONS = [
@@ -109,21 +108,17 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           if (ev.type === "meta") {
             if (ev.joke) rememberJoke(ev.joke);
             patchLast(gen, (m) => ({ ...m, sources: ev.sources ?? [], followUps: ev.followUps ?? [] }));
-            // First time a grape comes up in this chat: show its Wikipedia photo.
-            for (const wiki of (ev.grapes ?? []).filter((w) => !shown.has(w)).slice(0, 2)) {
-              shown.add(wiki);
-              fetchSummary(wiki).then((s) => {
-                if (!s?.thumbnail || gen !== generation.current) return;
-                const photo = { wiki, name: findGrapeByWiki(wiki)?.name ?? s.title, src: s.thumbnail.source };
-                setMessages((all) =>
-                  all.map((m) =>
-                    m.id === id && !m.photos?.some((p) => p.wiki === wiki)
-                      ? { ...m, photos: [...(m.photos ?? []), photo] }
-                      : m,
-                  ),
-                );
+            // First time a grape comes up in this chat: show its checked Commons photo, with its credit.
+            const photos = (ev.grapes ?? [])
+              .filter((w) => !shown.has(w))
+              .slice(0, 2)
+              .flatMap((wiki) => {
+                shown.add(wiki);
+                const name = findGrapeByWiki(wiki)?.name;
+                const p = photoOf(name);
+                return p && name ? [{ wiki, name, src: p.thumb, credit: { author: p.author, licence: p.licence, page: p.page } }] : [];
               });
-            }
+            if (photos.length) patchLast(gen, (m) => ({ ...m, photos }));
           } else if (ev.type === "text" || ev.type === "error") {
             patchLast(gen, (m) => ({ ...m, content: m.content + (ev.text ?? "") }));
           }
@@ -197,10 +192,23 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
                 ) : (
                   <>
                     {m.photos?.map((p) => (
-                      <a key={p.wiki} className="bubble-photo" href={wikiUrl(p.wiki)} target="_blank" rel="noreferrer">
+                      <span key={p.wiki} className="bubble-photo">
                         <img src={p.src} alt={`${p.name} grapes`} loading="lazy" />
-                        <span>{p.name}</span>
-                      </a>
+                        <span>
+                          <a href={wikiUrl(p.wiki)} target="_blank" rel="noreferrer">
+                            {p.name}
+                          </a>
+                          {p.credit && (
+                            <span className="photo-credit">
+                              Photo:{" "}
+                              <a href={p.credit.page} target="_blank" rel="noreferrer">
+                                {p.credit.author.slice(0, 40)}
+                              </a>
+                              , {p.credit.licence}
+                            </span>
+                          )}
+                        </span>
+                      </span>
                     ))}
                     {m.content}
                     {m.pending && <span className="caret" aria-hidden="true" />}

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import Bunch from "./Bunch";
-import { fetchSummary } from "../../lib/wiki";
+import { photoOf } from "../../lib/varieties";
+import PhotoCredit from "../PhotoCredit";
 import SourceLine from "../SourceLine";
 
 // Grape skin colours the way grape scientists record them: the five OIV classes (OIV descriptor
@@ -28,18 +28,6 @@ const CLASSES = [
 ];
 
 export default function ColourCompare({ onAsk }: { onAsk: (question: string) => void }) {
-  const [photos, setPhotos] = useState<Record<string, string>>({});
-  useEffect(() => {
-    let cancelled = false;
-    for (const c of CLASSES)
-      fetchSummary(c.wiki).then((s) => {
-        if (!cancelled && s?.thumbnail) setPhotos((p) => ({ ...p, [c.grape]: s.thumbnail!.source }));
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   return (
     <section className="card visual">
       <h2>🎨 “White” vs “black” grapes</h2>
@@ -101,7 +89,7 @@ export default function ColourCompare({ onAsk }: { onAsk: (question: string) => 
             onClick={() => onAsk(`Tell me about ${c.grape} grapes`)}
             aria-label={`${c.cls} (${c.meaning}): for example ${c.grape}. Ask Grape Bot about it`}
           >
-            <i>{photos[c.grape] && <img src={photos[c.grape]} alt="" />}</i>
+            <i>{photoOf(c.grape) && <img src={photoOf(c.grape)!.thumb} alt="" />}</i>
             <b>{c.cls}</b>
             <span className="swatch-meaning">{c.meaning}</span>
             <span>{c.grape.replace("Gewürztraminer", "Gewürz­traminer")}</span>
@@ -119,6 +107,19 @@ export default function ColourCompare({ onAsk }: { onAsk: (question: string) => 
         ))}
       </ul>
       <p className="muted small">Tap a colour to ask Grape Bot about that grape.</p>
+      <details className="credits">
+        <summary>Photo credits</summary>
+        <ul>
+          {CLASSES.map((c) => {
+            const p = photoOf(c.grape);
+            return p ? (
+              <li key={c.cls}>
+                {c.grape}: <PhotoCredit photo={p} />
+              </li>
+            ) : null;
+          })}
+        </ul>
+      </details>
 
       <SourceLine
         ids={["vivc"]}

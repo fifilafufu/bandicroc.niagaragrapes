@@ -1,0 +1,583 @@
+{
+ "checked": "2026-11-10",
+ "varieties": {
+  "Niagara": {
+   "wiki": "Niagara (grape)",
+   "vivc": {
+    "id": 8537,
+    "primeName": "NIAGARA",
+    "colour": "blanc",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "UNITED STATES OF AMERICA",
+    "pedigree": "CONCORD X CASSADY",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=8537"
+   },
+   "photo": {
+    "file": "Niagara_Grapes.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Niagara_Grapes.jpg/500px-Niagara_Grapes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Niagara_Grapes.jpg",
+    "mime": "image/jpeg",
+    "author": "andrew leahey",
+    "licence": "CC BY-SA 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "aiGenerated": false
+   }
+  },
+  "Concord": {
+   "wiki": "Concord grape",
+   "vivc": {
+    "id": 2801,
+    "primeName": "CONCORD",
+    "colour": "noir",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "UNITED STATES OF AMERICA",
+    "pedigree": "CATAWBA X VITIS LABRUSCA LINNE",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=2801"
+   },
+   "photo": {
+    "file": "ConcordGrapes.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/ConcordGrapes.jpg/500px-ConcordGrapes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:ConcordGrapes.jpg",
+    "mime": "image/jpeg",
+    "author": "Unknown Unknown ; cropped, cleaned up, and levels adjustment by Howcheng",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "aiGenerated": false
+   }
+  },
+  "Catawba": {
+   "wiki": "Catawba (grape)",
+   "vivc": {
+    "id": 2346,
+    "primeName": "CATAWBA",
+    "colour": "rouge",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "UNITED STATES OF AMERICA",
+    "pedigree": "VITIS LABRUSCA X SEMILLON",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=2346"
+   },
+   "photo": {
+    "file": "Catawba_grape.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Catawba_grape.jpg/500px-Catawba_grape.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Catawba_grape.jpg",
+    "mime": "image/jpeg",
+    "author": "Ulysses Prentiss Hedrick",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "aiGenerated": false
+   }
+  },
+  "Delaware": {
+   "wiki": "Delaware (grape)",
+   "vivc": {
+    "id": 3498,
+    "primeName": "DELAWARE",
+    "colour": "rouge",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "UNITED STATES OF AMERICA",
+    "pedigree": "(LABRUSCA X AESTIVALIS) X VINIFERA",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=3498"
+   },
+   "photo": {
+    "file": "Delaware_(grape).JPG",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Delaware_%28grape%29.JPG/500px-Delaware_%28grape%29.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Delaware_(grape).JPG",
+    "mime": "image/jpeg",
+    "author": "Bio06940",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "aiGenerated": false
+   }
+  },
+  "Cotton Candy": {
+   "wiki": "Cotton Candy grapes",
+   "vivc": null,
+   "photo": {
+    "file": "Cotton_Candy_grapes.jpg",
+    "thumb": "https://upload.wikimedia.org/wikipedia/commons/5/58/Cotton_Candy_grapes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "page": "https://commons.wikimedia.org/wiki/File:Cotton_Candy_grapes.jpg",
+    "mime": "image/jpeg",
+    "author": "Timtempleton",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "aiGenerated": false
+   }
+  },
+  "Thompson Seedless": {
+   "wiki": "Sultana (grape)",
+   "vivc": {
+    "id": 12051,
+    "primeName": "SULTANINA",
+    "colour": "blanc",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "CENTRAL ASIA",
+    "pedigree": null,
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=12051"
+   },
+   "photo": {
+    "file": "Thompson_seedless_grapes.JPG",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Thompson_seedless_grapes.JPG/500px-Thompson_seedless_grapes.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Thompson_seedless_grapes.JPG",
+    "mime": "image/jpeg",
+    "author": "Glane23",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "aiGenerated": false
+   }
+  },
+  "Red Globe": {
+   "wiki": "Red Globe",
+   "vivc": {
+    "id": 9972,
+    "primeName": "RED GLOBE",
+    "colour": "rouge",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "UNITED STATES OF AMERICA",
+    "pedigree": "L 12-80 X S 45-48",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=9972"
+   },
+   "photo": {
+    "file": "Red_Globe.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Red_Globe.jpg/500px-Red_Globe.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Red_Globe.jpg",
+    "mime": "image/jpeg",
+    "author": "BertholdWagner",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "aiGenerated": false
+   }
+  },
+  "Muscat": {
+   "wiki": "Muscat (grape)",
+   "vivc": null,
+   "photo": {
+    "file": "Muscat_blanc_et_Muscat_noir_by_JM_Rosier.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Muscat_blanc_et_Muscat_noir_by_JM_Rosier.jpg/500px-Muscat_blanc_et_Muscat_noir_by_JM_Rosier.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Muscat_blanc_et_Muscat_noir_by_JM_Rosier.jpg",
+    "mime": "image/jpeg",
+    "author": "Jean-Marc Rosier http://www.cjrosier.com + http://www.gordes-immobilier.com )",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "aiGenerated": false
+   }
+  },
+  "Chardonnay": {
+   "wiki": "Chardonnay",
+   "vivc": {
+    "id": 2455,
+    "primeName": "CHARDONNAY BLANC",
+    "colour": "blanc",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "FRANCE",
+    "pedigree": "HEUNISCH WEISS X PINOT",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=2455"
+   },
+   "photo": {
+    "file": "Chardonnay.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Chardonnay.jpg/500px-Chardonnay.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Chardonnay.jpg",
+    "mime": "image/jpeg",
+    "author": "Jenavive at English Wikipedia",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "aiGenerated": false
+   }
+  },
+  "Riesling": {
+   "wiki": "Riesling",
+   "vivc": {
+    "id": 10077,
+    "primeName": "RIESLING WEISS",
+    "colour": "blanc",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "GERMANY",
+    "pedigree": "? X HEUNISCH WEISS",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=10077"
+   },
+   "photo": {
+    "file": "Riesling_grapes_leaves.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Riesling_grapes_leaves.jpg/500px-Riesling_grapes_leaves.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Riesling_grapes_leaves.jpg",
+    "mime": "image/jpeg",
+    "author": "No machine-readable author provided. T.o.m.~commonswiki assumed (based on copyright claims).",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "aiGenerated": false
+   }
+  },
+  "Pinot Noir": {
+   "wiki": "Pinot noir",
+   "vivc": {
+    "id": 9279,
+    "primeName": "PINOT NOIR",
+    "colour": "noir",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "FRANCE",
+    "pedigree": "? X SAVAGNIN BLANC",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=9279"
+   },
+   "photo": {
+    "file": "Grape_near_Sancerre.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Grape_near_Sancerre.jpg/500px-Grape_near_Sancerre.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Grape_near_Sancerre.jpg",
+    "mime": "image/jpeg",
+    "author": "Cjp24",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "aiGenerated": false
+   }
+  },
+  "Cabernet Sauvignon": {
+   "wiki": "Cabernet Sauvignon",
+   "vivc": {
+    "id": 1929,
+    "primeName": "CABERNET SAUVIGNON",
+    "colour": "noir",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "FRANCE",
+    "pedigree": "CABERNET FRANC X SAUVIGNON",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=1929"
+   },
+   "photo": {
+    "file": "Red_Mountain_Cabernet_Sauvignon_grapes_from_Hedge_Vineyards.jpg",
+    "thumb": "https://upload.wikimedia.org/wikipedia/commons/3/32/Red_Mountain_Cabernet_Sauvignon_grapes_from_Hedge_Vineyards.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "page": "https://commons.wikimedia.org/wiki/File:Red_Mountain_Cabernet_Sauvignon_grapes_from_Hedge_Vineyards.jpg",
+    "mime": "image/jpeg",
+    "author": "Agne27 at English Wikipedia",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "aiGenerated": false
+   }
+  },
+  "Shine Muscat": {
+   "wiki": "Shine Muscat",
+   "vivc": {
+    "id": 22688,
+    "primeName": "SHINE MUSCAT",
+    "colour": "blanc",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "JAPAN",
+    "pedigree": "AKITSU 21 X HAKUNAN",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=22688"
+   },
+   "photo": {
+    "file": "シャインマスカット.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%B3%E3%83%9E%E3%82%B9%E3%82%AB%E3%83%83%E3%83%88.jpg/500px-%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%B3%E3%83%9E%E3%82%B9%E3%82%AB%E3%83%83%E3%83%88.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%B3%E3%83%9E%E3%82%B9%E3%82%AB%E3%83%83%E3%83%88.jpg",
+    "mime": "image/jpeg",
+    "author": "黒崎一男",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "aiGenerated": false
+   }
+  },
+  "Scuppernong": {
+   "wiki": "Scuppernong",
+   "vivc": {
+    "id": 10847,
+    "primeName": "SCUPPERNONG",
+    "colour": "blanc",
+    "species": "MUSCADINIA ROTUNDIFOLIA MICHAUX VAR. ROTUNDIFOLIA",
+    "origin": "UNITED STATES OF AMERICA",
+    "pedigree": null,
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=10847"
+   },
+   "photo": {
+    "file": "Muscadines.Scuppernongs.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Muscadines.Scuppernongs.jpg/500px-Muscadines.Scuppernongs.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Muscadines.Scuppernongs.jpg",
+    "mime": "image/jpeg",
+    "author": "Dcoetzee at en.wikipedia",
+    "licence": "CC0",
+    "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "aiGenerated": false
+   }
+  },
+  "Gewürztraminer": {
+   "wiki": "Gewürztraminer",
+   "vivc": {
+    "id": 12609,
+    "primeName": "GEWUERZTRAMINER",
+    "colour": "rose",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "GERMANY",
+    "pedigree": "SAVAGNIN ROSE MUTATION",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=12609"
+   },
+   "photo": {
+    "file": "Gewürztramine_Viala_et_Vermorelr.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Gew%C3%BCrztramine_Viala_et_Vermorelr.jpg/500px-Gew%C3%BCrztramine_Viala_et_Vermorelr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Gew%C3%BCrztramine_Viala_et_Vermorelr.jpg",
+    "mime": "image/jpeg",
+    "author": "Viala et Vermorel",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "aiGenerated": false
+   }
+  },
+  "Kyoho": {
+   "wiki": "Kyoho (grape)",
+   "vivc": {
+    "id": 6597,
+    "primeName": "KYOHO (4N)",
+    "colour": "noir",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "JAPAN",
+    "pedigree": "CENTENNIAL X ISHIHARA WASE",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=6597"
+   },
+   "photo": {
+    "file": "Japan's_Kyoho_Grapes.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Japan%27s_Kyoho_Grapes.jpg/500px-Japan%27s_Kyoho_Grapes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Japan%27s_Kyoho_Grapes.jpg",
+    "mime": "image/jpeg",
+    "author": "Grialte (Jennie Kondo - Jennie Valdivieso Kondo)",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "aiGenerated": false
+   }
+  },
+  "Pinot Gris": {
+   "wiki": "Pinot gris",
+   "vivc": {
+    "id": 9275,
+    "primeName": "PINOT GRIS",
+    "colour": "gris",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "FRANCE",
+    "pedigree": "PINOT NOIR MUTATION",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=9275"
+   },
+   "photo": {
+    "file": "Pinot_Grigio-20201027-RM-114053.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Pinot_Grigio-20201027-RM-114053.jpg/500px-Pinot_Grigio-20201027-RM-114053.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Pinot_Grigio-20201027-RM-114053.jpg",
+    "mime": "image/jpeg",
+    "author": "Ermell",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "aiGenerated": false
+   }
+  },
+  "Merlot": {
+   "wiki": "Merlot",
+   "vivc": {
+    "id": 7657,
+    "primeName": "MERLOT NOIR",
+    "colour": "noir",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "FRANCE",
+    "pedigree": "MAGDELEINE NOIRE DES CHARENTES X CABERNET FRANC",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=7657"
+   },
+   "photo": {
+    "file": "Merlot grapes at Château Le Bon Pasteur, Pomerol.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Merlot_grapes_at_Ch%C3%A2teau_Le_Bon_Pasteur%2C_Pomerol.jpg/500px-Merlot_grapes_at_Ch%C3%A2teau_Le_Bon_Pasteur%2C_Pomerol.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Merlot_grapes_at_Ch%C3%A2teau_Le_Bon_Pasteur,_Pomerol.jpg",
+    "mime": "image/jpeg",
+    "author": "Megan Mallen",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "aiGenerated": false
+   }
+  },
+  "Sauvignon Blanc": {
+   "wiki": "Sauvignon blanc",
+   "vivc": {
+    "id": 10790,
+    "primeName": "SAUVIGNON BLANC",
+    "colour": "blanc",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "FRANCE",
+    "pedigree": "SAVAGNIN = TRAMINER X ?",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=10790"
+   },
+   "photo": {
+    "file": "Sauvignon_blanc_grapes.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Sauvignon_blanc_grapes.jpg/500px-Sauvignon_blanc_grapes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Sauvignon_blanc_grapes.jpg",
+    "mime": "image/jpeg",
+    "author": "Nathan",
+    "licence": "CC BY-SA 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "aiGenerated": false
+   }
+  },
+  "Syrah": {
+   "wiki": "Syrah",
+   "vivc": {
+    "id": 11748,
+    "primeName": "SYRAH",
+    "colour": "noir",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "FRANCE",
+    "pedigree": "MONDEUSE BLANCHE X DUREZA",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=11748"
+   },
+   "photo": {
+    "file": "Shiraz Grapes.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Shiraz_Grapes.jpg/500px-Shiraz_Grapes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Shiraz_Grapes.jpg",
+    "mime": "image/jpeg",
+    "author": "Chrisada Sookdhis",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "aiGenerated": false
+   }
+  },
+  "Tempranillo": {
+   "wiki": "Tempranillo",
+   "vivc": {
+    "id": 12350,
+    "primeName": "TEMPRANILLO TINTO",
+    "colour": "noir",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "SPAIN",
+    "pedigree": "ALBILLO MAYOR X BENEDICTO",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=12350"
+   },
+   "photo": {
+    "file": "Tempranillo_Viala_et_Vermorel.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Tempranillo_Viala_et_Vermorel.jpg/500px-Tempranillo_Viala_et_Vermorel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Tempranillo_Viala_et_Vermorel.jpg",
+    "mime": "image/jpeg",
+    "author": "Viala et Vermorel",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "aiGenerated": false
+   }
+  },
+  "Grenache": {
+   "wiki": "Grenache",
+   "vivc": {
+    "id": 4461,
+    "primeName": "GARNACHA TINTA",
+    "colour": "noir",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "SPAIN",
+    "pedigree": null,
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=4461"
+   },
+   "photo": {
+    "file": "Grenache_N.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Grenache_N.jpg/500px-Grenache_N.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Grenache_N.jpg",
+    "mime": "image/jpeg",
+    "author": "Jules Troncy",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "aiGenerated": false
+   }
+  },
+  "Solaris": {
+   "wiki": "Solaris (grape)",
+   "vivc": {
+    "id": 20340,
+    "primeName": "SOLARIS",
+    "colour": "blanc",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "GERMANY",
+    "pedigree": "MERZLING X GEISENHEIM 6493",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=20340"
+   },
+   "photo": {
+    "file": "Javier_shows_part_of_the_grape_harvest_in_his_Lysekil_vineyard_1_-_cropped.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Javier_shows_part_of_the_grape_harvest_in_his_Lysekil_vineyard_1_-_cropped.jpg/500px-Javier_shows_part_of_the_grape_harvest_in_his_Lysekil_vineyard_1_-_cropped.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Javier_shows_part_of_the_grape_harvest_in_his_Lysekil_vineyard_1_-_cropped.jpg",
+    "mime": "image/jpeg",
+    "author": "W.carter",
+    "licence": "CC0",
+    "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "aiGenerated": false
+   }
+  },
+  "Regent": {
+   "wiki": "Regent (grape)",
+   "vivc": {
+    "id": 4572,
+    "primeName": "REGENT",
+    "colour": "noir",
+    "species": "VITIS VINIFERA LINNÉ SUBSP. SATIVA (DE CANDOLLE) HEGI",
+    "origin": "GERMANY",
+    "pedigree": "DIANA X CHAMBOURCIN",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=4572"
+   },
+   "photo": {
+    "file": "Regent-gr.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Regent-gr.jpg/500px-Regent-gr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Regent-gr.jpg",
+    "mime": "image/jpeg",
+    "author": "ZbyszekB",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "aiGenerated": false
+   }
+  },
+  "Marquette": {
+   "wiki": "Marquette (grape)",
+   "vivc": {
+    "id": 22714,
+    "primeName": "MARQUETTE",
+    "colour": "noir",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "UNITED STATES OF AMERICA",
+    "pedigree": "MN 1094 X RAVAT 262",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=22714"
+   },
+   "photo": {
+    "file": "Marquette-grona.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Marquette-grona.jpg/500px-Marquette-grona.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Marquette-grona.jpg",
+    "mime": "image/jpeg",
+    "author": "ZbyszekB",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "aiGenerated": false
+   }
+  },
+  "Seyval Blanc": {
+   "wiki": "Seyval blanc",
+   "vivc": {
+    "id": 11558,
+    "primeName": "SEYVAL BLANC",
+    "colour": "blanc",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "FRANCE",
+    "pedigree": "SEIBEL 5656 X RAYON D'OR",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=11558"
+   },
+   "photo": {
+    "file": "Hybrid_Seyval_blanc_grapes_pre-veraison.jpg",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Hybrid_Seyval_blanc_grapes_pre-veraison.jpg/500px-Hybrid_Seyval_blanc_grapes_pre-veraison.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Hybrid_Seyval_blanc_grapes_pre-veraison.jpg",
+    "mime": "image/jpeg",
+    "author": "Southern Foodways Alliance",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "aiGenerated": false
+   }
+  },
+  "Vidal Blanc": {
+   "wiki": "Vidal blanc",
+   "vivc": {
+    "id": 13047,
+    "primeName": "VIDAL BLANC",
+    "colour": "blanc",
+    "species": "VITIS INTERSPECIFIC CROSSING",
+    "origin": "FRANCE",
+    "pedigree": "UGNI BLANC X RAYON D'OR",
+    "url": "https://www.vivc.de/index.php?r=passport%2Fview&id=13047"
+   },
+   "photo": {
+    "file": "Vidal_grapes.png",
+    "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Vidal_grapes.png/500px-Vidal_grapes.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Vidal_grapes.png",
+    "mime": "image/png",
+    "author": "Ice_Wine_Vidal_Grapes.jpg : CJ derivative work: Agne27",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "aiGenerated": false
+   }
+  }
+ }
+}

@@ -243,8 +243,8 @@ I'll go through a checklist on the live link: private window, logged out, empty 
 | Part | What | Status |
 |---|---|---|
 | 1 | Fix outdated numbers with OIV data, source list, OIV uses chart, OIV colour classes, rename to Grapes | ✅ live |
-| 2 | Navigation: 5 tabs (Grapes, Make Wine, Quizzes, Grape Bot, My Grapes; Settings in the account menu), bottom bar on phones, top bar on wide screens, hash routing (Android back button), Quizzes tab, `quiz_results` table | ✅ done (Make Wine tab arrives with Part 6) |
-| 3 | Variety data (VIVC id, species, colour, taste, wine chemistry, photos with licences) + "How varieties work" explainer; 26 varieties: the current 16 + Merlot, Sauvignon Blanc, Syrah, Tempranillo, Grenache, Marquette, Frontenac, Seyval Blanc, Vidal Blanc, Regent or Solaris | |
+| 2 | Navigation: 5 tabs (Grapes, Make Wine, Quizzes, Grape Bot, My Grapes; Settings in the account menu), bottom bar on phones, top bar on wide screens, hash routing (Android back button), Quizzes tab, `quiz_results` table | ✅ live (Make Wine tab arrives with Part 6) |
+| 3 | Variety data: VIVC passports + credited Commons photos for 27 grapes (16 + Pinot Gris as the "gris" example + Merlot, Sauvignon Blanc, Syrah, Tempranillo, Grenache, Solaris, Regent, Marquette, Seyval Blanc, Vidal Blanc), "How varieties work" explainer with VIVC family trees, gallery with filters. Built by `scripts/build-varieties.mjs` into `shared/varietyData.json`. Wine chemistry per variety moved to Part 6, where it is used | ✅ done |
 | 4 | Learn pages: Statistics (FAOSTAT by country), Taste (labrusca "foxy" vs vinifera), Biology (species, berry anatomy, growth cycle wheel) | |
 | 5 | Winemaking flow (red, white, rosé, sparkling) and the Wine basics structure diagram, on a shared wine model | |
 | 6 | Make Your Wine simulator + `saved_wines` table (inputs, result, model version; guests on device, copied on login) | |
