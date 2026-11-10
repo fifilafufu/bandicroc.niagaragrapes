@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:phone": "vite --host",
     "dev:api": "vite build && wrangler pages dev dist --port 8788",
     "build": "tsc -b && tsc -p functions && vite build",
     "lint": "oxlint",
