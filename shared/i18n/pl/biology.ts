@@ -48,12 +48,12 @@ export const SPECIES_TEXT_PL: Record<string, { nick: string; where: string; text
   "Vitis vinifera": {
     nick: "winorośl właściwa",
     where: "basen Morza Śródziemnego, Europa Środkowa i Azja Południowo-Zachodnia",
-    text: "Gatunek, od którego pochodzi większość winogron na wino i deserowych. Udomowiony około 4100–3000 p.n.e. Uprawne krzewy mają kwiaty jednocześnie męskie i żeńskie, więc owocują same; dzikie są albo męskie, albo żeńskie.",
+    text: "Gatunek, od którego pochodzi większość winogron deserowych i na wino. Udomowiony około 4100–3000 p.n.e. Uprawne krzewy mają kwiaty jednocześnie męskie i żeńskie, więc owocują same; dzikie są albo męskie, albo żeńskie.",
   },
   "Vitis labrusca": {
     nick: "winorośl lisia",
     where: "Ameryka Północna",
-    text: "Piżmowy smak „foxy” i jagody typu „slip-skin”, z których skórka zsuwa się w całości. Ma wąsy czepne przy każdym węźle pędu. Należy do drzewa genealogicznego odmian Concord, Niagara i innych amerykańskich winogron.",
+    text: "Piżmowy smak „foxy” i jagody typu „slip-skin”, z których skórka zsuwa się w całości. Wąsy czepne wyrastają przy każdym węźle pędu. Należy do przodków odmian Concord, Niagara i innych amerykańskich winogron.",
     exampleNote: "głównie labrusca",
   },
   "Vitis riparia": {
@@ -64,7 +64,7 @@ export const SPECIES_TEXT_PL: Record<string, { nick: string; where: string; text
   "Vitis rotundifolia": {
     nick: "muscadine",
     where: "południowy wschód i południowa część środkowych USA",
-    text: "Lubi ciepłą, wilgotną pogodę. Duże jagody, brązowawe, ciemnofioletowe lub czarne. Jest tak odmienna, że ma własną podgrupę, Muscadinia; niektórzy botanicy uznają ją za osobny rodzaj.",
+    text: "Lubi ciepłą, wilgotną pogodę. Duże jagody, brązowawe, ciemnofioletowe lub czarne. Jest tak odmienna, że tworzy osobną podgrupę, Muscadinia; niektórzy botanicy uznają ją za odrębny rodzaj.",
   },
 };
 
@@ -73,7 +73,7 @@ export const STAGES_PL: Record<string, Pick<Stage, "name" | "when" | "text">> = 
   budbreak: {
     name: "Pękanie pąków",
     when: "Około marca (we wrześniu na półkuli południowej), gdy dni przekraczają około 10 °C",
-    text: "Pąki pęcznieją i pojawiają się pierwsze zielone pędy. Najpierw przycięte krzewy „płaczą”, wydzielając sok z ran po cięciu. Młode pędy łatwo zabija przymrozek.",
+    text: "Pąki pęcznieją i pojawiają się pierwsze zielone pędy. Wcześniej przycięte krzewy „płaczą”: z ran po cięciu wycieka sok. Młode pędy łatwo niszczy przymrozek.",
   },
   flowering: {
     name: "Kwitnienie",
@@ -83,7 +83,7 @@ export const STAGES_PL: Record<string, Pick<Stage, "name" | "when" | "text">> = 
   fruitset: {
     name: "Zawiązywanie owoców",
     when: "Zaraz po kwitnieniu, w maju (w listopadzie na półkuli południowej)",
-    text: "Zapłodnione kwiaty zmieniają się w małe, twarde, zielone jagody; pozostałe opadają. Średnio około 30% kwiatów staje się jagodami. To wyznacza, jak duże mogą być zbiory. Jagody rosną potem, zielone i kwaśne, aż do véraison.",
+    text: "Zapłodnione kwiaty zmieniają się w małe, twarde, zielone jagody, a pozostałe opadają. Średnio jagodami staje się około 30% kwiatów. To decyduje o tym, jak duże mogą być zbiory. Potem jagody rosną, zielone i kwaśne, aż do véraison.",
   },
   veraison: {
     name: "Véraison",
@@ -93,7 +93,7 @@ export const STAGES_PL: Record<string, Pick<Stage, "name" | "when" | "text">> = 
   harvest: {
     name: "Zbiór",
     when: "Wrzesień i październik (od lutego do kwietnia na półkuli południowej)",
-    text: "W miarę dojrzewania rośnie zawartość cukru i pH, a kwasów, takich jak kwas jabłkowy, ubywa. Plantatorzy zbierają, gdy proporcje pasują do tego, co chcą zrobić.",
+    text: "W miarę dojrzewania rośnie zawartość cukru i pH, a kwasów, takich jak kwas jabłkowy, ubywa. Plantatorzy zbierają winogrona, gdy te proporcje odpowiadają temu, co chcą z nich zrobić.",
   },
   dormancy: {
     name: "Opadanie liści i spoczynek",

@@ -30,16 +30,16 @@ export const SPECIES_PL: Record<string, string> = {
 
 // Same order as LADDER in shared/varietiesGuide.ts.
 export const LADDER_PL = [
-  { step: "Rodzaj", name: "Vitis (winorośl)", text: "Wszystkie winorośle. Muscadines (np. Scuppernong) tworzą własną podgrupę, Muscadinia; niektórzy botanicy uznają ją za osobny rodzaj." },
+  { step: "Rodzaj", name: "Vitis (winorośl)", text: "Wszystkie winorośle. Muscadines (np. Scuppernong) tworzą osobną podgrupę, Muscadinia; niektórzy botanicy uznają ją za odrębny rodzaj." },
   {
     step: "Gatunek",
     name: "Dzikie gatunki winorośli",
-    text: "Vitis vinifera (Europa i zachodnia Azja: większość winogron na wino i deserowych), Vitis labrusca (Ameryka Północna: piżmowy smak „foxy”), Vitis riparia (Ameryka Północna: bardzo mrozoodporna, używana na podkładki i w hodowli).",
+    text: "Vitis vinifera (Europa i zachodnia Azja: większość winogron deserowych i na wino), Vitis labrusca (Ameryka Północna: piżmowy smak „foxy”), Vitis riparia (Ameryka Północna: bardzo mrozoodporna, używana na podkładki i w hodowli).",
   },
   {
     step: "Odmiana",
-    name: "Jedna nazwana roślina, kopiowana",
-    text: "Każdy krzew Merlot to sadzonka z sadzonki pierwszej rośliny Merlot. Z nasiona wyrosłaby zupełnie nowa odmiana i właśnie tak hodowcy tworzą nowe.",
+    name: "Jedna roślina, rozmnażana bez końca",
+    text: "Każdy krzew Merlot wyrósł z sadzonek pochodzących od pierwszej rośliny tej odmiany. Z nasiona wyrosłaby zupełnie nowa odmiana: właśnie tak hodowcy tworzą nowe.",
   },
   { step: "Mutacja / klon", name: "Drobne zmiany", text: "Czasem krzew zmienia się sam. Pinot Gris to mutacja barwna Pinot Noir." },
 ];
@@ -63,7 +63,7 @@ export const TASTE_PL: Record<string, string> = {
   "Shine Muscat": "Słodki, aromat muszkatowy; jadalna skórka",
   Scuppernong: "Duża jagoda, gruba i twarda skórka",
   Gewürztraminer: "Wino pachnie liczi",
-  Kyoho: "Bardzo słodki, soczysty; je się go bez skórki",
+  Kyoho: "Bardzo słodki, soczysty; je się bez skórki",
   "Pinot Gris": "Wino: pełne i oleiste albo lekkie i rześkie",
   Merlot: "Wino: miękkie, mięsiste czerwone",
   "Sauvignon Blanc": "Wino: rześkie, od trawiastego po tropikalne",

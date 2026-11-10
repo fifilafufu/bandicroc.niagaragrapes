@@ -32,7 +32,7 @@ export const STEPS_PL: Record<StepId, { name: string; what: string; why: string 
   ferment: {
     name: "Fermentacja alkoholowa",
     what: "Drożdże zamieniają cukry z winogron w alkohol i dwutlenek węgla. Mogą to być dzikie drożdże ze skórek albo wybrane drożdże dodane przez winiarza.",
-    why: "To ona robi wino. Około 16,8 g/L cukru daje 1% alkoholu; drożdże zwykle przestają pracować gdzieś między 14 a 18%, a pozostały cukier sprawia, że wino jest słodkie.",
+    why: "To właśnie ten etap zmienia sok w wino. Około 16,8 g/L cukru daje 1% alkoholu; drożdże zwykle przestają pracować gdzieś między 14 a 18%, a pozostały cukier sprawia, że wino jest słodkie.",
   },
   mlf: {
     name: "Fermentacja jabłkowo-mlekowa",
@@ -56,7 +56,7 @@ export const STEPS_PL: Record<StepId, { name: string; what: string; why: string 
   },
   tirage: {
     name: "Tirage",
-    what: "Wino bazowe (niemusujące) rozlewa się do butelek z drożdżami i odrobiną cukru (liqueur de tirage) i zamyka kapslem.",
+    what: "Niemusujące wino bazowe rozlewa się do butelek razem z drożdżami i odrobiną cukru (liqueur de tirage), a butelki zamyka się kapslem.",
     why: "Z tego cukru powstaną bąbelki.",
   },
   second: {
@@ -76,7 +76,7 @@ export const STEPS_PL: Record<StepId, { name: string; what: string; why: string 
   },
   disgorge: {
     name: "Disgorging i dosage",
-    what: "Szyjkę zamraża się, a korek lodu z drożdżami zostaje wystrzelony. Butelkę uzupełnia się winem z odrobiną cukru (dosage) i zamyka korkiem.",
+    what: "Szyjkę butelki zamraża się, a lodowy czop z osadem drożdży wylatuje z butelki. Butelkę uzupełnia się winem z odrobiną cukru (dosage) i zamyka korkiem.",
     why: "Wino jest klarowne, a dosage decyduje, jak wytrawne lub słodkie jest w smaku, od brut nature do słodkiego.",
   },
 };
@@ -112,7 +112,7 @@ export const STYLES_PL: Record<Style["id"], { name: string; blurb: string; notes
 export const PARTS_PL: Record<PartId, { name: string; what: string; from: string; changes: string; numbers: string }> = {
   acidity: {
     name: "Kwasowość",
-    what: "Świeża, cierpka strona wina, od której cieknie ślinka. Z winogron pochodzą trzy główne kwasy: winowy, jabłkowy i cytrynowy.",
+    what: "Świeża, orzeźwiająca kwaskowatość wina, od której napływa ślinka. Z winogron pochodzą trzy główne kwasy: winowy, jabłkowy i cytrynowy.",
     from: "Z winogron. W miarę dojrzewania kwasów ubywa, więc wcześniej zebrane winogrona dają bardziej rześkie wino. Fermentacja jabłkowo-mlekowa zmienia ostry kwas jabłkowy w łagodniejszy kwas mlekowy.",
     changes: "Świeżość. Kwas winowy utrzymuje chemiczną stabilność wina i pomaga zachować barwę, a kwasy chronią wino przed bakteriami. Kwasowość ocenia się po tym, jak równoważy słodycz i gorzkie składniki, takie jak taniny.",
     numbers: "Większość win ma pH od 2,9 do 3,9. Im niższe pH, tym bardziej kwaśne wino. Kwasowość ogólną podaje się w gramach na litr w przeliczeniu na kwas winowy.",
