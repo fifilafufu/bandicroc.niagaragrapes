@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { STEPS, STYLES, type StepId, type Style } from "../../../shared/winemaking";
 import SourceLine from "../SourceLine";
+import { useLang } from "../../lib/lang";
+import { STEPS_PL, STYLES_PL } from "../../../shared/i18n/pl/wine";
 
 // Winemaking: pick a style and walk through its steps; tap a step for what it does and why.
 // Below, a table compares where each step happens in red, white, rosé and sparkling wine.
@@ -11,27 +13,34 @@ export default function WinemakingPage() {
   const [styleId, setStyleId] = useState<Style["id"]>("red");
   const [open, setOpen] = useState<StepId | null>("maceration");
   const style = STYLES.find((s) => s.id === styleId)!;
+  const { t, lang } = useLang();
+  const pl = lang === "pl";
+  // Text in the chosen language; icons, order and sources stay the same.
+  const stepText = (id: StepId) => (pl ? { ...STEPS[id], ...STEPS_PL[id] } : STEPS[id]);
+  const styleName = (s: Style) => (pl ? STYLES_PL[s.id].name : s.name);
+  const note = (s: Style, id: StepId, en?: string) => (pl ? (STYLES_PL[s.id].notes[id] ?? en) : en);
 
   return (
     <div className="stack">
       <section className="card">
-        <h1 className="page-title">🍷 How wine is made</h1>
-        <p className="muted">The same few steps, in a different order, make red, white, rosé or sparkling wine.</p>
+        <h1 className="page-title">{t("wm.title")}</h1>
+        <p className="muted">{t("wm.sub")}</p>
       </section>
 
       <section className="card visual">
-        <div className="chips-row" role="group" aria-label="Wine style">
+        <div className="chips-row" role="group" aria-label={t("wm.style")}>
           {STYLES.map((s) => (
             <button key={s.id} className={`chip ${styleId === s.id ? "on" : ""}`} onClick={() => setStyleId(s.id)} aria-pressed={styleId === s.id}>
-              {s.icon} {s.name}
+              {s.icon} {styleName(s)}
             </button>
           ))}
         </div>
-        <p className="style-blurb">{style.blurb}</p>
+        <p className="style-blurb">{pl ? STYLES_PL[style.id].blurb : style.blurb}</p>
 
         <ol className={`flow flow-${style.id}`}>
           {style.steps.map((s, i) => {
-            const step = STEPS[s.id];
+            const step = stepText(s.id);
+            const stepNote = note(style, s.id, s.note);
             const isOpen = open === s.id;
             return (
               <li key={s.id} className={`flow-step ${s.sometimes ? "sometimes" : ""} ${isOpen ? "open" : ""}`}>
@@ -42,11 +51,11 @@ export default function WinemakingPage() {
                   </span>
                   <span className="flow-name">
                     <b>{step.name}</b>
-                    {(s.note || s.sometimes) && (
+                    {(stepNote || s.sometimes) && (
                       <span className="muted small">
-                        {s.sometimes ? "sometimes" : ""}
-                        {s.sometimes && s.note ? ": " : ""}
-                        {s.note}
+                        {s.sometimes ? t("wm.sometimes") : ""}
+                        {s.sometimes && stepNote ? ": " : ""}
+                        {stepNote}
                       </span>
                     )}
                   </span>
@@ -57,10 +66,10 @@ export default function WinemakingPage() {
                 {isOpen && (
                   <div className="flow-body">
                     <p>
-                      <b>What happens:</b> {step.what}
+                      <b>{t("wm.what")}</b> {step.what}
                     </p>
                     <p>
-                      <b>Why:</b> {step.why}
+                      <b>{t("wm.why")}</b> {step.why}
                     </p>
                     <SourceLine ids={step.src} wiki={(step.wiki ?? []).map((w) => ({ label: w, title: w }))} />
                   </div>
@@ -72,16 +81,16 @@ export default function WinemakingPage() {
       </section>
 
       <section className="card visual">
-        <h2>🔀 How the four styles differ</h2>
-        <p className="muted small">The number is when each step happens. The big difference: red wine is pressed after fermenting, white and rosé before.</p>
+        <h2>{t("wm.compareTitle")}</h2>
+        <p className="muted small">{t("wm.compareSub")}</p>
         <div className="compare-wrap">
           <table className="compare">
             <thead>
               <tr>
-                <th>Step</th>
+                <th>{t("wm.step")}</th>
                 {STYLES.map((s) => (
                   <th key={s.id}>
-                    <span aria-hidden="true">{s.icon}</span> {s.name}
+                    <span aria-hidden="true">{s.icon}</span> {styleName(s)}
                   </th>
                 ))}
               </tr>
@@ -90,7 +99,7 @@ export default function WinemakingPage() {
               {ORDER.map((id) => (
                 <tr key={id} className={id === "press" ? "highlight" : ""}>
                   <th scope="row">
-                    {STEPS[id].icon} {STEPS[id].name}
+                    {STEPS[id].icon} {stepText(id).name}
                   </th>
                   {STYLES.map((s) => {
                     const i = s.steps.findIndex((x) => x.id === id);
@@ -106,7 +115,7 @@ export default function WinemakingPage() {
             </tbody>
           </table>
         </div>
-        <p className="muted small">(n) = sometimes. – = not part of this style.</p>
+        <p className="muted small">{t("wm.legend")}</p>
         <SourceLine ids={["oiv-code", "awri-mlf-red"]} wiki={[{ label: "Winemaking", title: "Winemaking" }, { label: "Traditional method", title: "Traditional method" }]} />
       </section>
     </div>

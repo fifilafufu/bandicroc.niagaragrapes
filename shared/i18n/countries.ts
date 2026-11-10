@@ -18,4 +18,6 @@ export function countryName(name: string, lang: Lang): string {
 }
 
 // Numbers written the way each language writes them (77.7 → 77,7 in Polish); the value never changes.
-export const num = (n: number, lang: Lang) => n.toLocaleString(lang === "pl" ? "pl-PL" : "en", { maximumFractionDigits: 2 });
+// digits: always show exactly that many decimals (e.g. 11.0%).
+export const num = (n: number, lang: Lang, digits?: number) =>
+  n.toLocaleString(lang === "pl" ? "pl-PL" : "en", digits === undefined ? { maximumFractionDigits: 2 } : { minimumFractionDigits: digits, maximumFractionDigits: digits });
