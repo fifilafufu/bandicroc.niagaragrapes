@@ -47,9 +47,9 @@ const BOARD_EN: BoardText = {
     half: ["Halfway to grape greatness! Not bad at all.", "Solid! You know your grapes better than most people at the supermarket."],
     close: ["So close! Just a grape or two away from perfect."],
     closePro: "Impressive. Dionysus is nodding slowly at you.",
-    closeNewbie: "Great job! You might be ready for Pro: Dionysus mode.",
+    closeNewbie: "Great job! You might be ready for Dionysus mode.",
     perfectPro: "Perfect in Dionysus mode?! The god of wine himself raises a glass (of grape juice) to you. 🍷",
-    perfectNewbie: "Perfect! You're no newbie anymore. Try Pro: Dionysus mode next?",
+    perfectNewbie: "Perfect! You're no newbie anymore. Try Dionysus mode next?",
   },
 };
 

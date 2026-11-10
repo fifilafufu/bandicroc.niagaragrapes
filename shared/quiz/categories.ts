@@ -13,7 +13,7 @@ export const CATEGORIES: { id: Category; emoji: string; name: string }[] = [
 
 export const LEVELS: { id: Level; emoji: string; name: string; blurb: string }[] = [
   { id: "newbie", emoji: "🌱", name: "Newbie", blurb: "Easy questions first" },
-  { id: "pro", emoji: "🍷", name: "Pro: Dionysus mode", blurb: "Dates, species and deep cuts" },
+  { id: "pro", emoji: "🍷", name: "Dionysus mode", blurb: "Dates, species and deep cuts" },
 ];
 
 export const categoryName = (id: Category, lang: Lang) => (lang === "pl" ? CATEGORY_NAMES_PL[id] : CATEGORIES.find((c) => c.id === id)!.name);

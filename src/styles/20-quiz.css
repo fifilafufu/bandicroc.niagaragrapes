@@ -9,6 +9,7 @@
 .quiz-option.wrong { border-color: var(--danger); color: var(--danger); }
 .quiz-option.dim { opacity: 0.55; }
 .quiz-why { margin-top: 12px; }
+.quiz-why .primary { scroll-margin-bottom: 20px; } /* room under "Next question" after the jump */
 .quiz-big { font-size: 3rem; margin: 0; }
 .quiz-verdict { font-size: 1.05rem; max-width: 34ch; margin: 4px auto 14px; }
 

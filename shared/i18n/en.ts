@@ -547,7 +547,7 @@ export const EN = {
   "quiz.next": "Next question",
   "quiz.got": "You got {score} / {total}",
   "quiz.again": "Play again",
-  "quiz.tryPro": "Try 🍷 Pro",
+  "quiz.tryPro": "Try 🍷 Dionysus mode",
   "quiz.others": "Other quizzes",
   "quiz.photoAlt": "Grapes to name",
   "quiz.berry": "A grape berry cut in half: tap a part",

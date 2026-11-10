@@ -539,7 +539,7 @@ export const PL: Partial<Record<TextKey, string>> = {
   "quiz.next": "Następne pytanie",
   "quiz.got": "Twój wynik: {score} / {total}",
   "quiz.again": "Zagraj jeszcze raz",
-  "quiz.tryPro": "Spróbuj 🍷 Pro",
+  "quiz.tryPro": "Spróbuj 🍷 trybu Dionizosa",
   "quiz.others": "Inne quizy",
   "quiz.photoAlt": "Winogrona do rozpoznania",
   "quiz.berry": "Jagoda winogrona przecięta na pół: dotknij jednej części",

@@ -15,7 +15,7 @@ export const CATEGORY_NAMES_PL: Record<Category, string> = {
 
 export const LEVELS_PL: Record<Level, { name: string; blurb: string }> = {
   newbie: { name: "Początkujący", blurb: "Najpierw łatwe pytania" },
-  pro: { name: "Pro: tryb Dionizosa", blurb: "Daty, gatunki i smaczki dla znawców" },
+  pro: { name: "Tryb Dionizosa", blurb: "Daty, gatunki i smaczki dla znawców" },
 };
 
 export const BOARD_PL: BoardText = {
@@ -52,8 +52,8 @@ export const BOARD_PL: BoardText = {
     half: ["W połowie drogi do winogronowej wielkości! Całkiem nieźle.", "Solidnie! Znasz winogrona lepiej niż większość ludzi w supermarkecie."],
     close: ["Tak blisko! Jedno czy dwa winogrona od ideału."],
     closePro: "Imponujące. Dionizos powoli kiwa do Ciebie głową.",
-    closeNewbie: "Świetna robota! Może czas na Pro: tryb Dionizosa?",
+    closeNewbie: "Świetna robota! Może czas na tryb Dionizosa?",
     perfectPro: "Komplet w trybie Dionizosa?! Sam bóg wina wznosi za Ciebie toast (sokiem winogronowym). 🍷",
-    perfectNewbie: "Komplet! To już nie jest poziom dla początkujących. Może teraz Pro: tryb Dionizosa?",
+    perfectNewbie: "Komplet! To już nie jest poziom dla początkujących. Może teraz tryb Dionizosa?",
   },
 };
