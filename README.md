@@ -20,7 +20,7 @@ The plan and the reasons behind each choice are in [PLAN.md](PLAN.md).
 
 ### 1. Supabase (login + database)
 1. Create a project at supabase.com.
-2. **SQL Editor → New query**: paste `supabase/schema.sql` and press **Run**.
+2. **SQL Editor → New query**: paste `supabase/schema.sql` and press **Run**. Do the same for `secret_messages.sql`, `chat_history.sql` and `quiz_results.sql`.
 3. **Authentication → Sign In / Providers → Email**: turn **off** "Confirm email". This makes demo sign-ups instant. The free tier only sends a few emails per hour.
 4. **Project Settings → API**: copy the **Project URL** and the **anon public** key.
 

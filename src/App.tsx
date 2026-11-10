@@ -1,27 +1,39 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useAuthAndFavourite } from "./lib/useAuthAndFavourite";
 import { detect, dismissTip, tipDismissed, useInstall } from "./lib/install";
 import { useOnline, useTheme } from "./lib/prefs";
 import { useChatHistory } from "./lib/useChatHistory";
+import { GREETING, type Msg } from "./lib/chatMessages";
+import { useRoute, type Page } from "./lib/route";
 import { supabase } from "./lib/supabase";
 import Home from "./components/Home";
-import Chat, { GREETING, type Msg } from "./components/Chat";
-import MyGrapes, { type Guest } from "./components/MyGrapes";
-import Settings from "./components/Settings";
+import type { Guest } from "./components/MyGrapes";
 import InstallSheet from "./components/InstallSheet";
 import AccountMenu from "./components/AccountMenu";
 import { LoginSheet, SavePrompt } from "./components/LoginSheet";
 
-type Tab = "home" | "chat" | "mine" | "settings";
+// Sections other than the home page load only when first opened, so the app starts faster.
+const Chat = lazy(() => import("./components/Chat"));
+const MyGrapes = lazy(() => import("./components/MyGrapes"));
+const Settings = lazy(() => import("./components/Settings"));
+const QuizzesPage = lazy(() => import("./components/QuizzesPage"));
+
+// The main sections, in tab order. "Make Your Wine" joins between Grapes and Quizzes when it's built.
+const TABS: { page: Page; icon: string; label: string }[] = [
+  { page: "home", icon: "🍇", label: "Grapes" },
+  { page: "quizzes", icon: "🎯", label: "Quizzes" },
+  { page: "chat", icon: "💬", label: "Grape Bot" },
+  { page: "mine", icon: "🧺", label: "My Grapes" },
+];
 
 const isPhone = () => ["ios", "android"].includes(detect().os);
 const NO_GUEST: Guest = { favourite: null, notes: "", notesAt: null };
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>("home");
+  const [page, go] = useRoute();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showTip, setShowTip] = useState(() => isPhone() && !tipDismissed());
-  // Kept here so the conversation survives switching tabs; "Clear chat" and logging out reset it.
+  // Kept here so the conversation survives switching sections; "Clear chat" and logging out reset it.
   const [chat, setChat] = useState<Msg[]>([GREETING]);
   // A question asked from elsewhere (e.g. tapping a grape in the gallery), sent when the chat opens.
   const [autoAsk, setAutoAsk] = useState<string | null>(null);
@@ -64,10 +76,10 @@ export default function App() {
     }
   }, [user, secret, guest, saveFavourite, saveSecret]);
 
-  // New tab starts at the top.
+  // A new section starts at the top.
   useEffect(() => {
     contentRef.current?.scrollTo({ top: 0 });
-  }, [tab]);
+  }, [page]);
 
   const openSheet = () => {
     setSheetOpen(true);
@@ -81,23 +93,40 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <button className="brand-btn" onClick={() => setTab("home")} aria-label="Grapes home">
+        <button className="brand-btn" onClick={() => go("home")} aria-label="Grapes home">
           <img src="/favicon.svg" alt="" width={28} height={28} />
           <span className="brand">Grapes</span>
         </button>
         {auth.favourite && (
-          <button className="fav-pill" onClick={() => setTab("mine")} aria-label={`Favourite grape: ${auth.favourite}`}>
+          <button className="fav-pill" onClick={() => go("mine")} aria-label={`Favourite grape: ${auth.favourite}`}>
             ♥ {auth.favourite}
           </button>
         )}
         <AccountMenu
           user={auth.user}
           onLogin={setLogin}
-          onSettings={() => setTab("settings")}
-          onMyGrapes={() => setTab("mine")}
-          onLoggedOut={() => setTab("mine")}
+          onSettings={() => go("settings")}
+          onMyGrapes={() => go("mine")}
+          onLoggedOut={() => go("mine")}
         />
       </header>
+
+      {/* Phones: a tab bar at the bottom (easy to reach with a thumb). Wide screens: the same tabs under the top bar. */}
+      <nav className="tabbar" aria-label="Main">
+        {TABS.map((t) => (
+          <button
+            key={t.page}
+            className={`tab ${page === t.page ? "active" : ""}`}
+            onClick={() => go(t.page)}
+            aria-current={page === t.page ? "page" : undefined}
+          >
+            <span className="icon" aria-hidden="true">
+              {t.icon}
+            </span>
+            <span>{t.label}</span>
+          </button>
+        ))}
+      </nav>
 
       {!online && (
         <div className="offline" role="status">
@@ -105,42 +134,50 @@ export default function App() {
         </div>
       )}
 
-      <main ref={contentRef} className={`content ${tab === "chat" ? "flush" : ""}`}>
-        {tab === "home" && <Home
-            onChat={() => setTab("chat")}
-            onMyGrapes={() => setTab("mine")}
-            onAsk={(q) => {
-              setAutoAsk(q);
-              setTab("chat");
-            }}
-          />}
-        {tab === "chat" && <Chat
-            favourite={auth.favourite}
-            loggedIn={!!auth.user}
-            messages={chat}
-            setMessages={setChat}
-            autoAsk={autoAsk}
-            onAutoAsked={() => setAutoAsk(null)}
-          />}
-        {tab === "mine" && (
-          <MyGrapes
-            {...auth}
-            guest={guest}
-            setGuest={setGuest}
-            onLogin={setLogin}
-            onGuestSaved={(what) => supabase && !promptOff.current && setSavePrompt(what)}
-          />
-        )}
-        {tab === "settings" && (
-          <Settings
-            user={auth.user}
-            onGetApp={openSheet}
-            theme={theme}
-            setTheme={setTheme}
-            onLoggedOut={() => setTab("mine")}
-            goToLogin={() => setLogin("in")}
-          />
-        )}
+      <main ref={contentRef} className={`content ${page === "chat" ? "flush" : ""}`}>
+        <Suspense fallback={<p className="muted center loading">Loading…</p>}>
+          {page === "home" && (
+            <Home
+              onChat={() => go("chat")}
+              onMyGrapes={() => go("mine")}
+              onAsk={(q) => {
+                setAutoAsk(q);
+                go("chat");
+              }}
+            />
+          )}
+          {page === "quizzes" && <QuizzesPage user={auth.user} onLogin={() => setLogin("in")} />}
+          {page === "chat" && (
+            <Chat
+              favourite={auth.favourite}
+              loggedIn={!!auth.user}
+              messages={chat}
+              setMessages={setChat}
+              autoAsk={autoAsk}
+              onAutoAsked={() => setAutoAsk(null)}
+              onQuiz={() => go("quizzes")}
+            />
+          )}
+          {page === "mine" && (
+            <MyGrapes
+              {...auth}
+              guest={guest}
+              setGuest={setGuest}
+              onLogin={setLogin}
+              onGuestSaved={(what) => supabase && !promptOff.current && setSavePrompt(what)}
+            />
+          )}
+          {page === "settings" && (
+            <Settings
+              user={auth.user}
+              onGetApp={openSheet}
+              theme={theme}
+              setTheme={setTheme}
+              onLoggedOut={() => go("mine")}
+              goToLogin={() => setLogin("in")}
+            />
+          )}
+        </Suspense>
       </main>
 
       {showTip && !installed && (
@@ -154,13 +191,6 @@ export default function App() {
           </button>
         </div>
       )}
-
-      <nav className="tabbar" aria-label="Main">
-        <TabButton active={tab === "home"} onClick={() => setTab("home")} icon="🍇" label="Grapes" />
-        <TabButton active={tab === "chat"} onClick={() => setTab("chat")} icon="💬" label="Grape Bot" />
-        <TabButton active={tab === "mine"} onClick={() => setTab("mine")} icon="🧺" label="My Grapes" />
-        <TabButton active={tab === "settings"} onClick={() => setTab("settings")} icon="⚙️" label="Settings" />
-      </nav>
 
       {sheetOpen && <InstallSheet onClose={() => setSheetOpen(false)} />}
       {savePrompt && (
@@ -178,16 +208,5 @@ export default function App() {
       )}
       {login && <LoginSheet key={login} mode={login} onClose={() => setLogin(null)} />}
     </div>
-  );
-}
-
-function TabButton(props: { active: boolean; onClick: () => void; icon: string; label: string }) {
-  return (
-    <button className={`tab ${props.active ? "active" : ""}`} onClick={props.onClick} aria-current={props.active ? "page" : undefined}>
-      <span className="icon" aria-hidden="true">
-        {props.icon}
-      </span>
-      <span>{props.label}</span>
-    </button>
   );
 }

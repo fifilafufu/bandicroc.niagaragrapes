@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
-import { GREETING, type Msg } from "../components/Chat";
+import { GREETING, type Msg } from "./chatMessages";
 
 const KEEP = 40; // messages kept in the cloud (older ones drop off)
 

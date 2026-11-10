@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import { LEVELS, markSeen, newRound, scoreMessage, type Level } from "../lib/quiz";
 import SourceLine from "./SourceLine";
 
-export default function Quiz({ onExit }: { onExit: () => void }) {
+// onFinish gets the level and score when a round ends (saved by the Quizzes page).
+// scores: a short line per level for the level picker, e.g. "Best 7 / 8 · 3 rounds".
+export default function Quiz(props: { onFinish: (level: Level, score: number, total: number) => void; scores?: Partial<Record<Level, string>> }) {
+  const { onFinish, scores } = props;
   const [level, setLevel] = useState<Level | null>(null);
-  if (!level) return <LevelPicker onPick={setLevel} />;
+  if (!level) return <LevelPicker onPick={setLevel} scores={scores} />;
   // Keyed by level so switching level starts a fresh round.
-  return <Round key={level} level={level} onExit={onExit} onLevels={() => setLevel(null)} onLevel={setLevel} />;
+  return <Round key={level} level={level} onFinish={onFinish} onLevels={() => setLevel(null)} onLevel={setLevel} />;
 }
 
-function LevelPicker({ onPick }: { onPick: (l: Level) => void }) {
+function LevelPicker({ onPick, scores }: { onPick: (l: Level) => void; scores?: Partial<Record<Level, string>> }) {
   return (
     <div className="quiz">
       <section className="card quiz-card">
@@ -24,6 +27,7 @@ function LevelPicker({ onPick }: { onPick: (l: Level) => void }) {
               <span>
                 <b>{l.name}</b>
                 <span className="muted small">{l.blurb}</span>
+                {scores?.[l.id] && <span className="quiz-best">{scores[l.id]}</span>}
               </span>
             </button>
           ))}
@@ -33,7 +37,7 @@ function LevelPicker({ onPick }: { onPick: (l: Level) => void }) {
   );
 }
 
-function Round(props: { level: Level; onExit: () => void; onLevels: () => void; onLevel: (l: Level) => void }) {
+function Round(props: { level: Level; onFinish: (level: Level, score: number, total: number) => void; onLevels: () => void; onLevel: (l: Level) => void }) {
   const { level } = props;
   const [round, setRound] = useState(() => newRound(level));
   const [index, setIndex] = useState(0);
@@ -57,7 +61,10 @@ function Round(props: { level: Level; onExit: () => void; onLevels: () => void; 
   function next() {
     setPicked(null);
     const n = index + 1;
-    if (n >= round.length) setVerdict(scoreMessage(score, round.length, level));
+    if (n >= round.length) {
+      setVerdict(scoreMessage(score, round.length, level));
+      props.onFinish(level, score, round.length);
+    }
     setIndex(n);
   }
   function restart() {
@@ -91,9 +98,6 @@ function Round(props: { level: Level; onExit: () => void; onLevels: () => void; 
             )}
             <button className="secondary" onClick={props.onLevels}>
               Change level
-            </button>
-            <button className="secondary" onClick={props.onExit}>
-              Back to chat
             </button>
           </div>
         </section>

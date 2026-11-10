@@ -1,26 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Counter from "./Counter";
-import Quiz from "./Quiz";
 import { fetchSummary } from "../lib/wiki";
 import { readPref, writePref } from "../lib/prefs";
 import { findGrapeByWiki, wikiUrl } from "../../shared/grapes";
 
-type Source = { title: string; url: string; data?: boolean }; // data: a statistics source (OIV, FAO), not Wikipedia
-type Photo = { wiki: string; name: string; src: string };
-export type Msg = {
-  role: "user" | "assistant";
-  content: string;
-  sources?: Source[];
-  followUps?: string[];
-  photos?: Photo[];
-  pending?: boolean; // still being written
-  id?: string;
-};
+import { GREETING, type Msg } from "../lib/chatMessages";
 
-export const GREETING: Msg = {
-  role: "assistant",
-  content: "Hi! I'm Grape Bot, your grape tutor. Ask me anything about grapes, and I'll answer from Wikipedia. 🍇",
-};
 const SUGGESTIONS = [
   "Where are grapes from?",
   "Can dogs eat grapes?",
@@ -51,12 +36,12 @@ type Props = {
   setMessages: React.Dispatch<React.SetStateAction<Msg[]>>;
   autoAsk?: string | null;
   onAutoAsked?: () => void;
+  onQuiz: () => void;
 };
 
-export default function Chat({ favourite, loggedIn, messages, setMessages, autoAsk, onAutoAsked }: Props) {
+export default function Chat({ favourite, loggedIn, messages, setMessages, autoAsk, onAutoAsked, onQuiz }: Props) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [quiz, setQuiz] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLTextAreaElement>(null);
   // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
@@ -116,7 +101,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           const ev = JSON.parse(line) as {
             type: string;
             text?: string;
-            sources?: Source[];
+            sources?: Msg["sources"];
             followUps?: string[];
             grapes?: string[];
             joke?: string | null;
@@ -183,7 +168,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
     if (!box) return;
     box.style.height = "auto";
     box.style.height = `${Math.min(box.scrollHeight, 132)}px`;
-  }, [input, quiz]);
+  }, [input]);
 
   const lastIndex = messages.length - 1;
 
@@ -192,25 +177,14 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
       <div className="chat-head">
         <img src="/favicon.svg" alt="" width={36} height={36} />
         <div className="who">
-          <b>{quiz ? "Grape Quiz" : "Grape Bot"}</b>
-          <span>{quiz ? "8 questions · facts from Wikipedia" : "Grape tutor · answers from Wikipedia"}</span>
+          <b>Grape Bot</b>
+          <span>Grape tutor · checked facts and Wikipedia</span>
         </div>
-        <button className="clear-btn" onClick={() => setQuiz((q) => !q)}>
-          {quiz ? "💬 Chat" : "🎯 Quiz"}
+        <button className="clear-btn" onClick={clearChat} disabled={messages.length <= 1 && !busy} aria-label="Clear chat">
+          🧹
         </button>
-        {!quiz && (
-          <button className="clear-btn" onClick={clearChat} disabled={messages.length <= 1 && !busy} aria-label="Clear chat">
-            🧹
-          </button>
-        )}
       </div>
 
-      {quiz ? (
-        <div className="messages">
-          <Quiz onExit={() => setQuiz(false)} />
-        </div>
-      ) : (
-        <>
           <div className="messages" aria-live="polite">
             {messages.map((m, i) => (
               <div key={i} className={`bubble ${m.role} ${m.pending && !m.content ? "typing" : ""}`}>
@@ -254,8 +228,8 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
                   </button>
                 ))}
                 {messages.length === 1 && (
-                  <button className="chip quiz-chip" onClick={() => setQuiz(true)}>
-                    🎯 Try the grape quiz
+                  <button className="chip quiz-chip" onClick={onQuiz}>
+                    🎯 Try a grape quiz
                   </button>
                 )}
               </div>
@@ -286,8 +260,6 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
             </button>
             <Counter length={input.length} max={MAX} />
           </form>
-        </>
-      )}
     </div>
   );
 }
