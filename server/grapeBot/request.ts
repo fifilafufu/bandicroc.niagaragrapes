@@ -2,10 +2,11 @@
 
 import { findGrape } from "../../shared/grapes";
 import { MAX_CHARS, MAX_TURNS, type Turn } from "./settings";
+import type { Lang } from "../../shared/i18n";
 
-export function parseBody(body: unknown): { messages: Turn[]; favourite: string | null; seenJokes: string[] } | null {
+export function parseBody(body: unknown): { messages: Turn[]; favourite: string | null; seenJokes: string[]; lang: Lang } | null {
   if (!body || typeof body !== "object") return null;
-  const { messages, favourite, seenJokes } = body as { messages?: unknown; favourite?: unknown; seenJokes?: unknown };
+  const { messages, favourite, seenJokes, lang } = body as { messages?: unknown; favourite?: unknown; seenJokes?: unknown; lang?: unknown };
   if (!Array.isArray(messages)) return null;
 
   const turns: Turn[] = [];
@@ -23,5 +24,6 @@ export function parseBody(body: unknown): { messages: Turn[]; favourite: string 
   const fav = typeof favourite === "string" ? findGrape(favourite)?.name ?? null : null;
   // Joke ids this device has already heard (only short strings, capped).
   const seen = Array.isArray(seenJokes) ? seenJokes.filter((j): j is string => typeof j === "string" && j.length < 40).slice(0, 100) : [];
-  return { messages: turns, favourite: fav, seenJokes: seen };
+  // The app's language: only "pl" or "en" (older app versions send nothing).
+  return { messages: turns, favourite: fav, seenJokes: seen, lang: lang === "pl" ? "pl" : "en" };
 }

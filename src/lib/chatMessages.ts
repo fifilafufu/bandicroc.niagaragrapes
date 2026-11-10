@@ -18,14 +18,13 @@ export type Msg = {
 // Answers are shown as plain text, so the marks are taken out instead of showing as stars.
 export const plainAnswer = (text: string) => text.replace(/\*\*|__/g, "").replace(/^#{1,6}\s+/gm, "");
 
+// The greeting is drawn in the chosen language; matched by its text too, as copies of it can come back from saved chats.
+export const isGreeting = (m: Msg) => m === GREETING || (m.role === "assistant" && m.content === GREETING.content);
+
 export const GREETING: Msg = {
   role: "assistant",
   content: "Hi! I'm Grape Bot, your grape tutor. Ask me anything about grapes, and I'll answer from checked facts and Wikipedia. 🍇",
 };
 
-export const SUGGESTIONS = [
-  "Where are grapes from?",
-  "Can dogs eat grapes?",
-  "What colours do grapes come in?",
-  "What's my favourite grape?",
-];
+// Starter questions on an empty chat (text keys, shown in the chosen language).
+export const SUGGESTIONS = ["chat.s1", "chat.s2", "chat.s3", "chat.s4"] as const;

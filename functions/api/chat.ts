@@ -14,6 +14,7 @@
 
 import { GENERAL_GRAPE_ARTICLE, findGrapeByWiki } from "../../shared/grapes";
 import { SOURCES } from "../../shared/sources";
+import { translate } from "../../shared/i18n";
 import { pickJoke, wantsJoke } from "../../shared/jokes";
 import { fetchArticle, pickArticles } from "../../server/grapeBot/articles";
 import { curatedKnowledge } from "../../server/grapeBot/knowledge";
@@ -48,9 +49,11 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     ? []
     : (await Promise.all(picked.titles.map((t) => fetchArticle(t, ctx).catch(() => null)))).filter((a): a is Article => a !== null);
   // Asked for a joke: pick one from the hand-written bank that this device hasn't heard yet.
-  const polish = isPolish(picked.latest);
+  // Polish when the app is set to Polish or the question is written in Polish.
+  const polish = parsed.lang === "pl" || isPolish(picked.latest);
+  const say = (key: "bot.lost" | "bot.cutOff" | "bot.empty") => translate(polish ? "pl" : "en", key);
   const joke = wantsJoke(picked.latest) ? pickJoke(polish ? "pl" : "en", parsed.seenJokes) : null;
-  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles, appData.notes, joke) }, ...parsed.messages];
+  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles, appData.notes, joke, parsed.lang) }, ...parsed.messages];
 
   // Source links: the Wikipedia articles read, the app data used, and the OIV figures for general questions.
   const chips: Chip[] = [
@@ -82,7 +85,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
           wrote = true;
           controller.enqueue(line({ type: "text", text }));
         }
-        if (!wrote) controller.enqueue(line({ type: "text", text: "Hmm, I lost my train of thought. Ask me again? 🍇" }));
+        if (!wrote) controller.enqueue(line({ type: "text", text: say("bot.lost") }));
         controller.enqueue(line({ type: "done", model }));
       } catch (error) {
         // The real error stays in the server log; the browser only gets a friendly line.
@@ -91,8 +94,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
           line({
             type: "error",
             text: wrote
-              ? " …(I got cut off. Try asking again.)"
-              : "I'm all out of grape juice for now (the free AI limit may be used up). Try again later! 🍇",
+              ? say("bot.cutOff")
+              : say("bot.empty"),
           }),
         );
       } finally {

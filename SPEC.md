@@ -83,7 +83,7 @@ Supabase is reached only from `src/lib/`, protected by row-level security. Full 
 - Wine numbers use OIV units: acidity in g/L as tartaric acid, sugar in g/L, alcohol in % vol, pressure in bar.
 - Each value records its source and the date it was checked. Missing data stays empty or is marked **Estimate**; nothing is guessed silently.
 - Photos are real (Wikimedia Commons) with author and licence shown, or diagrams drawn in code.
-- Translations keep every number, unit and source exactly as in English. Grape variety names, species names and source titles are not translated. Polish wording for wine and vine terms follows Polish Wikipedia where it has an article; any term without a checked Polish equivalent stays in English.
+- Translations keep every number, unit and source exactly as in English (same values; Polish text writes them the Polish way, e.g. 8000 and 77,7 mln). Grape variety names, species names and source titles are not translated. Polish wording for wine and vine terms follows Polish Wikipedia where it has an article; any term without a checked Polish equivalent stays in English.
 
 ## Definition of done (MVP)
 

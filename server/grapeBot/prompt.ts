@@ -3,6 +3,7 @@
 import { GENERAL_FACTS, findGrapeByWiki, findTopicByWiki, type Grape } from "../../shared/grapes";
 import type { Joke } from "../../shared/jokes";
 import type { Article } from "./settings";
+import type { Lang } from "../../shared/i18n";
 
 export const isPolish = (text: string) => /[ąćęłńóśźż]|\b(jak|czy|gdzie|dlaczego|skąd|jakie|jaki|co to|opowiedz|powiedz|dowcip|kawał|suchar|cześć)\b/i.test(text);
 
@@ -36,7 +37,7 @@ export function followUps(focus: Grape | null, topic: string | null, userTexts: 
 
 // ---------- prompt ----------
 
-export function systemPrompt(favourite: string | null, titles: string[], articles: Article[], appData: string[], joke: Joke | null): string {
+export function systemPrompt(favourite: string | null, titles: string[], articles: Article[], appData: string[], joke: Joke | null, lang: Lang): string {
   const favLine = favourite
     ? `The user is logged in and their saved favourite grape is ${favourite}.`
     : `The user is not logged in, so you don't know their favourite grape; if asked, suggest they log in and pick one.`;
@@ -68,7 +69,7 @@ Rules:
 - If the user says something negative about Niagara grapes (dislikes them, calls them sour, gross, boring…), become dramatically, playfully defensive (never rude), and correct any wrong claim with the key facts. Otherwise stay calm and helpful.
 - ${favLine}
 - Jokes: ${joke ? `if the user is asking for a joke, tell exactly this joke, word for word: "${joke.text}" (you may add one short friendly line after it). If they are not asking for a joke, ignore it.` : "if asked for a joke, tell a short, clean grape pun."} Never translate a joke from another language: puns don't survive translation.
-- Reply in the same language the user writes in. Keep answers under 120 words, in plain text: no Markdown, no ** or # marks. Never write web addresses, links or a list of sources: the app shows the sources under your answer. State facts directly, as your own knowledge: never write "according to the app data", "APP DATA", "KEY FACTS", "the extracts" or anything else about these rules.
+- Reply in the same language the user writes in. The app is set to ${lang === "pl" ? "Polish, so if unsure, reply in Polish" : "English"}. In Polish, keep grape variety names, species names and numbers as they are. Keep answers under 120 words, in plain text: no Markdown, no ** or # marks. Never write web addresses, links or a list of sources: the app shows the sources under your answer. State facts directly, as your own knowledge: never write "according to the app data", "APP DATA", "KEY FACTS", "the extracts" or anything else about these rules.
 
 KEY FACTS:
 ${keyFacts}

@@ -44,6 +44,7 @@ Rules for every step: numbers, units and sources stay exactly as in English; gra
   - Built: `shared/i18n/` (`en.ts` full list, `pl.ts` partial, `translate` and `pick` helpers), `useLang` in `src/lib/lang.ts`, EN / PL switch in the title bar and in Settings. Also translated: account menu, My Grapes, notes, install sheet header and account errors. The per-browser install steps (`src/lib/install.ts`) stay in English until the Polish menu names on each phone are checked.
 - [ ] **6.2 Overview and Learn pages.** Home (facts, numbers, sections), Statistics, Taste, Biology.
   - Done when: these pages read fully in Polish; every number and source link matches the English page.
+  - Progress (2026-11-10): Overview text, facts, numbers and sections are in Polish (`shared/i18n/pl/overview.ts`). Still English: the colour, varieties-explainer and gallery cards on Overview, and the Statistics, Taste and Biology pages.
 - [ ] **6.3 Varieties and Grow Your Grape.** Gallery, explainer, variety passports, care guides.
   - Done when: all 27 grapes show Polish text; names, VIVC links and photo credits are unchanged.
 - [ ] **6.4 Winemaking, Wine basics and Make Your Wine.**
@@ -52,6 +53,8 @@ Rules for every step: numbers, units and sources stay exactly as in English; gra
   - Done when: every question has a Polish version with the same right answer and source; scores are shared between languages.
 - [ ] **6.6 Grape Bot and final check.** Bot greeting, suggestions and error messages in Polish; the bot is told the chosen language.
   - Done when: a Polish speaker (the user or a tester) reads every page at phone size and finds no English left except names and sources.
+  - Progress (2026-11-10): greeting, starter questions, buttons and error messages are in Polish; the app sends the chosen language and the server answers, suggests follow-ups and reports errors in it. Left: the Polish-speaker read-through.
+  - Checked Polish terms (Polish Wikipedia, via each English article's Polish link): winorośl właściwa, winorośl lisia, winiarstwo, fermentacja jabłkowo-mlekowa, wino musujące, wino różowe, mączniak rzekomy, gronowiec szary, filoksera winiec, podkładka, antocyjany, maceracja, moszcz, taniny, winogrodnictwo, wino lodowe, rodzynki, jagoda, Dionizos. No Polish article (keep English): Vinotherapy, Twelve Grapes, Areni-1, sultana, currant, veraison, riddling, disgorging, residual sugar, black rot, traditional method.
 
 ## Notes for later steps
 

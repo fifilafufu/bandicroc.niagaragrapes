@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useLang } from "../lib/lang";
 
 // Copy an answer, or send it with the phone's share sheet.
 export default function AnswerTools({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   const canShare = typeof navigator.share === "function";
+  const { t } = useLang();
 
   async function copy() {
     try {
@@ -24,12 +26,12 @@ export default function AnswerTools({ text }: { text: string }) {
 
   return (
     <div className="answer-tools">
-      <button onClick={copy} aria-label="Copy answer">
-        {copied ? "✓ Copied" : "📋 Copy"}
+      <button onClick={copy} aria-label={t("chat.copyAnswer")}>
+        {copied ? t("chat.copied") : t("chat.copy")}
       </button>
       {canShare && (
-        <button onClick={share} aria-label="Share answer">
-          📤 Share
+        <button onClick={share} aria-label={t("chat.shareAnswer")}>
+          {t("chat.share")}
         </button>
       )}
     </div>

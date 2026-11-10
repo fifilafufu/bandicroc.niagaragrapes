@@ -2,8 +2,9 @@ import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "re
 import Counter from "./Counter";
 import AnswerTools from "./AnswerTools";
 import { wikiUrl } from "../../shared/grapes";
-import { GREETING, plainAnswer, SUGGESTIONS, type Msg } from "../lib/chatMessages";
+import { GREETING, isGreeting, plainAnswer, SUGGESTIONS, type Msg } from "../lib/chatMessages";
 import { askGrapeBot, photosFor, rememberJoke } from "../lib/grapeBot";
+import { useLang } from "../lib/lang";
 
 const MAX = 500;
 
@@ -21,6 +22,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const boxRef = useRef<HTMLTextAreaElement>(null);
+  const { t, lang } = useLang();
   // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
   const generation = useRef(0);
 
@@ -77,7 +79,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
     const shown = new Set(messages.flatMap((m) => m.photos?.map((p) => p.wiki) ?? []));
 
     try {
-      for await (const ev of askGrapeBot(history, loggedIn ? favourite : null)) {
+      for await (const ev of askGrapeBot(history, loggedIn ? favourite : null, lang)) {
         if (ev.type === "meta") {
           if (ev.joke) rememberJoke(ev.joke);
           patchLast(gen, (m) => ({ ...m, sources: ev.sources ?? [], followUps: ev.followUps ?? [] }));
@@ -87,13 +89,13 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           patchLast(gen, (m) => ({ ...m, content: m.content + (ev.text ?? "") }));
         }
       }
-      patchLast(gen, (m) => ({ ...m, pending: false, content: m.content.trim() || "Something went wrong on the vine. Try again? 🍇" }));
+      patchLast(gen, (m) => ({ ...m, pending: false, content: m.content.trim() || t("chat.wrong") }));
     } catch {
       patchLast(gen, (m) => ({
         ...m,
         pending: false,
         followUps: [],
-        content: m.content.trim() || (navigator.onLine ? "Something went wrong on the vine. Try again? 🍇" : "I can't reach the vineyard. Are you offline? 🍇"),
+        content: m.content.trim() || (navigator.onLine ? t("chat.wrong") : t("chat.offline")),
       }));
     } finally {
       if (gen === generation.current) setBusy(false);
@@ -137,9 +139,9 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
         <img src="/favicon.svg" alt="" width={36} height={36} />
         <div className="who">
           <b>Grape Bot</b>
-          <span>Grape tutor · checked facts and Wikipedia</span>
+          <span>{t("chat.tagline")}</span>
         </div>
-        <button className="clear-btn" onClick={clearChat} disabled={messages.length <= 1 && !busy} aria-label="Clear chat">
+        <button className="clear-btn" onClick={clearChat} disabled={messages.length <= 1 && !busy} aria-label={t("chat.clear")}>
           🧹
         </button>
       </div>
@@ -164,14 +166,14 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
                   <>
                     {m.photos?.map((p) => (
                       <span key={p.wiki} className="bubble-photo">
-                        <img src={p.src} alt={`${p.name} grapes`} loading="lazy" />
+                        <img src={p.src} alt={t("chat.photoOf", { name: p.name })} loading="lazy" />
                         <span>
                           <a href={wikiUrl(p.wiki)} target="_blank" rel="noreferrer">
                             {p.name}
                           </a>
                           {p.credit && (
                             <span className="photo-credit">
-                              Photo:{" "}
+                              {t("chat.photo")}{" "}
                               <a href={p.credit.page} target="_blank" rel="noreferrer">
                                 {p.credit.author.slice(0, 40)}
                               </a>
@@ -181,9 +183,9 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
                         </span>
                       </span>
                     ))}
-                    {m.role === "assistant" ? plainAnswer(m.content) : m.content}
+                    {isGreeting(m) ? t("chat.greeting") : m.role === "assistant" ? plainAnswer(m.content) : m.content}
                     {m.pending && <span className="caret" aria-hidden="true" />}
-                    {m.role === "assistant" && !m.pending && m !== GREETING && <AnswerTools text={plainAnswer(m.content)} />}
+                    {m.role === "assistant" && !m.pending && !isGreeting(m) && <AnswerTools text={plainAnswer(m.content)} />}
                     {m.sources && m.sources.length > 0 && !m.pending && (
                       <div className="sources">
                         {m.sources.map((s) => (
@@ -201,14 +203,14 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
             {/* Follow-up questions under the latest answer; starter questions on an empty chat. */}
             {!busy && (
               <div className="suggestions">
-                {(messages.length === 1 ? SUGGESTIONS : messages[lastIndex].followUps ?? []).map((s) => (
+                {(messages.length === 1 ? SUGGESTIONS.map((k) => t(k)) : messages[lastIndex].followUps ?? []).map((s) => (
                   <button key={s} className="chip" onClick={() => send(s)}>
                     {s}
                   </button>
                 ))}
                 {messages.length === 1 && (
                   <button className="chip quiz-chip" onClick={onQuiz}>
-                    🎯 Try a grape quiz
+                    {t("chat.quiz")}
                   </button>
                 )}
               </div>
@@ -228,13 +230,13 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
                   send(input);
                 }
               }}
-              placeholder="Ask Grape Bot about grapes…"
+              placeholder={t("chat.placeholder")}
               maxLength={MAX}
-              aria-label="Message"
+              aria-label={t("chat.message")}
               enterKeyHint="send"
             />
             <button className="primary" disabled={busy || !input.trim()}>
-              Send
+              {t("chat.send")}
             </button>
             <Counter length={input.length} max={MAX} />
           </form>

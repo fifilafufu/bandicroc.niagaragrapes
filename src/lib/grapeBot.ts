@@ -2,6 +2,7 @@ import { findGrapeByWiki } from "../../shared/grapes";
 import { readPref, writePref } from "./prefs";
 import { photoOf } from "../../shared/varieties";
 import { GREETING, type Msg } from "./chatMessages";
+import type { Lang } from "../../shared/i18n";
 
 // Talking to Grape Bot's server function (functions/api/chat.ts). The reply streams as one JSON
 // object per line: a "meta" event (sources, follow-ups, grapes, joke), then "text" pieces, then
@@ -28,7 +29,7 @@ export function rememberJoke(id: string) {
 }
 
 // Ask Grape Bot. Yields events as they arrive; throws if the server can't be reached.
-export async function* askGrapeBot(history: Msg[], favourite: string | null): AsyncGenerator<BotEvent> {
+export async function* askGrapeBot(history: Msg[], favourite: string | null, lang: Lang): AsyncGenerator<BotEvent> {
   const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -36,6 +37,7 @@ export async function* askGrapeBot(history: Msg[], favourite: string | null): As
       messages: history.filter((m) => m !== GREETING).map(({ role, content }) => ({ role, content })),
       favourite,
       seenJokes: heardJokes(),
+      lang,
     }),
   });
   if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
