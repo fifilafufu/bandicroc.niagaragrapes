@@ -4,7 +4,7 @@ import type { Pruning } from "../../../shared/grow";
 // Faded canes are last year's growth that gets removed. Based on University of Minnesota Extension
 // (spurs of one or two buds; 80 to 90% of last year's growth removed) and OIV's "close" vs "long" pruning.
 
-const BUD = (x: number, y: number) => <circle cx={x} cy={y} r={3} className="vd-bud" />;
+const BUD = (x: number, y: number) => <circle key={`bud-${x}-${y}`} cx={x} cy={y} r={3} className="vd-bud" />;
 const CUT = (x: number, y: number) => <line x1={x - 7} y1={y - 5} x2={x + 7} y2={y + 5} className="vd-cut" />;
 
 function Frame({ children, label }: { children: React.ReactNode; label: string }) {

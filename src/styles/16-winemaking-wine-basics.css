@@ -1,0 +1,55 @@
+/* ---------- Part 5: winemaking and wine basics ---------- */
+.style-blurb { margin: 8px 0 4px; }
+.flow { list-style: none; padding: 0; margin: 10px 0 0; position: relative; }
+.flow::before { content: ""; position: absolute; left: 17px; top: 18px; bottom: 18px; border-left: 3px solid var(--accent-soft); }
+.flow-step { position: relative; margin-bottom: 6px; }
+.flow-head { display: grid; grid-template-columns: 36px 28px 1fr 20px; align-items: center; gap: 8px; width: 100%; text-align: left; border: 1px solid var(--border); background: var(--surface-2); border-radius: 14px; padding: 6px 10px 6px 0; cursor: pointer; font: inherit; color: inherit; min-height: 48px; }
+.flow-step.open .flow-head { border-color: var(--accent); }
+.flow-step.sometimes .flow-head { border-style: dashed; }
+.flow-num { width: 28px; height: 28px; margin-left: 4px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-text); font-weight: 800; font-size: 0.85rem; position: relative; z-index: 1; }
+.flow-step.sometimes .flow-num { background: var(--surface); color: var(--accent-strong); border: 2px dashed var(--accent); }
+.flow-icon { font-size: 1.3rem; text-align: center; }
+.flow-name { display: flex; flex-direction: column; min-width: 0; }
+.flow-caret { font-weight: 800; color: var(--accent-strong); text-align: center; }
+.flow-body { margin: 4px 0 8px 44px; padding: 8px 12px; border-left: 3px solid var(--accent); font-size: 0.9rem; }
+.flow-body p { margin: 0 0 6px; }
+.compare-wrap { overflow-x: auto; margin-top: 8px; }
+.compare { border-collapse: collapse; width: 100%; font-size: 0.78rem; min-width: 420px; }
+.compare th, .compare td { padding: 5px 6px; border-bottom: 1px solid var(--border); text-align: center; white-space: nowrap; }
+.compare th[scope="row"] { text-align: left; font-weight: 600; }
+.compare thead th { color: var(--muted); font-weight: 700; }
+.compare td.yes { font-weight: 800; color: var(--accent-strong); }
+.compare td.maybe { color: var(--muted); }
+.compare td.no { color: var(--border); }
+.compare tr.highlight { background: var(--accent-soft); }
+.structure { max-width: 380px; }
+.glass-fill { fill: var(--surface); }
+.glass-bowl { fill: none; stroke: var(--muted); stroke-width: 2; }
+.glass-wine { fill: #8a2b48; opacity: 0.85; }
+.glass-stem { stroke: var(--muted); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+.part-line { stroke: var(--border); stroke-width: 1.5; }
+.part-node { cursor: pointer; }
+.part-node circle { fill: var(--surface-2); stroke: var(--border); stroke-width: 2; transition: fill 0.15s; }
+.part-node.on circle { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 3; }
+.part-node:focus-visible circle { stroke: var(--accent-strong); stroke-width: 3; }
+.part-node:focus { outline: none; }
+.part-icon { font-size: 22px; dominant-baseline: middle; pointer-events: none; }
+.part-label { fill: var(--text); font-size: 12px; font-weight: 700; pointer-events: none; }
+.part-info h2 { margin-top: 4px; }
+.part-info dl { margin: 6px 0; display: grid; gap: 2px 0; }
+.part-info dt { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-strong); margin-top: 6px; }
+.part-info dd { margin: 0; font-size: 0.9rem; }
+.scale { max-width: 340px; }
+.scale-post { fill: var(--muted); }
+.scale-beam { stroke: var(--text); stroke-width: 4; stroke-linecap: round; }
+.scale-string { stroke: var(--muted); stroke-width: 1.5; }
+.scale-pan.soft { fill: #c08a2b; }
+.scale-pan.firm { fill: var(--accent); }
+.scale-text { fill: var(--text); font-size: 12px; font-weight: 700; }
+.verdict { margin: 4px 0 10px; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; }
+.verdict.good { background: var(--accent-soft); }
+.verdict.off { background: color-mix(in srgb, var(--danger) 14%, transparent); }
+.sliders { display: flex; flex-direction: column; gap: 10px; }
+.slider { display: flex; flex-direction: column; gap: 4px; font-size: 0.88rem; }
+.slider input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 32px; }
+.callout.small { font-size: 0.82rem; }

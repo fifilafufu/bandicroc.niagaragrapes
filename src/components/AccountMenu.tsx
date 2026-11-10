@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import type { User } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import { accountsAvailable, displayName, logOut as logOutHere, type User } from "../lib/account";
 
 // Top-right account button: your name with an icon. Tap it for settings, switching account and logging out.
 // Logged out it says "Log in".
 
-export const displayName = (user: User) =>
-  (user.user_metadata?.name as string | undefined)?.trim() || (user.email ?? "You").split("@")[0];
 
 type Props = {
   user: User | null;
@@ -41,8 +38,7 @@ export default function AccountMenu({ user, onLogin, onSettings, onMyGrapes, onL
 
   async function logOut(thenLogin: boolean) {
     setBusy(true);
-    // "local": only this device, so the user stays logged in on their other devices.
-    await supabase?.auth.signOut({ scope: "local" });
+    await logOutHere();
     setBusy(false);
     setOpen(false);
     onLoggedOut();
@@ -98,7 +94,7 @@ export default function AccountMenu({ user, onLogin, onSettings, onMyGrapes, onL
           ) : (
             <>
               <p className="muted small account-note">Log in to save your grapes and chats on all your devices.</p>
-              {supabase && (
+              {accountsAvailable && (
                 <>
                   <button role="menuitem" className="strong" onClick={go(() => onLogin("in"))}>
                     🔑 Log in

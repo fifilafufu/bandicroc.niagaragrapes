@@ -1,6 +1,5 @@
 import { useState } from "react";
-import type { User } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import { logOut as logOutHere, type User } from "../lib/account";
 import { useInstall } from "../lib/install";
 import type { Theme } from "../lib/prefs";
 import { ChangePassword } from "./auth";
@@ -85,8 +84,7 @@ function AccountSettings({ user, onLoggedOut }: { user: User; onLoggedOut: () =>
 
   async function logOut() {
     setBusy(true);
-    // "local": only this device, so the user stays logged in on their other devices.
-    await supabase?.auth.signOut({ scope: "local" });
+    await logOutHere();
     setBusy(false);
     onLoggedOut();
   }

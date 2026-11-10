@@ -1,0 +1,24 @@
+/* ---------- home ---------- */
+.hero {
+  text-align: center;
+  padding: 30px 18px 26px;
+  background: linear-gradient(160deg, var(--hero-from), var(--hero-to));
+  position: relative;
+  overflow: hidden;
+}
+.hero::before, .hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.08;
+}
+.hero::before { width: 180px; height: 180px; top: -60px; left: -50px; }
+.hero::after { width: 120px; height: 120px; bottom: -40px; right: -30px; }
+.hero > * { position: relative; }
+.hero-grapes { display: block; margin: 0 auto 8px; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.15)); }
+.hero p { color: var(--muted); max-width: 30ch; margin: 0 auto 16px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.fact { display: flex; gap: 12px; align-items: flex-start; }
+.fact .emoji { font-size: 1.6rem; line-height: 1; }
+.fact p { color: var(--muted); margin: 0; }

@@ -1,0 +1,37 @@
+/* ---------- Part 3: varieties ---------- */
+.photo-credit { display: block; font-size: 0.66rem; line-height: 1.25; color: var(--muted); overflow-wrap: anywhere; }
+.photo-credit a { color: inherit; }
+.photo-credit.tiny { font-size: 0.6rem; text-align: center; }
+.grape-photo { float: right; width: 120px; margin: 0 0 8px 12px; }
+.grape-photo img { width: 100%; height: auto; border-radius: 12px; display: block; }
+.grape-card .grape-photo img { float: none; max-width: none; margin: 0; }
+.bubble-photo > span { display: flex; flex-direction: column; gap: 2px; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
+.chip.on { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.gallery { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.gallery-item { cursor: default; }
+.gallery-img { width: 96px; height: 96px; }
+.gallery-item .species { font-size: 0.7rem; font-style: italic; color: var(--muted); }
+.gallery-links { display: flex; gap: 10px; justify-content: center; font-size: 0.78rem; margin-top: 2px; }
+.credits summary { cursor: pointer; font-size: 0.8rem; color: var(--muted); }
+.credits ul { margin: 6px 0 0; padding-left: 18px; font-size: 0.72rem; }
+.credits .photo-credit { display: inline; font-size: inherit; }
+
+.explainer h3 { margin: 16px 0 6px; font-size: 1rem; }
+.ladder { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 6px; counter-reset: rung; }
+.ladder li { display: grid; grid-template-columns: 92px 1fr; column-gap: 10px; background: var(--surface-2); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 12px; padding: 8px 10px; }
+.ladder li:nth-child(2) { margin-left: 8px; } .ladder li:nth-child(3) { margin-left: 16px; } .ladder li:nth-child(4) { margin-left: 24px; }
+.ladder-step { grid-row: span 2; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-strong); align-self: center; }
+.ladder li > span:last-child { font-size: 0.8rem; color: var(--muted); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mini-card { display: flex; flex-direction: column; gap: 3px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; font-size: 0.8rem; }
+.names { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.82rem; }
+.names li { background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; }
+.ft-box { fill: var(--surface-2); stroke: var(--border); stroke-width: 1.5; }
+.ft-box.parent { stroke: var(--accent); }
+.ft-box.child { fill: var(--accent-soft); stroke: var(--accent); }
+.ft-text { fill: var(--text); font-size: 12px; font-weight: 600; }
+.ft-line { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+.ft-line.dashed { stroke-dasharray: 4 4; }
+.ft-note { fill: var(--muted); font-size: 11px; font-style: italic; }
+@media (max-width: 380px) { .two-col { grid-template-columns: 1fr; } .ladder li { grid-template-columns: 1fr; } .ladder-step { grid-row: auto; } }

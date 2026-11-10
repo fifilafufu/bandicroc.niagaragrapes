@@ -1,0 +1,82 @@
+/* ---------- Get app ---------- */
+.get-app {
+  margin-left: auto;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fav-pill + .get-app { margin-left: 8px; }
+.close { border: 0; background: none; font-size: 1.1rem; padding: 4px 8px; cursor: pointer; color: var(--muted); }
+.small-btn { padding: 6px 12px; font-size: 0.85rem; }
+.big { width: 100%; padding: 14px; font-size: 1.1rem; margin: 6px 0; }
+.tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 16px;
+  background: var(--accent-soft);
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.tip span { flex: 1; }
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 10;
+}
+.sheet {
+  width: 100%;
+  max-width: 520px;
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+  max-height: 85dvh;
+  overflow-y: auto;
+  animation: up 0.2s ease-out;
+}
+@media (min-width: 700px) {
+  .sheet-backdrop { align-items: center; }
+  .sheet { border-radius: 22px; }
+}
+@keyframes up { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+.sheet-head img { border-radius: 10px; }
+.sheet-head > div { flex: 1; }
+.sheet-head p { margin: 0; }
+.steps { padding-left: 22px; margin: 8px 0 14px; }
+.steps li { margin-bottom: 8px; }
+
+/* Collapsible cards: the summary row stays visible when closed. */
+details.collapsible > summary { gap: 10px; }
+details.collapsible > summary > span:first-child { flex: 1; }
+details.collapsible[open] > summary { margin-bottom: 8px; }
+.fav-choice {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fav-choice.none { background: var(--accent-soft); color: var(--accent-strong); }
+
+/* The notes box gets most of the screen; the cards around it fold up to make room. */
+.secret-box {
+  min-height: 42dvh;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  padding: 14px 16px;
+}

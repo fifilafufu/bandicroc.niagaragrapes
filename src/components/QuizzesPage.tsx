@@ -1,8 +1,7 @@
-import type { User } from "@supabase/supabase-js";
+import { accountsAvailable, type User } from "../lib/account";
 import Quiz from "./Quiz";
 import { LEVELS, type Level } from "../lib/quiz";
 import { summary, useQuizResults } from "../lib/useQuizResults";
-import { supabase } from "../lib/supabase";
 
 // The Quizzes section. Scores are saved to the account when logged in (see useQuizResults).
 export default function QuizzesPage({ user, onLogin }: { user: User | null; onLogin: () => void }) {
@@ -22,7 +21,7 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
         {user ? (
           <p className="muted small">{synced ? "✓ Your scores are saved to your account." : "Your scores are saved on this device."}</p>
         ) : (
-          supabase && (
+          accountsAvailable && (
             <p className="muted small">
               Your scores are kept on this device.{" "}
               <button className="link inline" onClick={onLogin}>

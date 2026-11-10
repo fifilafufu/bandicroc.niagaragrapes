@@ -1,0 +1,45 @@
+/* ---------- Part 4: Learn pages ---------- */
+.learn-nav { display: flex; gap: 6px; overflow-x: auto; padding: 0 2px 10px; margin-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.learn-nav::-webkit-scrollbar { display: none; }
+.learn-nav .chip { flex-shrink: 0; white-space: nowrap; }
+.more-card { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; cursor: pointer; font: inherit; color: inherit; }
+.more-card > span:nth-child(2) { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.more-icon { font-size: 1.8rem; }
+.more-arrow { font-size: 1.3rem; color: var(--accent-strong); }
+.more-card:hover { border-color: var(--accent); }
+.hbars { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.hbars li { display: grid; grid-template-columns: 96px 1fr auto; align-items: center; gap: 8px; font-size: 0.82rem; }
+.hbar-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbar-track { height: 10px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; }
+.hbar-track i { display: block; height: 100%; border-radius: 999px; background: var(--accent); min-width: 4px; }
+.hbar-value { font-size: 0.78rem; white-space: nowrap; }
+.callout { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); font-size: 0.85rem; }
+.aroma-family { margin-top: 8px; }
+.aroma-family-name { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+.aroma-family .chips-row { margin-top: 4px; }
+.aroma-results { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); }
+.aroma-results p { margin: 0 0 6px; }
+.aroma-results ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.aroma-results li { display: grid; grid-template-columns: 52px 1fr auto; gap: 10px; align-items: center; }
+.aroma-results img { width: 52px; height: 52px; object-fit: cover; border-radius: 10px; }
+.aroma-results li > span { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.species-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.species-card { display: grid; grid-template-columns: 76px 1fr; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); }
+.species-card:not(:has(img)) { grid-template-columns: 1fr; }
+.species-card img { width: 76px; height: 76px; object-fit: cover; border-radius: 12px; }
+.species-card > div { display: flex; flex-direction: column; gap: 2px; }
+.species-card p { margin: 4px 0; font-size: 0.85rem; }
+.photo-credit.inline { display: inline; font-size: inherit; }
+.wheel { max-width: 340px; }
+.wheel-tick { stroke: var(--border); stroke-width: 1; }
+.wheel-month { fill: var(--muted); font-size: 11px; }
+.wheel-stage { cursor: pointer; }
+.wheel-stage path { fill: var(--accent-soft); stroke: var(--surface); stroke-width: 2; transition: fill 0.15s; }
+.wheel-stage.on path { fill: var(--accent); }
+.wheel-icon { font-size: 18px; pointer-events: none; }
+.wheel-needle { stroke: var(--danger); stroke-width: 2.5; stroke-linecap: round; }
+.wheel-hub { fill: var(--danger); }
+.wheel-today { fill: var(--danger); font-size: 11px; font-weight: 700; }
+.stage-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; justify-content: center; }
+.stage-info { margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
+.stage-info p { margin: 4px 0 0; font-size: 0.9rem; }

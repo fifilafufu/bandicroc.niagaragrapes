@@ -1,0 +1,46 @@
+/* ---------- account ---------- */
+.grape-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 8px; }
+.grape {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: transform 0.08s;
+}
+.grape:active { transform: scale(0.97); }
+.grape.selected { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 700; }
+.wiki-list { list-style: none; padding: 0; margin: 8px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.grape-card img { float: right; max-width: 110px; height: auto; margin: 0 0 8px 12px; border-radius: 12px; }
+.secret-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; }
+
+details:is(.settings, .collapsible) > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+}
+details:is(.settings, .collapsible) > summary::-webkit-details-marker { display: none; }
+details:is(.settings, .collapsible) > summary::after { content: "▾"; color: var(--muted); transition: transform 0.15s; }
+details:is(.settings, .collapsible)[open] > summary::after { transform: rotate(180deg); }
+.settings-body { display: flex; flex-direction: column; gap: 18px; margin-top: 14px; }
+.settings-body h3 { margin: 0 0 4px; font-size: 1rem; }
+.settings-body section + section { border-top: 1px solid var(--border); padding-top: 16px; }
+
+.password-field { position: relative; }
+.password-field input { padding-right: 68px; }
+.reveal {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}

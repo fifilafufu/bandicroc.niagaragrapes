@@ -64,9 +64,10 @@ Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape B
 
 | Folder | Role | May import |
 |---|---|---|
-| `functions/` | Backend: Cloudflare Pages Functions (Grape Bot, AI calls, secrets) | `shared/` |
+| `functions/` | Backend entry points: Cloudflare Pages Functions (each file is a web address, e.g. `/api/chat`) | `server/`, `shared/` |
+| `server/` | Backend modules (Grape Bot: request, articles, prompt, AI providers) | `shared/` |
 | `src/components/` | Frontend screens: drawing and taps only | `src/lib/`, `shared/` |
-| `src/lib/` | Frontend data layer: Supabase, server calls, routing, device storage, hooks | `shared/` |
+| `src/lib/` | Frontend data layer: account (`account.ts`), Grape Bot client (`grapeBot.ts`), synced lists (`useSyncedList.ts`), routing, device storage, hooks | `shared/` |
 | `src/styles/` | Styles, one file per feature | none |
 | `shared/` | Plain data and pure logic for both sides (no React, no DOM, no network) | `shared/` |
 | `scripts/` | Data build scripts and tests (run by hand) | `shared/` |

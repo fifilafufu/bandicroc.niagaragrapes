@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import type { User } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import { useEffect, useRef, useState } from "react";
+import { accountsAvailable, type User } from "../lib/account";
 import type { Secret } from "../lib/useAuthAndFavourite";
-import { GRAPES, findGrape, wikiUrl } from "../../shared/grapes";
+import { GRAPES, findGrape } from "../../shared/grapes";
 import GrapeCard from "./GrapeCard";
-import Counter from "./Counter";
+import SecretMessage from "./mygrapes/SecretMessage";
+import LearnList from "./mygrapes/LearnList";
+import WinesCard from "./mygrapes/WinesCard";
+import type { Guest } from "../lib/useGuestMerge";
 
-const SECRET_MAX = 1000;
 
-export type Guest = { favourite: string | null; notes: string; notesAt: string | null };
 
 type Props = {
   user: User | null;
@@ -30,7 +30,7 @@ type Props = {
 
 export default function MyGrapes(props: Props) {
   const { user, ready, guest, setGuest } = props;
-  if (supabase && !ready) return <p className="muted center">Loading…</p>;
+  if (accountsAvailable && !ready) return <p className="muted center">Loading…</p>;
 
   if (user)
     return (
@@ -56,9 +56,9 @@ export default function MyGrapes(props: Props) {
           <b>You're not logged in</b>
           <p className="muted small">
             You can pick a favourite and write notes, but they disappear when you close the app.
-            {supabase ? " Log in to keep them on all your devices." : " Saving isn't available right now."}
+            {accountsAvailable ? " Log in to keep them on all your devices." : " Saving isn't available right now."}
           </p>
-          {supabase && (
+          {accountsAvailable && (
             <div className="hero-actions left">
               <button className="primary small-btn" onClick={() => props.onLogin("in")}>
                 🔑 Log in to save
@@ -161,111 +161,5 @@ function Picks(props: PicksProps) {
 
       {findGrape(favourite) && <GrapeCard grape={findGrape(favourite)!} />}
     </>
-  );
-}
-
-// "Notes about grapes": a private notebook only this account can read, synced live to every device.
-// (Stored in the secret_messages table, its original name.)
-function SecretMessage({ secret, missing, save, guest }: { secret: Secret | null; missing: boolean; save: Props["saveSecret"]; guest?: boolean }) {
-  const saved = secret?.message ?? "";
-  const [draft, setDraft] = useState<string | null>(null); // null = not editing, show the synced text
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const value = draft ?? saved;
-  const changed = draft !== null && draft !== saved;
-
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    if (busy || !changed) return;
-    setBusy(true);
-    const error = await save(value);
-    setBusy(false);
-    if (error) setMsg({ ok: false, text: error });
-    else {
-      setDraft(null);
-      setMsg({ ok: true, text: !value.trim() ? "Cleared ✓" : guest ? "Kept for now ✓ Log in to save it for good." : "Saved ✓ Your other devices update live." });
-    }
-  }
-
-  return (
-    <section className="card">
-      <h2>📝 Notes about grapes</h2>
-      {missing ? (
-        <p className="muted">Notes aren't available right now.</p>
-      ) : (
-        <>
-          <p className="muted small">
-            {guest
-              ? "Your grape notebook: tastings, favourites to try, facts you learned. Not logged in, so it's kept only until you close the app."
-              : "Your private grape notebook: tastings, favourites to try, facts you learned. Only you can read it, and it syncs to every device you're logged in on."}
-          </p>
-          <form onSubmit={submit}>
-            <textarea
-              className="secret-box"
-              value={value}
-              onChange={(e) => {
-                setDraft(e.target.value);
-                setMsg(null);
-              }}
-              placeholder="e.g. Tried Cotton Candy grapes today: really do taste like candy! Next: find Muscat…"
-              maxLength={SECRET_MAX}
-              aria-label="Notes about grapes"
-            />
-            <div className="secret-meta">
-              <span className="muted small">
-                {changed
-                  ? "Unsaved changes"
-                  : secret?.updatedAt
-                    ? `${guest ? "Kept" : "Saved"} ${new Date(secret.updatedAt).toLocaleString()}`
-                    : "Nothing saved yet"}
-              </span>
-              <Counter length={value.length} max={SECRET_MAX} always />
-              <button className="primary small-btn" disabled={busy || !changed}>
-                {busy ? "Saving…" : "Save"}
-              </button>
-            </div>
-          </form>
-          {msg && <p className={msg.ok ? "success" : "notice"} role="alert">{msg.text}</p>}
-        </>
-      )}
-    </section>
-  );
-}
-
-function LearnList() {
-  return (
-    <details className="card collapsible">
-      <summary>
-        <span>📖 Learn about each grape</span>
-      </summary>
-      <p className="muted small">Every grape here has a Wikipedia article. Grape Bot reads them too.</p>
-      <ul className="wiki-list">
-        {GRAPES.map((g) => (
-          <li key={g.name}>
-            <a href={wikiUrl(g.wiki)} target="_blank" rel="noreferrer">
-              {g.name}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </details>
-  );
-}
-
-// Saved wines live in Make Your Wine; this card points there.
-function WinesCard({ onOpen }: { onOpen: () => void }) {
-  return (
-    <button className="card more-card" onClick={onOpen}>
-      <span className="more-icon" aria-hidden="true">
-        🍾
-      </span>
-      <span>
-        <b>Your wines</b>
-        <span className="muted small">Wines you made and saved in Make Your Wine.</span>
-      </span>
-      <span className="more-arrow" aria-hidden="true">
-        →
-      </span>
-    </button>
   );
 }

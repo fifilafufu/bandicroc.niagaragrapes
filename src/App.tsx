@@ -4,11 +4,12 @@ import { detect, dismissTip, tipDismissed, useInstall } from "./lib/install";
 import { useOnline, useTheme } from "./lib/prefs";
 import { useChatHistory } from "./lib/useChatHistory";
 import { GREETING, type Msg } from "./lib/chatMessages";
-import { isGamePage, isLearnPage, useRoute, type Page } from "./lib/route";
-import SubNav, { GAME_ITEMS, LEARN_ITEMS } from "./components/SubNav";
-import { supabase } from "./lib/supabase";
+import { GAME_ITEMS, isGamePage, isLearnPage, LEARN_ITEMS, useRoute, type Page } from "./lib/route";
+import SubNav from "./components/SubNav";
+import { accountsAvailable } from "./lib/account";
 import Home from "./components/Home";
-import type { Guest } from "./components/MyGrapes";
+import { NO_GUEST, useGuestMerge, type Guest } from "./lib/useGuestMerge";
+import { useHideOnScroll } from "./lib/useHideOnScroll";
 import InstallSheet from "./components/InstallSheet";
 import AccountMenu from "./components/AccountMenu";
 import { LoginSheet, SavePrompt } from "./components/LoginSheet";
@@ -35,7 +36,6 @@ const TABS: { page: Page; icon: string; label: string }[] = [
 ];
 
 const isPhone = () => ["ios", "android"].includes(detect().os);
-const NO_GUEST: Guest = { favourite: null, notes: "", notesAt: null };
 
 export default function App() {
   const [page, go] = useRoute();
@@ -67,40 +67,11 @@ export default function App() {
     if (auth.user) setLogin(null); // logged in: close the login sheet
   }, [auth.user]);
 
-  // Just logged in after trying things as a guest: save what they did to the account.
-  const { user, secret, saveFavourite, saveSecret } = auth;
-  useEffect(() => {
-    if (!user) return;
-    if (guest.favourite) {
-      saveFavourite(guest.favourite);
-      setGuest((g) => ({ ...g, favourite: null }));
-    }
-    // Notes wait until the account's own notes have loaded, then go underneath them (never replace them).
-    const notes = guest.notes.trim();
-    if (notes && secret) {
-      const existing = secret.message.trim();
-      if (!existing.includes(notes)) saveSecret((existing ? `${existing}\n\n${notes}` : notes).slice(0, 1000));
-      setGuest((g) => ({ ...g, notes: "", notesAt: null }));
-    }
-  }, [user, secret, guest, saveFavourite, saveSecret]);
+  useGuestMerge(auth, guest, setGuest);
 
   // The title bar slides away while scrolling down and comes back when scrolling up (or at the top).
   const topbarRef = useRef<HTMLElement>(null);
-  const [barHidden, setBarHidden] = useState(false);
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!el) return;
-    let last = el.scrollTop;
-    const onScroll = () => {
-      const y = el.scrollTop;
-      if (Math.abs(y - last) < 8) return; // ignore tiny jitters
-      setBarHidden(y > last && y > 80);
-      last = y;
-    };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
-  }, []);
-  useEffect(() => setBarHidden(false), [page]);
+  const barOffset = useHideOnScroll(contentRef, topbarRef, page);
 
   // A new section starts at the top.
   useEffect(() => {
@@ -128,8 +99,8 @@ export default function App() {
       <header
         className="topbar"
         ref={topbarRef}
-        style={barHidden ? { marginTop: -(topbarRef.current?.offsetHeight ?? 60) } : undefined}
-        aria-hidden={barHidden || undefined}
+        style={barOffset ? { marginTop: barOffset } : undefined}
+        aria-hidden={barOffset ? true : undefined}
       >
         <button className="brand-btn" onClick={() => go("home")} aria-label="Grapes home">
           <img src="/favicon.svg" alt="" width={28} height={28} />
@@ -202,7 +173,7 @@ export default function App() {
               guest={guest}
               setGuest={setGuest}
               onLogin={setLogin}
-              onGuestSaved={(what) => supabase && !promptOff.current && setSavePrompt(what)}
+              onGuestSaved={(what) => accountsAvailable && !promptOff.current && setSavePrompt(what)}
               onWines={() => go("wine")}
             />
           )}

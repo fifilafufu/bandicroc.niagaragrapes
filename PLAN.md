@@ -20,7 +20,7 @@ Build steps in order. Tick a step (`- [x]`) only when its "Done when" checks pas
   - Done when: checked on a phone-size screen; the user confirms the empty-space fix on a real phone.
 - [x] **5.7 Grow Your Grape** (Grapes tab). Per grape: species or hybrid type, cold hardiness, vigour, ripening time, disease susceptibility (powdery and downy mildew, botrytis, black rot), phylloxera and rootstock, training system, spur or cane pruning, climate and soil, a yearly care calendar tied to the growth cycle, a "my coldest winter" check, and vine diagrams drawn in code with the pruning cuts. Sources used: OIV Focus 2017 (11 grapes), each grape's Wikipedia article, University of Minnesota Extension (general care, calendar, Marquette). Disease resistance: VIVC resistance scores (OIV 1 to 9 scale, median of all studies) for 21 grapes, fetched by `scripts/build-varieties.mjs`. Cornell, Michigan State and Iowa State hardiness tables could not be reached, so most grapes have no winter temperature, only a description.
   - Done when: every grape shows only sourced advice or says "no reliable data"; the favourite grape opens first; diagrams fit a phone screen.
-- [ ] **5.8 Code cleanup** (no visible changes). Follow the code structure rules in `CLAUDE.md`:
+- [x] **5.8 Code cleanup** (no visible changes). Follow the code structure rules in `CLAUDE.md`:
   - one data layer: all Supabase and `/api` calls move from components into `src/lib/`;
   - content out of components: grape gallery info, home sections and facts, colour classes, species, explainer lists, game grape groups move into `shared/` data files;
   - one "save on device, sync to account" helper replaces the copies in quiz scores and saved wines;

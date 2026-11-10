@@ -1,46 +1,17 @@
 import { useMemo, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import { accountsAvailable, type User } from "../../lib/account";
 import { SIM_GRAPES, TABLE_ONLY, simGrape, type SimGrape } from "../../../shared/simGrapes";
 import { brixToSugar, defaultInputs, describe, makeWine, MODEL_VERSION, SKIN_STEPS, skinLabel, type Inputs } from "../../../shared/wineSim";
 import { abvFromSugar } from "../../../shared/wine";
 import { useSavedWines, type SavedWine } from "../../lib/useSavedWines";
-import { supabase } from "../../lib/supabase";
 import { photoOf } from "../../lib/varieties";
 import SourceLine from "../SourceLine";
 import WineGlass from "./WineGlass";
+import { Range, Segmented } from "./Controls";
+import { GROUPS } from "../../../shared/simGroups";
 
 // Make Your Wine: choose a grape and how to make it, and see the wine that comes out.
 // All the maths is in shared/wineSim.ts (tested by scripts/test-wine.ts).
-
-const GROUPS: { label: string; names: string[] }[] = [
-  { label: "European wine grapes", names: ["Cabernet Sauvignon", "Merlot", "Pinot Noir", "Syrah", "Tempranillo", "Grenache", "Chardonnay", "Riesling", "Sauvignon Blanc", "Gewürztraminer", "Pinot Gris", "Muscat", "Thompson Seedless"] },
-  { label: "American grapes", names: ["Concord", "Niagara", "Catawba", "Delaware", "Scuppernong"] },
-  { label: "Cold-hardy crosses", names: ["Regent", "Marquette", "Solaris", "Seyval Blanc", "Vidal Blanc"] },
-];
-
-function Segmented<T extends string | number>({ value, options, onChange, label }: { value: T; options: { v: T; label: string }[]; onChange: (v: T) => void; label: string }) {
-  return (
-    <div className="segmented" role="group" aria-label={label}>
-      {options.map((o) => (
-        <button key={String(o.v)} className={value === o.v ? "on" : ""} onClick={() => onChange(o.v)} aria-pressed={value === o.v}>
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function Range(props: { label: string; value: number; min: number; max: number; step?: number; onChange: (v: number) => void; show: string; hint?: string }) {
-  return (
-    <label className="slider">
-      <span>
-        {props.label} <b>{props.show}</b>
-        {props.hint && <span className="muted small"> · {props.hint}</span>}
-      </span>
-      <input type="range" min={props.min} max={props.max} step={props.step ?? 1} value={props.value} onChange={(e) => props.onChange(+e.target.value)} />
-    </label>
-  );
-}
 
 export default function MakeWinePage({ user, favourite, onLogin }: { user: User | null; favourite: string | null; onLogin: () => void }) {
   const start = simGrape(favourite) ?? simGrape("Cabernet Sauvignon")!;
@@ -198,7 +169,7 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
               {saved ? "Saved ✓" : "Save wine"}
             </button>
           </div>
-          {!user && supabase && (
+          {!user && accountsAvailable && (
             <p className="muted small">
               Saved on this device.{" "}
               <button className="link inline" onClick={onLogin}>

@@ -1,0 +1,42 @@
+/* ---------- building blocks ---------- */
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.muted { color: var(--muted); }
+.center { text-align: center; }
+.small { font-size: 0.9rem; }
+.notice { color: var(--danger); margin-top: 10px; }
+.success { color: var(--accent-strong); margin-top: 10px; }
+
+.primary, .secondary, .danger-btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.08s, filter 0.15s;
+}
+.primary:active, .secondary:active, .danger-btn:active { transform: scale(0.97); }
+.primary { background: var(--accent); color: var(--accent-text); }
+.primary:hover { filter: brightness(1.05); }
+.secondary { background: var(--accent-soft); color: var(--accent-strong); }
+.danger-btn { background: none; color: var(--danger); border: 1px solid currentColor; }
+.primary:disabled, .secondary:disabled { opacity: 0.5; cursor: default; transform: none; }
+.link { background: none; border: 0; color: var(--accent-strong); padding: 8px 0 0; cursor: pointer; }
+
+.form { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+input, textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 16px; /* stops iOS zooming on focus */
+}
+input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+textarea { resize: vertical; min-height: 90px; line-height: 1.4; }

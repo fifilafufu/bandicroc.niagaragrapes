@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { supabase } from "../lib/supabase";
-import { friendlyError, looksLikeEmail } from "../lib/errors";
+import { accountsAvailable, changePassword, logIn, signUp } from "../lib/account";
+import { looksLikeEmail } from "../lib/errors";
 
 // Password field with a show/hide button, so people can check what they typed.
 export function PasswordInput(props: {
@@ -44,7 +44,7 @@ export function LoginForm({ initialMode = "in" }: { initialMode?: "in" | "up" } 
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    if (!supabase || busy) return;
+    if (!accountsAvailable || busy) return;
     // Our own checks first, so empty or odd input gets a clear message.
     if (!email.trim()) return setMsg({ ok: false, text: "Type your email address." });
     if (!looksLikeEmail(email)) return setMsg({ ok: false, text: "That doesn't look like an email address." });
@@ -53,18 +53,15 @@ export function LoginForm({ initialMode = "in" }: { initialMode?: "in" | "up" } 
 
     setBusy(true);
     setMsg(null);
-    try {
-      const { data, error } =
-        mode === "in"
-          ? await supabase.auth.signInWithPassword({ email: email.trim(), password })
-          : await supabase.auth.signUp({ email: email.trim(), password });
-      if (error) setMsg({ ok: false, text: friendlyError(error.message) });
-      else if (mode === "up" && !data.session) setMsg({ ok: true, text: "Check your email to confirm your account, then log in." });
-    } catch (err) {
-      setMsg({ ok: false, text: friendlyError(err instanceof Error ? err.message : String(err)) });
-    } finally {
-      setBusy(false);
+    if (mode === "in") {
+      const error = await logIn(email, password);
+      if (error) setMsg({ ok: false, text: error });
+    } else {
+      const { error, needsConfirmation } = await signUp(email, password);
+      if (error) setMsg({ ok: false, text: error });
+      else if (needsConfirmation) setMsg({ ok: true, text: "Check your email to confirm your account, then log in." });
     }
+    setBusy(false);
   }
 
   const switchMode = () => {
@@ -114,21 +111,16 @@ export function ChangePassword() {
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    if (!supabase || busy) return;
+    if (!accountsAvailable || busy) return;
     if (password.length < 6) return setMsg({ ok: false, text: "Your new password needs at least 6 characters." });
     setBusy(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) setMsg({ ok: false, text: friendlyError(error.message) });
-      else {
-        setMsg({ ok: true, text: "Saved ✓ Use the new password next time you log in." });
-        setPassword("");
-      }
-    } catch (err) {
-      setMsg({ ok: false, text: friendlyError(err instanceof Error ? err.message : String(err)) });
-    } finally {
-      setBusy(false);
+    const error = await changePassword(password);
+    if (error) setMsg({ ok: false, text: error });
+    else {
+      setMsg({ ok: true, text: "Saved ✓ Use the new password next time you log in." });
+      setPassword("");
     }
+    setBusy(false);
   }
 
   return (

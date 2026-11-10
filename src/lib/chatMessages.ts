@@ -18,3 +18,10 @@ export const GREETING: Msg = {
   role: "assistant",
   content: "Hi! I'm Grape Bot, your grape tutor. Ask me anything about grapes, and I'll answer from checked facts and Wikipedia. 🍇",
 };
+
+export const SUGGESTIONS = [
+  "Where are grapes from?",
+  "Can dogs eat grapes?",
+  "What colours do grapes come in?",
+  "What's my favourite grape?",
+];

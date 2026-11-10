@@ -14,6 +14,24 @@ export const isLearnPage = (p: Page) => (LEARN_PAGES as readonly Page[]).include
 export const GAME_PAGES = ["quizzes", "wine"] as const satisfies readonly Page[];
 export const isGamePage = (p: Page) => (GAME_PAGES as readonly Page[]).includes(p);
 
+// The buttons shown at the top of the Grapes and Games tabs.
+export type SubNavItem = { page: Page; label: string };
+
+export const LEARN_ITEMS: SubNavItem[] = [
+  { page: "home", label: "🍇 Overview" },
+  { page: "stats", label: "📊 Statistics" },
+  { page: "taste", label: "👅 Taste" },
+  { page: "biology", label: "🌱 Biology" },
+  { page: "winemaking", label: "🍷 Winemaking" },
+  { page: "basics", label: "🥂 Wine basics" },
+  { page: "grow", label: "🌿 Grow" },
+];
+
+export const GAME_ITEMS: SubNavItem[] = [
+  { page: "quizzes", label: "🎯 Quizzes" },
+  { page: "wine", label: "🍷 Make Your Wine" },
+];
+
 const PATHS: Record<Page, string> = {
   home: "/",
   stats: "/learn/statistics",

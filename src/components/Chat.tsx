@@ -1,32 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Counter from "./Counter";
-import { readPref, writePref } from "../lib/prefs";
-import { findGrapeByWiki, wikiUrl } from "../../shared/grapes";
-import { photoOf } from "../lib/varieties";
-import { GREETING, type Msg } from "../lib/chatMessages";
+import AnswerTools from "./AnswerTools";
+import { wikiUrl } from "../../shared/grapes";
+import { GREETING, SUGGESTIONS, type Msg } from "../lib/chatMessages";
+import { askGrapeBot, photosFor, rememberJoke } from "../lib/grapeBot";
 
-const SUGGESTIONS = [
-  "Where are grapes from?",
-  "Can dogs eat grapes?",
-  "What colours do grapes come in?",
-  "What's my favourite grape?",
-];
 const MAX = 500;
-
-// Jokes this device has heard, so Grape Bot tells a new one each time (see shared/jokes.ts).
-const JOKES_KEY = "jokes-heard";
-function heardJokes(): string[] {
-  try {
-    const v = JSON.parse(readPref(JOKES_KEY) ?? "[]");
-    return Array.isArray(v) ? v : [];
-  } catch {
-    return [];
-  }
-}
-function rememberJoke(id: string) {
-  const heard = heardJokes().filter((j) => j !== id);
-  writePref(JOKES_KEY, JSON.stringify([...heard, id].slice(-60)));
-}
 
 type Props = {
   favourite: string | null;
@@ -79,54 +58,14 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
     const shown = new Set(messages.flatMap((m) => m.photos?.map((p) => p.wiki) ?? []));
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: history.filter((m) => m !== GREETING).map(({ role, content }) => ({ role, content })),
-          favourite: loggedIn ? favourite : null,
-          seenJokes: heardJokes(),
-        }),
-      });
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        let nl;
-        while ((nl = buffer.indexOf("\n")) >= 0) {
-          const line = buffer.slice(0, nl).trim();
-          buffer = buffer.slice(nl + 1);
-          if (!line) continue;
-          const ev = JSON.parse(line) as {
-            type: string;
-            text?: string;
-            sources?: Msg["sources"];
-            followUps?: string[];
-            grapes?: string[];
-            joke?: string | null;
-          };
-          if (ev.type === "meta") {
-            if (ev.joke) rememberJoke(ev.joke);
-            patchLast(gen, (m) => ({ ...m, sources: ev.sources ?? [], followUps: ev.followUps ?? [] }));
-            // First time a grape comes up in this chat: show its checked Commons photo, with its credit.
-            const photos = (ev.grapes ?? [])
-              .filter((w) => !shown.has(w))
-              .slice(0, 2)
-              .flatMap((wiki) => {
-                shown.add(wiki);
-                const name = findGrapeByWiki(wiki)?.name;
-                const p = photoOf(name);
-                return p && name ? [{ wiki, name, src: p.thumb, credit: { author: p.author, licence: p.licence, page: p.page } }] : [];
-              });
-            if (photos.length) patchLast(gen, (m) => ({ ...m, photos }));
-          } else if (ev.type === "text" || ev.type === "error") {
-            patchLast(gen, (m) => ({ ...m, content: m.content + (ev.text ?? "") }));
-          }
+      for await (const ev of askGrapeBot(history, loggedIn ? favourite : null)) {
+        if (ev.type === "meta") {
+          if (ev.joke) rememberJoke(ev.joke);
+          patchLast(gen, (m) => ({ ...m, sources: ev.sources ?? [], followUps: ev.followUps ?? [] }));
+          const photos = photosFor(ev.grapes ?? [], shown);
+          if (photos.length) patchLast(gen, (m) => ({ ...m, photos }));
+        } else if (ev.type === "text" || ev.type === "error") {
+          patchLast(gen, (m) => ({ ...m, content: m.content + (ev.text ?? "") }));
         }
       }
       patchLast(gen, (m) => ({ ...m, pending: false, content: m.content.trim() || "Something went wrong on the vine. Try again? 🍇" }));
@@ -280,42 +219,6 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
             </button>
             <Counter length={input.length} max={MAX} />
           </form>
-    </div>
-  );
-}
-
-// Copy an answer, or send it with the phone's share sheet.
-function AnswerTools({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  const canShare = typeof navigator.share === "function";
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* clipboard blocked */
-    }
-  }
-  async function share() {
-    try {
-      await navigator.share({ text: `${text}\n\nGrape Bot 🍇 https://bandicroc-niagaragrapes.pages.dev` });
-    } catch {
-      /* closed the share sheet */
-    }
-  }
-
-  return (
-    <div className="answer-tools">
-      <button onClick={copy} aria-label="Copy answer">
-        {copied ? "✓ Copied" : "📋 Copy"}
-      </button>
-      {canShare && (
-        <button onClick={share} aria-label="Share answer">
-          📤 Share
-        </button>
-      )}
     </div>
   );
 }
