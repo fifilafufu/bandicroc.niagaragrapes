@@ -1,4 +1,5 @@
 import type { Pruning } from "../../../shared/grow";
+import { useLang } from "../../lib/lang";
 
 // A dormant vine on a wire, drawn in code, showing where to cut (red marks) for spur or cane pruning.
 // Faded canes are last year's growth that gets removed. Based on University of Minnesota Extension
@@ -20,9 +21,10 @@ function Frame({ children, label }: { children: React.ReactNode; label: string }
 }
 
 function Spur() {
+  const { t } = useLang();
   const spurs = [70, 115, 225, 270];
   return (
-    <Frame label="Spur pruning: a trunk with two permanent arms along the wire. Each arm has short spurs; every cane is cut back to a spur of two buds.">
+    <Frame label={t("vd.spurLabel")}>
       <path d="M170 210 V112" className="vd-trunk" />
       <path d="M170 112 H40 M170 112 H300" className="vd-arm" />
       {spurs.map((x) => (
@@ -35,18 +37,19 @@ function Spur() {
         </g>
       ))}
       <text x={170} y={36} textAnchor="middle" className="vd-title">
-        Spur pruning (close pruning)
+        {t("vd.spurTitle")}
       </text>
       <text x={170} y={226} textAnchor="middle" className="vd-note">
-        Keep the arms; cut each cane back to 2 buds
+        {t("vd.spurNote")}
       </text>
     </Frame>
   );
 }
 
 function Cane() {
+  const { t } = useLang();
   return (
-    <Frame label="Cane pruning: a trunk with one long cane from last year tied along the wire, a short renewal spur near the head, and all other old canes cut away.">
+    <Frame label={t("vd.caneLabel")}>
       <path d="M170 210 V118" className="vd-trunk" />
       {/* the old fruiting cane being removed */}
       <path d="M170 120 C130 112 90 112 40 112" className="vd-old" />
@@ -62,35 +65,36 @@ function Cane() {
       {BUD(160, 117)}
       {BUD(156, 113)}
       <text x={110} y={140} textAnchor="middle" className="vd-label">
-        renewal spur (2 buds)
+        {t("vd.renewal")}
       </text>
       <text x={248} y={96} textAnchor="middle" className="vd-label">
-        new cane, tied to the wire
+        {t("vd.newCane")}
       </text>
       <text x={170} y={36} textAnchor="middle" className="vd-title">
-        Cane pruning (long pruning)
+        {t("vd.caneTitle")}
       </text>
       <text x={170} y={226} textAnchor="middle" className="vd-note">
-        Keep one long cane and a renewal spur; cut the rest
+        {t("vd.caneNote")}
       </text>
     </Frame>
   );
 }
 
 export default function VineDiagram({ type }: { type: Pruning | null }) {
+  const { t } = useLang();
   return (
     <div className="vine-diagrams">
       {(type === null || type === "spur") && <Spur />}
       {(type === null || type === "cane") && <Cane />}
       <p className="legend muted small">
         <span>
-          <i className="lg-cut" /> cut here
+          <i className="lg-cut" /> {t("vd.cut")}
         </span>
         <span>
-          <i className="lg-old" /> last year's growth, removed
+          <i className="lg-old" /> {t("vd.old")}
         </span>
         <span>
-          <i className="lg-bud" /> bud
+          <i className="lg-bud" /> {t("vd.bud")}
         </span>
       </p>
     </div>

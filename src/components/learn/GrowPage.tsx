@@ -1,79 +1,44 @@
 import { useState } from "react";
 import { GRAPES } from "../../../shared/grapes";
-import { GENERAL_CALENDAR, GENERAL_DISEASE, GENERAL_PRUNING, GROW, rootstockAdvice } from "../../../shared/grow";
-import { MONTHS } from "../../../shared/growthCycle";
-import { DISEASE_NAMES, resistanceWord, type DiseaseKey } from "../../../shared/diseases";
+import { GROW, growFor } from "../../../shared/grow";
+import type { DiseaseKey } from "../../../shared/diseases";
 import { photoOf, speciesLabel, varietyInfo } from "../../../shared/varieties";
+import { SPECIES_PL } from "../../../shared/i18n/pl/varieties";
+import { useLang } from "../../lib/lang";
 import PhotoCredit from "../PhotoCredit";
-import SourceLine from "../SourceLine";
-import VineDiagram from "../grow/VineDiagram";
+import GrowCalendar from "../grow/GrowCalendar";
+import GrowDiseases from "../grow/GrowDiseases";
+import GrowGlance from "../grow/GrowGlance";
+import GrowPruning from "../grow/GrowPruning";
+import GrowWinter from "../grow/GrowWinter";
 
 // Grow Your Grape: a care guide for one grape. Grape-specific advice comes only from its sources
 // (shared/grow.ts); where none exist the page says "No reliable data" and shows the general advice
 // from University of Minnesota Extension, labelled as general.
 
-const NONE = "No reliable data";
-
-function Fact({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className={`fact ${value ? "" : "missing"}`}>
-      <span className="muted small">{label}</span>
-      <b>{value ?? NONE}</b>
-    </div>
-  );
-}
-
 export default function GrowPage({ favourite }: { favourite: string | null }) {
+  const { lang, t } = useLang();
   const [name, setName] = useState(GRAPES.some((g) => g.name === favourite) ? favourite! : "Marquette");
-  const [south, setSouth] = useState(false);
-  const [coldest, setColdest] = useState(-20);
-  const g = GROW[name];
+  const g = growFor(name, lang);
   const v = varietyInfo(name);
   const photo = photoOf(name);
-  const species = speciesLabel(v?.vivc?.species ?? null);
-  const shift = (m: number) => MONTHS[(m - 1 + (south ? 6 : 0)) % 12];
-
-  // Winter check: only with a temperature a source gives.
-  let winter: { tone: "good" | "warn" | "bad" | "none"; text: string };
-  if (g?.cold?.minC !== undefined) {
-    const margin = coldest - g.cold.minC;
-    winter =
-      margin >= 3
-        ? { tone: "good", text: `${name} should survive ${coldest} °C (sources: down to about ${g.cold.minC} °C).` }
-        : margin >= 0
-          ? { tone: "warn", text: `Borderline: ${coldest} °C is close to the ${g.cold.minC} °C limit. Expect some winter injury in harsh years.` }
-          : { tone: "bad", text: `Too cold: ${coldest} °C is below the ${g.cold.minC} °C our sources give. Expect serious winter injury.` };
-  } else
-    winter = {
-      tone: "none",
-      text: g?.cold ? `No temperature in our sources. They say: ${g.cold.text}` : "No reliable data on how much cold this grape survives.",
-    };
-
-  // Calendar: general tasks plus this grape's own notes (only from its sourced traits).
-  const own: { months: [number, number]; task: string }[] = [];
-  if (g?.frostRisk) own.push({ months: [3, 5], task: `Frost risk: ${g.frostRisk}` });
+  const label = speciesLabel(v?.vivc?.species ?? null);
+  const species = (lang === "pl" && label ? SPECIES_PL[label] : undefined) ?? label;
   const res = v?.resistance ?? null;
   const weak = res ? (Object.keys(res) as DiseaseKey[]).filter((k) => res[k]!.score <= 3) : [];
-  if (weak.length) own.push({ months: [4, 10], task: `Most at risk from (VIVC scores): ${weak.map((k) => DISEASE_NAMES[k].toLowerCase()).join(", ")}. Inspect often.` });
-  // Only when a source calls it susceptible (Marquette, for example, resists black rot).
-  if (/susceptible[^.]*black rot/i.test(g?.diseases ?? "") || weak.includes("blackRot")) own.push({ months: [5, 7], task: "Black rot window (bloom to about 6 weeks after): this grape is susceptible." });
-  if (g?.diseases) own.push({ months: [4, 10], task: `Disease notes: ${g.diseases}` });
-  if (g?.ripening === "early") own.push({ months: [8, 9], task: "Early ripener: check ripeness sooner than for most grapes." });
-  if (g?.ripening === "late") own.push({ months: [10, 10], task: "Late ripener: needs a long enough season; harvest comes later." });
-  if (g?.cold?.text.toLowerCase().includes("autumn frost")) own.push({ months: [10, 11], task: g.cold.text });
 
   return (
     <div className="stack grow">
       <section className="card">
-        <h1 className="page-title">🌿 Grow Your Grape</h1>
-        <p className="muted">A care guide for one grape. Advice for that grape comes from its sources; where they say nothing, we say so instead of guessing.</p>
+        <h1 className="page-title">{t("grow.title")}</h1>
+        <p className="muted">{t("grow.intro")}</p>
         <label className="slider">
-          <span>Grape</span>
+          <span>{t("grow.grape")}</span>
           <select value={name} onChange={(e) => setName(e.target.value)}>
             {GRAPES.map((x) => (
               <option key={x.name} value={x.name}>
                 {x.name}
-                {GROW[x.name] || varietyInfo(x.name)?.resistance ? "" : " (little data)"}
+                {GROW[x.name] || varietyInfo(x.name)?.resistance ? "" : t("grow.littleData")}
               </option>
             ))}
           </select>
@@ -81,7 +46,7 @@ export default function GrowPage({ favourite }: { favourite: string | null }) {
         <div className="grape-basis">
           {photo && <img src={photo.thumb} alt="" />}
           <span className="muted small">
-            {species ?? "Species not in VIVC"}
+            {species ?? t("grow.noSpecies")}
             {photo && (
               <>
                 {" "}
@@ -91,135 +56,11 @@ export default function GrowPage({ favourite }: { favourite: string | null }) {
           </span>
         </div>
       </section>
-
-      <section className="card">
-        <h2>📋 At a glance</h2>
-        <div className="facts">
-          <Fact label="Cold hardiness" value={g?.cold?.text} />
-          <Fact
-            label="Disease risk (VIVC scores)"
-            value={weak.length ? `Susceptible to ${weak.map((k) => DISEASE_NAMES[k].toLowerCase()).join(", ")}` : res ? `None of the ${Object.keys(res).length} ${Object.keys(res).length === 1 ? "disease" : "diseases"} scored is a weak spot` : undefined}
-          />
-          <Fact label="Budbreak" value={g?.budding} />
-          <Fact label="Ripening" value={g?.ripening} />
-          <Fact label="Vigour" value={g?.vigour} />
-          <Fact label="Pruning" value={g?.pruning ? `${g.pruning.type === "spur" ? "Spur" : "Cane"}: ${g.pruning.text}` : undefined} />
-          <Fact label="Training" value={g?.training} />
-          <Fact label="Climate and soil" value={g?.climateSoil} />
-        </div>
-        {g ? <SourceLine ids={g.src.ids} wiki={(g.src.wiki ?? []).map((w) => ({ label: w, title: w }))} /> : <p className="muted small">No grape-specific growing source found yet. The general advice below still applies.</p>}
-      </section>
-
-      <section className="card">
-        <h2>❄️ Will it survive my winter?</h2>
-        <label className="slider">
-          <span>
-            My coldest winter night <b>{coldest} °C</b>
-          </span>
-          <input type="range" min={-45} max={5} value={coldest} onChange={(e) => setColdest(+e.target.value)} />
-        </label>
-        <p className={`verdict ${winter.tone === "good" ? "good" : winter.tone === "none" ? "" : "off"}`} aria-live="polite">
-          {winter.text}
-        </p>
-      </section>
-
-      <section className="card">
-        <h2>🦠 Diseases</h2>
-        {res ? (
-          <>
-            <p className="muted small">Resistance scores collected by VIVC from research studies, on the OIV scale: 1 = very susceptible, 9 = very resistant.</p>
-            <ul className="res-bars">
-              {(Object.keys(DISEASE_NAMES) as DiseaseKey[])
-                .filter((k) => res[k])
-                .map((k) => {
-                  const r = res[k]!;
-                  return (
-                    <li key={k} className={`res-${resistanceWord(r.score)}`}>
-                      <span>{DISEASE_NAMES[k]}</span>
-                      <span className="res-track" aria-hidden="true">
-                        <i style={{ width: `${(r.score / 9) * 100}%` }} />
-                      </span>
-                      <b>
-                        {r.score} {resistanceWord(r.score)}
-                      </b>
-                      <span className="muted small">
-                        {r.studies} {r.studies === 1 ? "study" : "studies"}
-                      </span>
-                    </li>
-                  );
-                })}
-            </ul>
-            {v?.vivc && (
-              <SourceLine ids={["vivc"]} wiki={[]} />
-            )}
-          </>
-        ) : (
-          <p className="muted small">No resistance scores in VIVC for this grape.</p>
-        )}
-        {g?.diseases ? (
-          <p>
-            <b>Other sources say:</b> {g.diseases}
-          </p>
-        ) : (
-          !res && <p>{NONE} on this grape's diseases.</p>
-        )}
-        <p>
-          <b>Roots and phylloxera:</b> {rootstockAdvice(name, v?.vivc?.species)}
-        </p>
-        <h3>For every grape (general)</h3>
-        <ul className="tips">
-          {GENERAL_DISEASE.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-        <SourceLine ids={["umn-home-grapes"]} wiki={[{ label: "Phylloxera", title: "Phylloxera" }]} />
-      </section>
-
-      <section className="card visual">
-        <h2>✂️ Pruning</h2>
-        {g?.pruning ? (
-          <p className="muted small">
-            Our sources say {name} suits <b>{g.pruning.type} pruning</b>: {g.pruning.text}
-          </p>
-        ) : (
-          <p className="muted small">No source says whether {name} prefers spur or cane pruning, so both are shown.</p>
-        )}
-        <VineDiagram type={g?.pruning?.type ?? null} />
-        <h3>For every grape (general)</h3>
-        <ul className="tips">
-          {GENERAL_PRUNING.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-        <SourceLine ids={["umn-home-grapes", "oiv-varieties-2017"]} />
-      </section>
-
-      <section className="card">
-        <h2>📅 Care calendar</h2>
-        <div className="chips-row" role="group" aria-label="Hemisphere">
-          <button className={`chip ${!south ? "on" : ""}`} onClick={() => setSouth(false)} aria-pressed={!south}>
-            Northern Hemisphere
-          </button>
-          <button className={`chip ${south ? "on" : ""}`} onClick={() => setSouth(true)} aria-pressed={south}>
-            Southern Hemisphere
-          </button>
-        </div>
-        <ol className="calendar">
-          {[...own.map((o) => ({ ...o, own: true })), ...GENERAL_CALENDAR.map((o) => ({ ...o, own: false }))]
-            .sort((a, b) => a.months[0] - b.months[0])
-            .map((o) => (
-              <li key={o.task} className={o.own ? "own" : ""}>
-                <span className="cal-months">{o.months[0] === o.months[1] ? shift(o.months[0]) : `${shift(o.months[0])} to ${shift(o.months[1])}`}</span>
-                <span>
-                  {o.own && <b>{name}: </b>}
-                  {o.task}
-                </span>
-              </li>
-            ))}
-        </ol>
-        <p className="muted small">Usual months for a cold-winter climate like Minnesota's; they move with your weather. Lines starting with “{name}” come from this grape's sources.</p>
-        <SourceLine ids={["umn-home-grapes"]} wiki={[{ label: "Annual growth cycle of grapevines", title: "Annual growth cycle of grapevines" }]} />
-      </section>
+      <GrowGlance g={g} res={res} weak={weak} />
+      <GrowWinter name={name} g={g} />
+      <GrowDiseases name={name} g={g} res={res} species={v?.vivc?.species} hasVivc={!!v?.vivc} />
+      <GrowPruning name={name} g={g} />
+      <GrowCalendar name={name} g={g} en={GROW[name]} weak={weak} />
     </div>
   );
 }

@@ -6,6 +6,8 @@
 // describes; each grape's Wikipedia article; University of Minnesota Extension "Growing grapes in the
 // home garden" (Marquette zones and harvest, and all general advice); Wikipedia "Phylloxera".
 
+import type { Lang } from "./i18n";
+import { CALENDAR_PL, DISEASE_TIPS_PL, GROW_PL, PRUNING_PL, ROOTSTOCK_PL } from "./i18n/pl/grow";
 import type { SourceId } from "./sources";
 
 export type Level = "low" | "medium" | "high";
@@ -178,16 +180,41 @@ export const GROW: Record<string, GrowInfo> = {
   },
 };
 
+// One grape's growing traits in the chosen language (same values and sources; Polish text from
+// shared/i18n/pl/grow.ts where it exists).
+export function growFor(name: string, lang: Lang): GrowInfo | undefined {
+  const g = GROW[name];
+  const pl = lang === "pl" ? GROW_PL[name] : undefined;
+  if (!g || !pl) return g;
+  return {
+    ...g,
+    cold: g.cold && { ...g.cold, text: pl.cold ?? g.cold.text },
+    vigour: pl.vigour ?? g.vigour,
+    diseases: pl.diseases ?? g.diseases,
+    frostRisk: pl.frostRisk ?? g.frostRisk,
+    pruning: g.pruning && { ...g.pruning, text: pl.pruning ?? g.pruning.text },
+    training: pl.training ?? g.training,
+    climateSoil: pl.climateSoil ?? g.climateSoil,
+    rootstock: pl.rootstock ?? g.rootstock,
+  };
+}
+
+const ROOTSTOCK_EN = {
+  vinifera: "European Vitis vinifera roots are attacked by phylloxera: where it is present, graft onto phylloxera-resistant American rootstock.",
+  muscadine: "No source on rootstocks for muscadines found.",
+  american: "Has American ancestry, which helps against phylloxera; no grape-specific rootstock advice found.",
+};
+
 // American species (and their rootstocks) resist phylloxera; European Vitis vinifera roots don't, so
 // vinifera is grafted onto resistant American rootstock where the pest is present (Wikipedia "Phylloxera").
-export function rootstockAdvice(name: string, species: string | null | undefined): string {
-  const own = GROW[name]?.rootstock;
+export function rootstockAdvice(name: string, species: string | null | undefined, lang: Lang): string {
+  const own = growFor(name, lang)?.rootstock;
   if (own) return own;
+  const text = lang === "pl" ? ROOTSTOCK_PL : ROOTSTOCK_EN;
   const s = (species ?? "").toUpperCase();
-  if (s.startsWith("VITIS VINIFERA"))
-    return "European Vitis vinifera roots are attacked by phylloxera: where it is present, graft onto phylloxera-resistant American rootstock.";
-  if (s.includes("ROTUNDIFOLIA")) return "No source on rootstocks for muscadines found.";
-  return "Has American ancestry, which helps against phylloxera; no grape-specific rootstock advice found.";
+  if (s.startsWith("VITIS VINIFERA")) return text.vinifera;
+  if (s.includes("ROTUNDIFOLIA")) return text.muscadine;
+  return text.american;
 }
 
 // General advice for everyone (University of Minnesota Extension). Months are for the Northern
@@ -217,3 +244,13 @@ export const GENERAL_DISEASE = [
   "Black rot: grapes are susceptible from bloom until about 6 weeks later.",
   "Keep lawn weed killers with 2,4-D or dicamba well away: grapes are very sensitive to them.",
 ];
+
+// The general advice in the chosen language (same order as above).
+export function generalAdvice(lang: Lang) {
+  const pl = lang === "pl";
+  return {
+    calendar: GENERAL_CALENDAR.map((c, i) => ({ ...c, task: pl ? CALENDAR_PL[i] : c.task })),
+    pruning: pl ? PRUNING_PL : GENERAL_PRUNING,
+    disease: pl ? DISEASE_TIPS_PL : GENERAL_DISEASE,
+  };
+}

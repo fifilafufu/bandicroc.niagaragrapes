@@ -92,7 +92,7 @@ function growNotes(g: Grape, out: Knowledge) {
     gi.src.ids?.forEach((id) => out.chips.push(sourceChip(id)));
     gi.src.wiki?.forEach((w) => out.chips.push(wikiChip(w)));
   }
-  out.notes.push(`${g.name}, rootstock: ${rootstockAdvice(g.name, info?.vivc?.species)}`);
+  out.notes.push(`${g.name}, rootstock: ${rootstockAdvice(g.name, info?.vivc?.species, "en")}`);
   if (!gi?.rootstock) out.chips.push(wikiChip("Phylloxera"));
 }
 

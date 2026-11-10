@@ -9,6 +9,7 @@ import type { QuizText } from "../../quiz/text";
 import { niceCase } from "../../varieties";
 import { countryName, num } from "../countries";
 import { SPECIES_TEXT_PL, STAGES_PL } from "./biology";
+import { GROW_PL } from "./grow";
 import { CLASSES_PL } from "./varieties";
 import { PARTS_PL, STEPS_PL, STYLES_PL, SWEETNESS_PL } from "./wine";
 
@@ -53,12 +54,12 @@ export const QUIZ_TEXT_PL: QuizText = {
   parentsQ: (name) => `Kto jest rodzicami odmiany ${name}?`,
   parentsWhy: (name, parents) => `Według VIVC rodzice odmiany ${name} to ${parents}.`,
   budQ: "Która z tych odmian wcześnie wypuszcza pąki, więc wiosenny przymrozek może uszkodzić jej młode pędy?",
-  budWhy: (name, wrong) => `${name} wypuszcza pąki wcześnie, a ${wrong.join(", ")} późno.`,
+  budWhy: (name, wrong) => `${name} wypuszcza pąki wcześnie, a ${wrong.join(", ")} późno. ${GROW_PL[name]?.frostRisk ?? ""}`.trim(),
   ripeQ: "Która z tych odmian dojrzewa wcześnie?",
   ripeWhy: (name, wrong) => `${name} dojrzewa wcześnie, a ${wrong.join(", ")} późno.`,
   pruneQ: (name) => `Jakie cięcie pasuje do odmiany ${name}?`,
   pruneOptions: ["Cięcie krótkie (spur)", "Cięcie długie (cane)"],
-  pruneWhy: (name, type) => `Według źródła do odmiany ${name} pasuje ${PRUNE[type]}.`,
+  pruneWhy: (name, type) => GROW_PL[name]?.pruning ?? `Według źródła do odmiany ${name} pasuje ${PRUNE[type]}.`,
   resistQ: (d) => `Która z tych odmian jest najbardziej odporna na ${DISEASE_ACC[d] ?? d}?`,
   resistWhy: (scores) => `Oceny VIVC (1 = bardzo podatna, 9 = bardzo odporna): ${scores}.`,
 
