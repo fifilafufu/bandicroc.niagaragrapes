@@ -10,6 +10,10 @@ export type Page = "home" | "stats" | "taste" | "biology" | "winemaking" | "basi
 export const LEARN_PAGES = ["home", "stats", "taste", "biology", "winemaking", "basics"] as const satisfies readonly Page[];
 export const isLearnPage = (p: Page) => (LEARN_PAGES as readonly Page[]).includes(p);
 
+// The games all live under the Games tab (Make Your Wine joins here).
+export const GAME_PAGES = ["quizzes"] as const satisfies readonly Page[];
+export const isGamePage = (p: Page) => (GAME_PAGES as readonly Page[]).includes(p);
+
 const PATHS: Record<Page, string> = {
   home: "/",
   stats: "/learn/statistics",
@@ -17,15 +21,18 @@ const PATHS: Record<Page, string> = {
   biology: "/learn/biology",
   winemaking: "/learn/winemaking",
   basics: "/learn/wine-basics",
-  quizzes: "/quizzes",
+  quizzes: "/games/quizzes",
   chat: "/chat",
   mine: "/my-grapes",
   settings: "/settings",
 };
 
+// Addresses used by older versions, so links people shared keep working.
+const OLD_PATHS: Record<string, Page> = { "/quizzes": "quizzes", "/games": "quizzes" };
+
 function pageFromHash(): Page {
   const path = location.hash.replace(/^#/, "").replace(/\/+$/, "") || "/";
-  return (Object.keys(PATHS) as Page[]).find((p) => PATHS[p] === path) ?? "home";
+  return (Object.keys(PATHS) as Page[]).find((p) => PATHS[p] === path) ?? OLD_PATHS[path] ?? "home";
 }
 
 export function useRoute() {

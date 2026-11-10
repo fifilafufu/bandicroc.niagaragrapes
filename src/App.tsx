@@ -4,8 +4,8 @@ import { detect, dismissTip, tipDismissed, useInstall } from "./lib/install";
 import { useOnline, useTheme } from "./lib/prefs";
 import { useChatHistory } from "./lib/useChatHistory";
 import { GREETING, type Msg } from "./lib/chatMessages";
-import { isLearnPage, useRoute, type Page } from "./lib/route";
-import LearnNav from "./components/LearnNav";
+import { isGamePage, isLearnPage, useRoute, type Page } from "./lib/route";
+import SubNav, { GAME_ITEMS, LEARN_ITEMS } from "./components/SubNav";
 import { supabase } from "./lib/supabase";
 import Home from "./components/Home";
 import type { Guest } from "./components/MyGrapes";
@@ -24,10 +24,10 @@ const BiologyPage = lazy(() => import("./components/learn/BiologyPage"));
 const WinemakingPage = lazy(() => import("./components/learn/WinemakingPage"));
 const WineBasicsPage = lazy(() => import("./components/learn/WineBasicsPage"));
 
-// The main sections, in tab order. "Make Your Wine" joins between Grapes and Quizzes when it's built.
+// The main sections, in tab order. Kept to four: new pages go inside a tab, not next to it.
 const TABS: { page: Page; icon: string; label: string }[] = [
   { page: "home", icon: "🍇", label: "Grapes" },
-  { page: "quizzes", icon: "🎯", label: "Quizzes" },
+  { page: "quizzes", icon: "🎮", label: "Games" },
   { page: "chat", icon: "💬", label: "Grape Bot" },
   { page: "mine", icon: "🧺", label: "My Grapes" },
 ];
@@ -87,8 +87,8 @@ export default function App() {
     contentRef.current?.scrollTo({ top: 0 });
   }, [page]);
 
-  // The Grapes tab stays lit on every Learn page.
-  const active = (tab: Page) => page === tab || (tab === "home" && isLearnPage(page));
+  // A tab stays lit on every page inside it.
+  const active = (tab: Page) => page === tab || (tab === "home" && isLearnPage(page)) || (tab === "quizzes" && isGamePage(page));
   const ask = (q: string) => {
     setAutoAsk(q);
     go("chat");
@@ -149,7 +149,8 @@ export default function App() {
 
       <main ref={contentRef} className={`content ${page === "chat" ? "flush" : ""}`}>
         <Suspense fallback={<p className="muted center loading">Loading…</p>}>
-          {isLearnPage(page) && <LearnNav page={page} go={go} />}
+          {isLearnPage(page) && <SubNav items={LEARN_ITEMS} page={page} go={go} label="Learn about grapes" />}
+          {isGamePage(page) && <SubNav items={GAME_ITEMS} page={page} go={go} label="Games" />}
           {page === "home" && <Home onChat={() => go("chat")} onMyGrapes={() => go("mine")} onAsk={ask} go={go} />}
           {page === "stats" && <StatsPage />}
           {page === "taste" && <TastePage onAsk={ask} />}

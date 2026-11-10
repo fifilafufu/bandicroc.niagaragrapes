@@ -239,6 +239,9 @@ I'll go through a checklist on the live link: private window, logged out, empty 
 
 **Data standard:** stored the way OIV and AWRI do it. Variety traits use OIV descriptors (e.g. berry skin colour: blanc, rose, gris, rouge, noir, as in VIVC). Wine numbers use OIV units (acidity g/L as tartaric, residual sugar g/L, alcohol % vol, pressure bar). Each value records its source and the date checked; missing data stays empty, never guessed. Curated data lives in the repo (`shared/`), not in Supabase, because free Supabase projects pause after a week of no use and the installed app must work offline. Supabase only holds user data.
 
+### Navigation rule (2026-11-10)
+The bottom bar stays at four tabs: **Grapes** (Overview, Statistics, Taste, Biology, Winemaking, Wine basics, and later Grow), **Games** (Quizzes, and Make Your Wine from Part 6), **Grape Bot**, **My Grapes**. New pages go inside a tab, never next to it. Settings is in the account menu.
+
 ### Build order (each part is built, tested, committed and deployed on its own)
 | Part | What | Status |
 |---|---|---|
@@ -246,8 +249,8 @@ I'll go through a checklist on the live link: private window, logged out, empty 
 | 2 | Navigation: 5 tabs (Grapes, Make Wine, Quizzes, Grape Bot, My Grapes; Settings in the account menu), bottom bar on phones, top bar on wide screens, hash routing (Android back button), Quizzes tab, `quiz_results` table | ✅ live (Make Wine tab arrives with Part 6) |
 | 3 | Variety data: VIVC passports + credited Commons photos for 27 grapes (16 + Pinot Gris as the "gris" example + Merlot, Sauvignon Blanc, Syrah, Tempranillo, Grenache, Solaris, Regent, Marquette, Seyval Blanc, Vidal Blanc), "How varieties work" explainer with VIVC family trees, gallery with filters. Built by `scripts/build-varieties.mjs` into `shared/varietyData.json`. Wine chemistry per variety moved to Part 6, where it is used | ✅ live |
 | 4 | Learn pages under the Grapes tab (Overview · Statistics · Taste · Biology, own addresses). Statistics: FAO map + top 10, OIV uses, table-grape and raisin producers, exporters and importers (OIV 2024). Taste: labrusca "foxy" vs vinifera (methyl anthranilate), ripening and sweetness, aroma finder from checked facts. Biology: four species, berry and vine diagrams, growth-cycle wheel for both hemispheres with today marker | ✅ live |
-| 5 | Winemaking page (steps for red, white, rosé, sparkling; tap a step; comparison table) and Wine basics page (structure diagram, balance scale, sugar-to-alcohol calculator). Shared tested model in `shared/wine.ts` (`npm run test:wine`): OIV sugar × 0.05943 = % alcohol, yeast limit, EU 2019/33 sweetness words, balance rule (Virginia Tech). Sources: OIV Code of Oenological Practices, AWRI, EU, Wikipedia | ✅ done |
-| 6 | Make Your Wine simulator + `saved_wines` table (inputs, result, model version; guests on device, copied on login) | |
+| 5 | Winemaking page (steps for red, white, rosé, sparkling; tap a step; comparison table) and Wine basics page (structure diagram, balance scale, sugar-to-alcohol calculator). Shared tested model in `shared/wine.ts` (`npm run test:wine`): OIV sugar × 0.05943 = % alcohol, yeast limit, EU 2019/33 sweetness words, balance rule (Virginia Tech). Sources: OIV Code of Oenological Practices, AWRI, EU, Wikipedia | ✅ live |
+| 6 | Make Your Wine simulator (inside the Games tab, next to Quizzes) + `saved_wines` table (inputs, result, model version; guests on device, copied on login) | |
 | 7 | Grow Your Grape: per-variety hardiness, vigour, ripening, diseases, rootstock, training, pruning, calendar; vine training diagrams with pruning cuts | |
 | 8 | Quizzes: categories, photo ID, ordering, matching, diagram taps, number estimates; questions generated from the data | |
 | 9 | Grape Bot cites curated sources (chips come from the server, never from the model) | |
