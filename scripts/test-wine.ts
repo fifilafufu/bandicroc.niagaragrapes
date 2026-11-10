@@ -49,5 +49,56 @@ check("even wine is balanced", balance({ acidity: 0.5, tannin: 0.5, sweetness: 0
 check("sweet, low acid → too soft", balance({ acidity: 0.2, tannin: 0, sweetness: 0.9, alcohol: 0.4 }).verdict, "too soft");
 check("tannic, sour, dry → too firm", balance({ acidity: 0.8, tannin: 0.8, sweetness: 0, alcohol: 0.4 }).verdict, "too firm");
 
+// ---------- Make Your Wine (the approved check cases) ----------
+const g = (n: string) => simGrape(n)!;
+const wine = (n: string, over: Partial<Inputs>) => makeWine(g(n), { ...defaultInputs(g(n)), ...over });
+const has = (s: string, word: string) => s.includes(word);
+
+check("OIV table: 22 °Brix = 214.7 g/L", brixToSugar(22), 214.7);
+check("OIV table: 16.5 °Brix ≈ 152.7 g/L", brixToSugar(16.5), 152.65);
+
+const youngCab = wine("Cabernet Sauvignon", { skinDays: 14, oak: "new", oakMonths: 12, bottleYears: 0 });
+check("young Cabernet is red", youngCab.style, "red");
+check("young Cabernet looks deep purple", has(youngCab.colour.words, "deep purple"), true);
+check("young Cabernet has firm tannin", youngCab.tannin > 0.6, true);
+
+const oldRed = wine("Merlot", { skinDays: 14, bottleYears: 10 });
+check("10-year Merlot: garnet core", has(oldRed.colour.words, "garnet"), true);
+check("10-year Merlot: tawny rim", has(oldRed.colour.words, "tawny rim"), true);
+check("…its tannin has softened", oldRed.tannin < wine("Merlot", { skinDays: 14, bottleYears: 0 }).tannin, true);
+
+const riesling = wine("Riesling", { bottleYears: 0 });
+check("young unoaked Riesling is pale lemon-green", riesling.colour.words, "pale lemon-green");
+check("…and has no tannin", riesling.tannin, 0);
+check("…and is balanced", riesling.balance.verdict, "balanced");
+
+const chard = wine("Chardonnay", { oak: "new", oakMonths: 12, bottleYears: 3, mlf: 1 });
+check("oaked 3-year Chardonnay is gold", has(chard.colour.words, "gold"), true);
+check("…smells of vanilla and butter", chard.aromas.includes("vanilla") && chard.aromas.some((a) => a.startsWith("butter")), true);
+check("unoaked Chardonnay has no oak butter", wine("Chardonnay", { oak: "none", mlf: 0 }).aromas.some((a) => a.includes("oak")), false);
+
+const rose = wine("Grenache", { skinDays: 0.25, mlf: 0 });
+check("6-hour Grenache is a rosé", rose.style, "rosé");
+check("…pale salmon", rose.colour.words, "pale salmon");
+
+check("2 weeks of skin contact on Pinot Gris → orange wine", wine("Pinot Gris", { skinDays: 14 }).style, "orange");
+check("dark grapes pressed straight away → almost white", wine("Pinot Noir", { skinDays: 0 }).style, "white");
+check("tannin only with skin contact or oak", wine("Cabernet Sauvignon", { skinDays: 0, oak: "none" }).tannin, 0);
+
+// Concord can't be both strong and sweet
+check("dry Concord only reaches about 9%", wine("Concord", { fermentPct: 100 }).abv < 9.5, true);
+const sweetConcord = wine("Concord", { fermentPct: 70 });
+check("sweeter Concord is weaker still", sweetConcord.abv < 7, true);
+check("…and is labelled sweet", sweetConcord.sweetnessWord, "sweet");
+
+// Bubbles
+const fizz = wine("Chardonnay", { bubbles: "sparkling", dosage: 8 });
+check("traditional method: 6 bar", fizz.pressureBar, 6);
+check("…adds about 1.1% alcohol", fizz.abv - wine("Chardonnay", {}).abv, 1.07);
+check("…8 g/L dosage = brut", fizz.sweetnessWord, "brut");
+check("no dosage, fully fermented = brut nature", wine("Chardonnay", { bubbles: "sparkling", dosage: 0 }).sweetnessWord, "brut nature");
+check("semi-sparkling = 2 bar", wine("Riesling", { bubbles: "semi" }).pressureBar, 2);
+check("still wine has no bubbles", wine("Riesling", {}).pressureBar, 0);
+
 console.log(failed ? `\n${failed} check(s) failed` : "\nAll wine model checks passed");
 process.exit(failed ? 1 : 0);
