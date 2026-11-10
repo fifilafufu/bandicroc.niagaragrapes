@@ -124,6 +124,14 @@ export const SOURCES = {
     url: "https://www.growingproduce.com/fruits/grapes/big-berries-fuel-2014-concord-harvest/",
     checked: "2026-11-10",
   },
+  "umn-home-grapes": {
+    id: "umn-home-grapes",
+    publisher: "University of Minnesota Extension",
+    title: "Growing grapes in the home garden (reviewed 2024)",
+    year: 2024,
+    url: "https://extension.umn.edu/garden-and-home/yard-and-garden/gardening-in-minnesota/growing-grapes-in-the-home-garden",
+    checked: "2026-11-10",
+  },
 } satisfies Record<string, Source>;
 
 export type SourceId = keyof typeof SOURCES;

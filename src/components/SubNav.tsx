@@ -11,6 +11,7 @@ export const LEARN_ITEMS: SubNavItem[] = [
   { page: "biology", label: "🌱 Biology" },
   { page: "winemaking", label: "🍷 Winemaking" },
   { page: "basics", label: "🥂 Wine basics" },
+  { page: "grow", label: "🌿 Grow" },
 ];
 
 export const GAME_ITEMS: SubNavItem[] = [

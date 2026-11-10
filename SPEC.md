@@ -21,7 +21,7 @@ The bottom bar (top bar on wide screens) has **four tabs, never more**. New page
 
 | Tab | Pages | Address |
 |---|---|---|
-| 🍇 **Grapes** | Overview · Statistics · Taste · Biology · Winemaking · Wine basics (Grow Your Grape is next) | `#/`, `#/learn/statistics`, `#/learn/taste`, `#/learn/biology`, `#/learn/winemaking`, `#/learn/wine-basics` |
+| 🍇 **Grapes** | Overview · Statistics · Taste · Biology · Winemaking · Wine basics · Grow | `#/`, `#/learn/statistics`, `#/learn/taste`, `#/learn/biology`, `#/learn/winemaking`, `#/learn/wine-basics`, `#/learn/grow` |
 | 🎮 **Games** | Quizzes · Make Your Wine | `#/games/quizzes`, `#/games/make-wine` |
 | 💬 **Grape Bot** | AI chat about grapes (answers in the user's language) | `#/chat` |
 | 🧺 **My Grapes** | Favourite grape, private notes, link to saved wines, grape links | `#/my-grapes` |
@@ -54,7 +54,7 @@ SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe 
 | `shared/grapes.ts` | 27 grapes: names, keywords, checked facts (Grape Bot uses these) |
 | `shared/varietyData.json` | VIVC passport data + credited Commons photo per grape (built by `scripts/build-varieties.mjs`) |
 | `shared/grapeUses.ts` | OIV uses and production figures |
-| `shared/aromas.ts`, `shared/growthCycle.ts`, `shared/winemaking.ts`, `shared/wineBasics.ts` | page content with sources |
+| `shared/aromas.ts`, `shared/growthCycle.ts`, `shared/winemaking.ts`, `shared/wineBasics.ts`, `shared/grow.ts` | page content with sources (grow.ts: growing traits per grape, empty where no source) |
 | `shared/wine.ts`, `shared/wineSim.ts`, `shared/simGrapes.ts` | the wine model and simulator data |
 | `src/data/worldMap.json` | FAO production per country (built by `scripts/build-map.mjs`) |
 

@@ -24,6 +24,7 @@ const TastePage = lazy(() => import("./components/learn/TastePage"));
 const BiologyPage = lazy(() => import("./components/learn/BiologyPage"));
 const WinemakingPage = lazy(() => import("./components/learn/WinemakingPage"));
 const WineBasicsPage = lazy(() => import("./components/learn/WineBasicsPage"));
+const GrowPage = lazy(() => import("./components/learn/GrowPage"));
 
 // The main sections, in tab order. Kept to four: new pages go inside a tab, not next to it.
 const TABS: { page: Page; icon: string; label: string }[] = [
@@ -181,6 +182,7 @@ export default function App() {
           {page === "biology" && <BiologyPage />}
           {page === "winemaking" && <WinemakingPage />}
           {page === "basics" && <WineBasicsPage />}
+          {page === "grow" && <GrowPage favourite={auth.favourite} />}
           {page === "quizzes" && <QuizzesPage user={auth.user} onLogin={() => setLogin("in")} />}
           {page === "wine" && <MakeWinePage user={auth.user} favourite={auth.favourite} onLogin={() => setLogin("in")} />}
           {page === "chat" && (
