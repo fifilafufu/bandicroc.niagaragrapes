@@ -944,3 +944,43 @@ html, body { overflow: hidden; overscroll-behavior: none; }
 .slider { display: flex; flex-direction: column; gap: 4px; font-size: 0.88rem; }
 .slider input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 32px; }
 .callout.small { font-size: 0.82rem; }
+
+/* ---------- Part 6: Make Your Wine ---------- */
+.wine-layout { display: grid; gap: 14px; }
+@media (min-width: 900px) {
+  .wine-layout { grid-template-columns: 1fr 1fr; align-items: start; }
+  .wine-result { position: sticky; top: 0; }
+}
+.wine-glass { width: 100%; max-width: 220px; height: auto; display: block; margin: 0 auto; }
+.glass-outline { fill: none; stroke: var(--muted); stroke-width: 2.5; stroke-linejoin: round; }
+.bubble { fill: rgba(255, 255, 255, 0.75); animation: rise 3s linear infinite; }
+@keyframes rise {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.9; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-78px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubble { animation: none; opacity: 0.7; transform: translateY(-30px); }
+}
+.wine-style { text-align: center; font-size: 1.15rem; font-weight: 800; margin: 6px 0 0; text-transform: capitalize; }
+.center { text-align: center; }
+.tasting p { margin: 6px 0; font-size: 0.92rem; }
+.wine-controls h3 { margin: 16px 0 6px; font-size: 0.95rem; color: var(--accent-strong); }
+.wine-controls select { width: 100%; min-height: 44px; font: inherit; padding: 6px 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); }
+.grape-basis { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+.grape-basis img { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+.estimate { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, #c08a2b 25%, transparent); color: var(--text); font-size: 0.7rem; }
+.field-label { display: block; font-size: 0.88rem; margin: 8px 0 4px; }
+.segmented { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 3px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.segmented button { border: 0; background: none; border-radius: 9px; padding: 8px 4px; min-height: 40px; font: inherit; font-size: 0.82rem; color: var(--text); cursor: pointer; }
+.segmented button.on { background: var(--accent); color: var(--accent-text); font-weight: 700; }
+.save-row { display: flex; gap: 8px; }
+.save-row input { flex: 1; min-width: 0; min-height: 44px; font: inherit; padding: 6px 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); }
+.wine-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.wine-list li { display: grid; grid-template-columns: 28px 1fr auto auto; gap: 10px; align-items: center; }
+.wine-list i { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); }
+.wine-list li > span { display: flex; flex-direction: column; min-width: 0; }
+.link.danger { color: var(--danger); }
+.how-it-works summary { cursor: pointer; font-weight: 700; }
+.how-it-works li { margin-bottom: 6px; font-size: 0.88rem; }

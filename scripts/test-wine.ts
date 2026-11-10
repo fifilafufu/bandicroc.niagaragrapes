@@ -1,5 +1,7 @@
 // Checks the shared wine model against its sources. Run: node scripts/test-wine.ts
 import { abvFromSugar, balance, ferment, sparklingSweetness, stillSweetness, SUGAR_PER_ABV } from "../shared/wine.ts";
+import { brixToSugar, defaultInputs, makeWine, type Inputs } from "../shared/wineSim.ts";
+import { simGrape } from "../shared/simGrapes.ts";
 
 let failed = 0;
 function check(name: string, got: unknown, want: unknown) {

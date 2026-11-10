@@ -24,6 +24,8 @@ type Props = {
   onLogin: (mode: "in" | "up") => void;
   // Tells the app a guest just saved something, so it can ask them to log in.
   onGuestSaved: (what: string) => void;
+  // Opens Make Your Wine, where saved wines are listed.
+  onWines: () => void;
 };
 
 export default function MyGrapes(props: Props) {
@@ -40,6 +42,7 @@ export default function MyGrapes(props: Props) {
           secretMissing={props.secretMissing}
           saveSecret={props.saveSecret}
         />
+        <WinesCard onOpen={props.onWines} />
         <LearnList />
       </div>
     );
@@ -83,6 +86,7 @@ export default function MyGrapes(props: Props) {
           return null;
         }}
       />
+      <WinesCard onOpen={props.onWines} />
       <LearnList />
     </div>
   );
@@ -245,5 +249,23 @@ function LearnList() {
         ))}
       </ul>
     </details>
+  );
+}
+
+// Saved wines live in Make Your Wine; this card points there.
+function WinesCard({ onOpen }: { onOpen: () => void }) {
+  return (
+    <button className="card more-card" onClick={onOpen}>
+      <span className="more-icon" aria-hidden="true">
+        🍾
+      </span>
+      <span>
+        <b>Your wines</b>
+        <span className="muted small">Wines you made and saved in Make Your Wine.</span>
+      </span>
+      <span className="more-arrow" aria-hidden="true">
+        →
+      </span>
+    </button>
   );
 }

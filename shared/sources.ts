@@ -116,6 +116,14 @@ export const SOURCES = {
     url: "https://enology.fst.vt.edu/VC/Jan-Feb02.html",
     checked: "2026-11-10",
   },
+  "gp-concord-2014": {
+    id: "gp-concord-2014",
+    publisher: "Growing Produce",
+    title: "Big berries fuel 2014 Concord harvest (Concord at 16 to 17 °Brix)",
+    year: 2014,
+    url: "https://www.growingproduce.com/fruits/grapes/big-berries-fuel-2014-concord-harvest/",
+    checked: "2026-11-10",
+  },
 } satisfies Record<string, Source>;
 
 export type SourceId = keyof typeof SOURCES;

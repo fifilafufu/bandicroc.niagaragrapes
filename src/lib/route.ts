@@ -4,14 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 // and the phone's back button goes back to the previous section instead of closing the app.
 // Hash addresses need no server setup, so they work on Cloudflare Pages and in the installed app.
 
-export type Page = "home" | "stats" | "taste" | "biology" | "winemaking" | "basics" | "quizzes" | "chat" | "mine" | "settings";
+export type Page = "home" | "stats" | "taste" | "biology" | "winemaking" | "basics" | "quizzes" | "wine" | "chat" | "mine" | "settings";
 
 // The Learn pages all live under the Grapes tab.
 export const LEARN_PAGES = ["home", "stats", "taste", "biology", "winemaking", "basics"] as const satisfies readonly Page[];
 export const isLearnPage = (p: Page) => (LEARN_PAGES as readonly Page[]).includes(p);
 
-// The games all live under the Games tab (Make Your Wine joins here).
-export const GAME_PAGES = ["quizzes"] as const satisfies readonly Page[];
+// The games all live under the Games tab.
+export const GAME_PAGES = ["quizzes", "wine"] as const satisfies readonly Page[];
 export const isGamePage = (p: Page) => (GAME_PAGES as readonly Page[]).includes(p);
 
 const PATHS: Record<Page, string> = {
@@ -22,6 +22,7 @@ const PATHS: Record<Page, string> = {
   winemaking: "/learn/winemaking",
   basics: "/learn/wine-basics",
   quizzes: "/games/quizzes",
+  wine: "/games/make-wine",
   chat: "/chat",
   mine: "/my-grapes",
   settings: "/settings",

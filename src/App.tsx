@@ -18,6 +18,7 @@ const Chat = lazy(() => import("./components/Chat"));
 const MyGrapes = lazy(() => import("./components/MyGrapes"));
 const Settings = lazy(() => import("./components/Settings"));
 const QuizzesPage = lazy(() => import("./components/QuizzesPage"));
+const MakeWinePage = lazy(() => import("./components/wine/MakeWinePage"));
 const StatsPage = lazy(() => import("./components/learn/StatsPage"));
 const TastePage = lazy(() => import("./components/learn/TastePage"));
 const BiologyPage = lazy(() => import("./components/learn/BiologyPage"));
@@ -158,6 +159,7 @@ export default function App() {
           {page === "winemaking" && <WinemakingPage />}
           {page === "basics" && <WineBasicsPage />}
           {page === "quizzes" && <QuizzesPage user={auth.user} onLogin={() => setLogin("in")} />}
+          {page === "wine" && <MakeWinePage user={auth.user} favourite={auth.favourite} onLogin={() => setLogin("in")} />}
           {page === "chat" && (
             <Chat
               favourite={auth.favourite}
@@ -176,6 +178,7 @@ export default function App() {
               setGuest={setGuest}
               onLogin={setLogin}
               onGuestSaved={(what) => supabase && !promptOff.current && setSavePrompt(what)}
+              onWines={() => go("wine")}
             />
           )}
           {page === "settings" && (

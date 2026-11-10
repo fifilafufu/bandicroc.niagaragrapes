@@ -67,7 +67,7 @@ export function balance({ acidity, tannin, sweetness, alcohol }: BalanceInput) {
   const firm = acidity + tannin;
   const tilt = soft - firm; // > 0 leans soft, < 0 leans firm
   let verdict: "balanced" | "too soft" | "too firm";
-  if (Math.abs(tilt) <= 0.3) verdict = "balanced";
+  if (Math.abs(tilt) <= 0.35) verdict = "balanced";
   else verdict = tilt > 0 ? "too soft" : "too firm";
   let note: string;
   if (verdict === "balanced") note = "Nothing sticks out: a balanced wine.";

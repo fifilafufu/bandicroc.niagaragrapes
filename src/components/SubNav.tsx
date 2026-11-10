@@ -13,8 +13,10 @@ export const LEARN_ITEMS: SubNavItem[] = [
   { page: "basics", label: "🥂 Wine basics" },
 ];
 
-// "Make Your Wine" joins here in Part 6.
-export const GAME_ITEMS: SubNavItem[] = [{ page: "quizzes", label: "🎯 Quizzes" }];
+export const GAME_ITEMS: SubNavItem[] = [
+  { page: "quizzes", label: "🎯 Quizzes" },
+  { page: "wine", label: "🍷 Make Your Wine" },
+];
 
 export default function SubNav({ items, page, go, label }: { items: SubNavItem[]; page: Page; go: (p: Page) => void; label: string }) {
   if (items.length < 2) return null; // a single page needs no row of buttons
