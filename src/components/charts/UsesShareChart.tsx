@@ -2,17 +2,19 @@ import { useState } from "react";
 import { USES_SERIES, type UsesYear } from "../../../shared/grapeUses";
 import { SOURCES, type SourceId } from "../../../shared/sources";
 import SourceLine from "../SourceLine";
+import { useLang } from "../../lib/lang";
+import type { TextKey } from "../../../shared/i18n";
 
 // Line chart of what the world's grapes are used for, OIV years only. Lines join published years;
 // the long 2000 to 2018 gap and the provisional 2025 figure are dashed so nothing looks invented.
 
 type Key = "pressed" | "table" | "dried";
-const SERIES: { key: Key; label: string; shape: "circle" | "square" | "diamond" }[] = [
-  { key: "pressed", label: "Pressed (wine, musts, juice)", shape: "circle" },
-  { key: "table", label: "Table grapes (eaten fresh)", shape: "square" },
-  { key: "dried", label: "Dried (raisins)", shape: "diamond" },
+const SERIES: { key: Key; label: TextKey; shape: "circle" | "square" | "diamond" }[] = [
+  { key: "pressed", label: "chart.pressedLong", shape: "circle" },
+  { key: "table", label: "chart.tableLong", shape: "square" },
+  { key: "dried", label: "chart.driedLong", shape: "diamond" },
 ];
-const SHORT: Record<Key, string> = { pressed: "Pressed", table: "Table", dried: "Dried" };
+const SHORT: Record<Key, TextKey> = { pressed: "tree.pressed", table: "tree.table", dried: "tree.dried" };
 
 const W = 360;
 const H = 210;
@@ -32,28 +34,29 @@ function Marker({ shape, cx, cy, hollow }: { shape: string; cx: number; cy: numb
 
 export default function UsesShareChart() {
   const [picked, setPicked] = useState<UsesYear>(USES_SERIES.find((d) => d.year === 2024)!);
+  const { t } = useLang();
   // Newest source first.
   const sourceIds = [...new Set(USES_SERIES.map((d) => d.source))].sort((a, b) => SOURCES[b].year - SOURCES[a].year) as SourceId[];
 
   return (
     <figure className="chart">
       <figcaption className="chart-title">
-        <b>Where the world's grapes go, 2000 to 2025</b>
-        <span className="muted small">Share of grapes available after harvest losses (%)</span>
+        <b>{t("chart.title")}</b>
+        <span className="muted small">{t("chart.sub")}</span>
       </figcaption>
 
-      <ul className="chart-legend" aria-label="Legend">
+      <ul className="chart-legend" aria-label={t("chart.legend")}>
         {SERIES.map((s) => (
           <li key={s.key} className={`s-${s.key}`}>
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
               <Marker shape={s.shape} cx={6} cy={6} />
             </svg>
-            {s.label}
+            {t(s.label)}
           </li>
         ))}
       </ul>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="line-chart" role="img" aria-label="Line chart: pressed grapes fell from 57% in 2018 to 47% in 2024, table grapes rose from 26% in 2000 to 48% in 2025, dried grapes stayed around 7%.">
+      <svg viewBox={`0 0 ${W} ${H}`} className="line-chart" role="img" aria-label={t("chart.aria")}>
         {[0, 20, 40, 60].map((v) => (
           <g key={v}>
             <line className="grid" x1={M.l} x2={W - M.r} y1={y(v)} y2={y(v)} />
@@ -93,7 +96,7 @@ export default function UsesShareChart() {
                 <Marker key={d.year} shape={s.shape} cx={x(d.year)} cy={y(d[s.key]!)} hollow={d.provisional} />
               ))}
               <text className="direct" x={x(last.year) + 8} y={y(last[s.key]!) + (s.key === "table" ? -2 : s.key === "pressed" ? 10 : 4)}>
-                {SHORT[s.key]} {last[s.key]}%
+                {t(SHORT[s.key])} {last[s.key]}%
               </text>
             </g>
           );
@@ -118,32 +121,31 @@ export default function UsesShareChart() {
 
       <p className="map-readout" aria-live="polite">
         <b>{picked.year}</b>
-        {picked.provisional && <span className="muted"> (provisional)</span>}
+        {picked.provisional && <span className="muted">{t("chart.provisional")}</span>}
         {SERIES.map((s) =>
           picked[s.key] !== undefined ? (
             <span key={s.key}>
               {" "}
-              · {SHORT[s.key]} {picked[s.key]}%
+              · {t(SHORT[s.key])} {picked[s.key]}%
             </span>
           ) : null,
         )}
         <span className="muted"> · {SOURCES[picked.source].publisher}</span>
       </p>
       <p className="muted small">
-        Tap a year. Lines only join years OIV has published; dashed parts cover a long gap or a provisional figure. For 2000 and 2025
-        OIV has only given the table-grape share so far.
+        {t("chart.help")}
       </p>
 
       <details className="chart-table">
-        <summary>Show as a table</summary>
+        <summary>{t("chart.asTable")}</summary>
         <table>
           <thead>
             <tr>
-              <th>Year</th>
-              <th>Pressed</th>
-              <th>Table</th>
-              <th>Dried</th>
-              <th>Source</th>
+              <th>{t("chart.year")}</th>
+              <th>{t("tree.pressed")}</th>
+              <th>{t("tree.table")}</th>
+              <th>{t("tree.dried")}</th>
+              <th>{t("chart.source")}</th>
             </tr>
           </thead>
           <tbody>
@@ -153,15 +155,15 @@ export default function UsesShareChart() {
                   {d.year}
                   {d.provisional ? "*" : ""}
                 </td>
-                <td>{d.pressed ?? "n/a"}{d.pressed !== undefined && "%"}</td>
-                <td>{d.table ?? "n/a"}{d.table !== undefined && "%"}</td>
-                <td>{d.dried ?? "n/a"}{d.dried !== undefined && "%"}</td>
+                <td>{d.pressed ?? t("chart.na")}{d.pressed !== undefined && "%"}</td>
+                <td>{d.table ?? t("chart.na")}{d.table !== undefined && "%"}</td>
+                <td>{d.dried ?? t("chart.na")}{d.dried !== undefined && "%"}</td>
                 <td>{SOURCES[d.source].publisher}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        <p className="muted small">* provisional. n/a: not published by OIV.</p>
+        <p className="muted small">{t("chart.foot")}</p>
       </details>
 
       <SourceLine ids={sourceIds} />

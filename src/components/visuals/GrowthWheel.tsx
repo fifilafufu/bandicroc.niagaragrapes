@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { MONTHS, STAGES } from "../../../shared/growthCycle";
 import SourceLine from "../SourceLine";
+import { useLang } from "../../lib/lang";
+import { MONTHS_PL, STAGES_PL } from "../../../shared/i18n/pl/biology";
 
 // The vine's year as a wheel: twelve months around the edge, one coloured arc per growth stage,
 // and a needle for today. The Southern Hemisphere switch moves the months by six.
@@ -25,34 +27,38 @@ function arcPath(start: number, end: number) {
 
 export default function GrowthWheel() {
   const [south, setSouth] = useState(false);
+  const { t, lang } = useLang();
+  const months = lang === "pl" ? MONTHS_PL : MONTHS;
+  const local = (s: (typeof STAGES)[number]) => (lang === "pl" ? { ...s, ...STAGES_PL[s.id] } : s);
   const [picked, setPicked] = useState(STAGES[0].id);
-  const stage = STAGES.find((s) => s.id === picked)!;
+  const stage = local(STAGES.find((s) => s.id === picked)!);
 
   // Today's position on the wheel (the wheel is drawn in Northern Hemisphere months).
   const [now] = useState(() => new Date());
   const today = now.getMonth() + 1 + (now.getDate() - 1) / 31 - (south ? 6 : 0);
   const todayWheel = ((today - 1 + 12) % 12) + 1;
-  const todayStage = STAGES.find((s) => {
+  const todayFound = STAGES.find((s) => {
     const t = todayWheel < s.start ? todayWheel + 12 : todayWheel;
     return t >= s.start && t < s.end;
   });
+  const todayStage = todayFound ? local(todayFound) : undefined;
   const [nx, ny] = pt(R_OUT + 6, angle(todayWheel));
 
   return (
     <section className="card visual">
-      <h2>🔄 A grapevine's year</h2>
-      <div className="chips-row" role="group" aria-label="Hemisphere">
+      <h2>{t("wheel.title")}</h2>
+      <div className="chips-row" role="group" aria-label={t("wheel.hemisphere")}>
         <button className={`chip ${!south ? "on" : ""}`} onClick={() => setSouth(false)} aria-pressed={!south}>
-          Northern Hemisphere
+          {t("wheel.north")}
         </button>
         <button className={`chip ${south ? "on" : ""}`} onClick={() => setSouth(true)} aria-pressed={south}>
-          Southern Hemisphere
+          {t("wheel.south")}
         </button>
       </div>
 
-      <svg viewBox="0 0 320 320" className="diagram wheel" role="img" aria-label={`Growth stages through the year in the ${south ? "Southern" : "Northern"} Hemisphere. Today is in ${todayStage?.name ?? "winter"}.`}>
+      <svg viewBox="0 0 320 320" className="diagram wheel" role="img" aria-label={t(south ? "wheel.labelSouth" : "wheel.labelNorth", { stage: todayStage?.name ?? t("wheel.winter") })}>
         {MONTHS.map((_, i) => {
-          const label = MONTHS[(i + (south ? 6 : 0)) % 12];
+          const label = months[(i + (south ? 6 : 0)) % 12];
           const [x, y] = pt(R_OUT + 20, angle(i + 1.5));
           const [tx0, ty0] = pt(R_IN - 2, angle(i + 1));
           const [tx1, ty1] = pt(R_OUT + 8, angle(i + 1));
@@ -73,21 +79,21 @@ export default function GrowthWheel() {
               <text x={ix} y={iy + 6} textAnchor="middle" className="wheel-icon">
                 {s.icon}
               </text>
-              <title>{s.name}</title>
+              <title>{local(s).name}</title>
             </g>
           );
         })}
         <line x1={C} y1={C} x2={nx} y2={ny} className="wheel-needle" />
         <circle cx={C} cy={C} r={5} className="wheel-hub" />
         <text x={C} y={C + 26} textAnchor="middle" className="wheel-today">
-          Today
+          {t("wheel.today")}
         </text>
       </svg>
 
-      <div className="stage-buttons" role="group" aria-label="Growth stages">
+      <div className="stage-buttons" role="group" aria-label={t("wheel.stages")}>
         {STAGES.map((s) => (
           <button key={s.id} className={`chip ${s.id === picked ? "on" : ""}`} onClick={() => setPicked(s.id)} aria-pressed={s.id === picked}>
-            {s.icon} {s.name}
+            {s.icon} {local(s).name}
           </button>
         ))}
       </div>
@@ -99,7 +105,8 @@ export default function GrowthWheel() {
         <p>{stage.text}</p>
       </div>
       <p className="muted small">
-        Usual months; real dates move with the weather and the variety. {todayStage && `Right now vines in the ${south ? "south" : "north"} are around: ${todayStage.name.toLowerCase()}.`}
+        {t("wheel.usual")}
+        {todayStage && t(south ? "wheel.nowSouth" : "wheel.nowNorth", { stage: todayStage.name.toLowerCase() })}
       </p>
       <SourceLine wiki={[{ label: "Annual growth cycle of grapevines", title: "Annual growth cycle of grapevines" }]} />
     </section>

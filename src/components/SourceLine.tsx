@@ -1,14 +1,16 @@
 import { wikiUrl } from "../../shared/grapes";
 import { SOURCES, type Source, type SourceId } from "../../shared/sources";
+import { useLang } from "../lib/lang";
 
 // The "where this comes from" line under a card: data sources (📊) first, then Wikipedia (📖).
 export default function SourceLine({ ids = [], wiki = [] }: { ids?: SourceId[]; wiki?: { label: string; title: string }[] }) {
+  const { t } = useLang();
   return (
     <p className="sources-line">
       {ids.map((id) => {
         const s: Source = SOURCES[id];
         return (
-          <a key={id} href={s.url} target="_blank" rel="noreferrer" title={`${s.title} (${s.year}). Checked ${s.checked}.`}>
+          <a key={id} href={s.url} target="_blank" rel="noreferrer" title={t("src.checked", { title: s.title, year: s.year, date: s.checked })}>
             📊 {s.publisher}: {s.title}
           </a>
         );

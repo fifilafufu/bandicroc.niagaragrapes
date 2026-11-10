@@ -1,4 +1,5 @@
 import { wikiUrl } from "../../../shared/grapes";
+import { useLang } from "../../lib/lang";
 
 // Facts: Wikipedia "Grape" (flesh 75–85% water, yeast on the skins, clusters of 15–300), "Vitis" (twining plants; each pollinated flower in a
 // bunch becomes a berry) and "Vitis vinifera" (a liana growing 12–15 m), "Grape seed oil".
@@ -17,8 +18,9 @@ function Label({ x, y, title, sub, anchor = "start" }: { x: number; y: number; t
 }
 
 function Berry() {
+  const { t } = useLang();
   return (
-    <svg viewBox="0 0 360 240" className="diagram" role="img" aria-label="Inside a grape: stem, skin, flesh and seeds">
+    <svg viewBox="0 0 360 240" className="diagram" role="img" aria-label={t("ana.berryLabel")}>
       {/* stem */}
       <path d="M103 46 C103 30 107 20 115 10" stroke="var(--wood)" strokeWidth="6" fill="none" strokeLinecap="round" />
       {/* skin + flesh */}
@@ -36,20 +38,21 @@ function Berry() {
         <path d="M163 128 H204" />
         <path d="M133 140 L204 190" />
       </g>
-      <Label x={210} y={26} title="Stem" sub="holds it to the bunch" />
-      <Label x={210} y={76} title="Skin" sub="wild yeast lives on it" />
-      <Label x={210} y={132} title="Flesh (pulp)" sub="75–85% water" />
-      <Label x={210} y={194} title="Seeds (pips)" sub="→ grape seed oil" />
+      <Label x={210} y={26} title={t("ana.stem")} sub={t("ana.stemSub")} />
+      <Label x={210} y={76} title={t("ana.skin")} sub={t("ana.skinSub")} />
+      <Label x={210} y={132} title={t("ana.flesh")} sub={t("ana.fleshSub")} />
+      <Label x={210} y={194} title={t("ana.seeds")} sub={t("ana.seedsSub")} />
     </svg>
   );
 }
 
 function Vine() {
+  const { t } = useLang();
   const berries: [number, number][] = [
     [162, 138], [176, 138], [190, 138], [169, 151], [183, 151], [176, 164], [176, 125],
   ];
   return (
-    <svg viewBox="0 0 380 270" className="diagram" role="img" aria-label="A grapevine: trunk, arm on a support wire, leaves, tendril and a bunch of grapes">
+    <svg viewBox="0 0 380 270" className="diagram" role="img" aria-label={t("ana.vineLabel")}>
       {/* ground, post and wire */}
       <path d="M10 250 H370" stroke="var(--wood)" strokeWidth="3" opacity="0.5" />
       <path d="M345 250 V86" stroke="var(--wood)" strokeWidth="5" opacity="0.6" />
@@ -82,25 +85,25 @@ function Vine() {
         <path d="M312 92 L330 52" />
         <path d="M76 196 H84" />
       </g>
-      <Label x={110} y={20} title="Leaves" sub="make sugar from sunlight" />
-      <Label x={372} y={36} title="Tendril" sub="curls around supports" anchor="end" />
-      <Label x={206} y={124} title="Arm on a wire" />
-      <Label x={206} y={160} title="Bunch" sub="15–300 grapes" />
-      <Label x={88} y={200} title="Trunk" sub="thick woody stem" />
+      <Label x={110} y={20} title={t("ana.leaves")} sub={t("ana.leavesSub")} />
+      <Label x={372} y={36} title={t("ana.tendril")} sub={t("ana.tendrilSub")} anchor="end" />
+      <Label x={206} y={124} title={t("ana.arm")} />
+      <Label x={206} y={160} title={t("ana.bunch")} sub={t("ana.bunchSub")} />
+      <Label x={88} y={200} title={t("ana.trunk")} sub={t("ana.trunkSub")} />
     </svg>
   );
 }
 
 export default function GrapeAnatomy() {
+  const { t } = useLang();
   return (
     <section className="card visual">
-      <h2>🔬 Inside a grape</h2>
+      <h2>{t("ana.title")}</h2>
       <Berry />
 
-      <h2 className="mt">🌱 What grapes grow on</h2>
+      <h2 className="mt">{t("ana.vineTitle")}</h2>
       <p className="muted small">
-        Not a tree: a <b>vine</b>. Grapevines are climbing plants (lianas) that grab supports with tendrils. In the wild a vine
-        can climb <b>12–15 m</b>; on farms it's trained along wires.
+        {t("ana.vineText1")}<b>{t("ana.vineWord")}</b>{t("ana.vineText2")}<b>12–15 m</b>{t("ana.vineText3")}
       </p>
       <Vine />
 

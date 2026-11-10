@@ -3,11 +3,13 @@ import { wikiUrl, type Grape } from "../../shared/grapes";
 import { fetchSummary, type Summary } from "../lib/wiki";
 import { photoOf } from "../../shared/varieties";
 import PhotoCredit from "./PhotoCredit";
+import { useLang } from "../lib/lang";
 
 // A short Wikipedia summary of one grape, with its checked Commons photo and credit.
 export default function GrapeCard({ grape }: { grape: Grape }) {
   const [state, setState] = useState<{ wiki: string; summary: Summary | null; failed: boolean } | null>(null);
   const photo = photoOf(grape.name);
+  const { t, lang } = useLang();
 
   useEffect(() => {
     let cancelled = false;
@@ -24,24 +26,27 @@ export default function GrapeCard({ grape }: { grape: Grape }) {
 
   return (
     <section className="card grape-card">
-      <h2>About {grape.name}</h2>
+      <h2>{t("card.about", { name: grape.name })}</h2>
       {photo && (
         <figure className="grape-photo">
-          <img src={photo.thumb} alt={`${grape.name} grapes`} loading="lazy" />
+          <img src={photo.thumb} alt={t("chat.photoOf", { name: grape.name })} loading="lazy" />
           <figcaption>
             <PhotoCredit photo={photo} />
           </figcaption>
         </figure>
       )}
       {summary ? (
-        <p>{summary.extract}</p>
+        <>
+          <p lang="en">{summary.extract}</p>
+          {lang !== "en" && <p className="muted small">{t("card.english")}</p>}
+        </>
       ) : current?.failed ? (
-        <p className="muted">Couldn't load Wikipedia right now.</p>
+        <p className="muted">{t("card.failed")}</p>
       ) : (
-        <p className="muted">Loading from Wikipedia…</p>
+        <p className="muted">{t("card.loading")}</p>
       )}
       <a href={wikiUrl(grape.wiki)} target="_blank" rel="noreferrer">
-        Read the full article on Wikipedia →
+        {t("card.full")}
       </a>
     </section>
   );

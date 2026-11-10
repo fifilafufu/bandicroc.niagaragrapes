@@ -42,9 +42,9 @@ Rules for every step: numbers, units and sources stay exactly as in English; gra
 - [x] **6.1 Language switch.** A small, free text helper (no paid service), `shared/i18n/` with `en` and `pl` word lists, a `useLang` hook in `src/lib/`, and an EN / PL switch next to the Log in button, kept in device storage. Default: the phone's language if it is Polish, otherwise English.
   - Done when: the switch changes the tab bar, title bar, Settings and login sheet; the choice survives a reload; a missing Polish string falls back to English instead of showing a key.
   - Built: `shared/i18n/` (`en.ts` full list, `pl.ts` partial, `translate` and `pick` helpers), `useLang` in `src/lib/lang.ts`, EN / PL switch in the title bar and in Settings. Also translated: account menu, My Grapes, notes, install sheet header and account errors. The per-browser install steps (`src/lib/install.ts`) stay in English until the Polish menu names on each phone are checked.
-- [ ] **6.2 Overview and Learn pages.** Home (facts, numbers, sections), Statistics, Taste, Biology.
+- [x] **6.2 Overview and Learn pages.** Home (facts, numbers, sections), Statistics, Taste, Biology.
   - Done when: these pages read fully in Polish; every number and source link matches the English page.
-  - Progress (2026-11-10): Overview text, facts, numbers and sections are in Polish (`shared/i18n/pl/overview.ts`). Still English: the colour, varieties-explainer and gallery cards on Overview, and the Statistics, Taste and Biology pages.
+  - Built: Polish text in `shared/i18n/pl/` (overview, varieties, biology) and `shared/i18n/en.ts`/`pl.ts`; country names from the browser's own CLDR names via `shared/i18n/countryCodes.json`; numbers written the Polish way with the same values. Source link titles stay in English (they name English sources).
 - [ ] **6.3 Varieties and Grow Your Grape.** Gallery, explainer, variety passports, care guides.
   - Done when: all 27 grapes show Polish text; names, VIVC links and photo credits are unchanged.
 - [ ] **6.4 Winemaking, Wine basics and Make Your Wine.**

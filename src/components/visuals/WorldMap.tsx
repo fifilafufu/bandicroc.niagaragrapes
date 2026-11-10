@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import SourceLine from "../SourceLine";
+import { useLang } from "../../lib/lang";
+import { countryName, num } from "../../../shared/i18n/countries";
+import type { TextKey } from "../../../shared/i18n";
 
 // "Where grapes grow" as a world map: each country coloured by how many grapes it grew.
 // The paths are pre-drawn by scripts/build-map.mjs (FAO data via Our World in Data) and loaded
@@ -9,27 +12,25 @@ type Country = { name: string; d: string; t: number; y?: number }; // t = thousa
 type MapData = { width: number; height: number; year: number; worldKt: number; countries: Country[] };
 
 // Thousand tonnes. Darker purple = more grapes.
-const BANDS = [
-  { min: 10000, label: "10M+ t", color: "#4a1f73" },
-  { min: 3000, label: "3–10M", color: "#6d3a9c" },
-  { min: 1000, label: "1–3M", color: "#9566c0" },
-  { min: 300, label: "0.3–1M", color: "#b99ad8" },
-  { min: 1, label: "under 0.3M", color: "#dccbec" },
+const BANDS: { min: number; label: TextKey; color: string }[] = [
+  { min: 10000, label: "map.b1", color: "#4a1f73" },
+  { min: 3000, label: "map.b2", color: "#6d3a9c" },
+  { min: 1000, label: "map.b3", color: "#9566c0" },
+  { min: 300, label: "map.b4", color: "#b99ad8" },
+  { min: 1, label: "map.b5", color: "#dccbec" },
 ];
 const bandOf = (t: number) => BANDS.find((b) => t >= b.min);
 
-const NAMES: Record<string, string> = { "United States of America": "United States" };
-const nice = (n: string) => NAMES[n] ?? n;
 
-function tonnes(kt: number) {
-  if (kt >= 1000) return `${(kt / 1000).toFixed(1)} million tonnes`;
-  return `${kt.toLocaleString("en")} thousand tonnes`;
-}
 
 export default function WorldMap() {
   const [data, setData] = useState<MapData | null>(null);
   const [failed, setFailed] = useState(false);
   const [picked, setPicked] = useState<string | null>("China");
+  const { t, lang } = useLang();
+  const nice = (name: string) => countryName(name, lang);
+  const mln = (kt: number) => num(Math.round(kt / 100) / 10, lang);
+  const tonnes = (kt: number) => (kt >= 1000 ? t("map.mln", { n: mln(kt) }) : t("map.kt", { n: num(kt, lang) }));
 
   useEffect(() => {
     import("../../data/worldMap.json")
@@ -47,15 +48,14 @@ export default function WorldMap() {
   return (
     <article className="card topic visual">
       <h2>
-        <span aria-hidden="true">🌍</span> Where they grow
+        <span aria-hidden="true">🌍</span> {t("map.title")}
       </h2>
       <p>
-        FAO counted {data ? `${(data.worldKt / 1000).toFixed(1)} million tonnes` : "about 76 million tonnes"} of grapes grown in{" "}
-        {data?.year ?? 2024}. (OIV's estimate is 77.7: the two count slightly differently.) China grows the most by far. Tap a country to see its harvest; the top ten are listed below.
+        {t("map.text", { total: data ? t("map.mln", { n: mln(data.worldKt) }) : t("map.about76"), year: data?.year ?? 2024 })}
       </p>
 
       {failed ? (
-        <p className="muted small">The map couldn't load. Check your connection and open this page again.</p>
+        <p className="muted small">{t("map.failed")}</p>
       ) : !data ? (
         <div className="map-skeleton" aria-hidden="true" />
       ) : (
@@ -64,7 +64,7 @@ export default function WorldMap() {
             className="world-map"
             viewBox={`0 0 ${data.width} ${data.height}`}
             role="img"
-            aria-label="World map of grape production by country"
+            aria-label={t("map.aria")}
           >
             {data.countries.map((c) => {
               const band = bandOf(c.t);
@@ -77,7 +77,7 @@ export default function WorldMap() {
                   onClick={() => setPicked(c.name)}
                   onMouseEnter={() => setPicked(c.name)}
                 >
-                  <title>{`${nice(c.name)}: ${c.t ? tonnes(c.t) : "few or no grapes"}${c.y ? ` (${c.y} data)` : ""}`}</title>
+                  <title>{`${nice(c.name)}: ${c.t ? tonnes(c.t) : t("map.few")}${c.y ? ` (${t("map.dataYear", { y: c.y })})` : ""}`}</title>
                 </path>
               );
             })}
@@ -91,28 +91,28 @@ export default function WorldMap() {
                   <>
                     · {tonnes(current.t)}{" "}
                     <span className="muted">
-                      (#{rank} in the world{current.y ? `, ${current.y} data` : ""})
+                      ({t("map.rank", { rank })}{current.y ? `, ${t("map.dataYear", { y: current.y })}` : ""})
                     </span>
                   </>
                 ) : (
-                  <span className="muted">· grows few or no grapes</span>
+                  <span className="muted">· {t("map.growsFew")}</span>
                 )}
               </>
             ) : (
-              <span className="muted">Tap a country</span>
+              <span className="muted">{t("map.tap")}</span>
             )}
           </p>
 
-          <div className="map-legend" aria-label="Legend">
+          <div className="map-legend" aria-label={t("chart.legend")}>
             {BANDS.map((b) => (
               <span key={b.label}>
                 <i style={{ background: b.color }} />
-                {b.label}
+                {t(b.label)}
               </span>
             ))}
             <span>
               <i className="none" />
-              few / none
+              {t("map.fewNone")}
             </span>
           </div>
 
@@ -122,7 +122,7 @@ export default function WorldMap() {
                 <button className={picked === c.name ? "on" : ""} onClick={() => setPicked(c.name)}>
                   <span>{nice(c.name)}</span>
                   <i style={{ width: `${(c.t / ranked[0].t) * 100}%`, background: bandOf(c.t)!.color }} />
-                  <b>{(c.t / 1000).toFixed(1)}M t</b>
+                  <b>{t("map.topMt", { n: mln(c.t) })}</b>
                 </button>
               </li>
             ))}

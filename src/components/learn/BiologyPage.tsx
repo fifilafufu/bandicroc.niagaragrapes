@@ -4,38 +4,43 @@ import SourceLine from "../SourceLine";
 import GrapeAnatomy from "../visuals/GrapeAnatomy";
 import GrowthWheel from "../visuals/GrowthWheel";
 import { SPECIES } from "../../../shared/species";
+import { SPECIES_TEXT_PL } from "../../../shared/i18n/pl/biology";
+import { useLang } from "../../lib/lang";
 
 // Biology: the main species (Wikipedia "Vitis vinifera", "Vitis labrusca", "Vitis riparia",
 // "Vitis rotundifolia"), inside a grape and the vine, and the yearly growth cycle.
 
 export default function BiologyPage() {
+  const { t, lang } = useLang();
   return (
     <div className="stack">
       <section className="card">
-        <h1 className="page-title">🌱 Grape biology</h1>
-        <p className="muted">What kind of plant a grape is, what's inside a berry, and what a vine does all year.</p>
+        <h1 className="page-title">{t("bio.title")}</h1>
+        <p className="muted">{t("bio.sub")}</p>
       </section>
 
       <section className="card visual">
-        <h2>🌍 The main species</h2>
-        <p className="muted small">A species is a wild kind of vine. Varieties like Merlot or Concord come from these (see “How grape varieties work” on the Overview).</p>
+        <h2>{t("bio.speciesTitle")}</h2>
+        <p className="muted small">{t("bio.speciesSub")}</p>
         <div className="species-list">
           {SPECIES.map((s) => {
             const p = s.example ? photoOf(s.example) : null;
+            // Polish text when chosen; the species name and example grape stay as they are.
+            const tx = lang === "pl" ? { ...s, ...SPECIES_TEXT_PL[s.name] } : s;
             return (
               <article key={s.name} className="species-card">
-                {p && <img src={p.thumb} alt={`${s.example} grapes`} loading="lazy" />}
+                {p && <img src={p.thumb} alt={t("chat.photoOf", { name: s.example! })} loading="lazy" />}
                 <div>
                   <b>
                     <i>{s.name}</i>
                   </b>
                   <span className="muted small">
-                    {s.nick} · {s.where}
+                    {tx.nick} · {tx.where}
                   </span>
-                  <p>{s.text}</p>
+                  <p>{tx.text}</p>
                   {p && (
                     <span className="muted small">
-                      Pictured: {s.example}{"exampleNote" in s ? ` (${s.exampleNote})` : ""}. <PhotoCredit photo={p} className="inline" />
+                      {t("bio.pictured", { name: s.example! })}{"exampleNote" in tx && tx.exampleNote ? ` (${tx.exampleNote})` : ""}. <PhotoCredit photo={p} className="inline" />
                     </span>
                   )}
                 </div>
