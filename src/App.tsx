@@ -4,7 +4,8 @@ import { detect, dismissTip, tipDismissed, useInstall } from "./lib/install";
 import { useOnline, useTheme } from "./lib/prefs";
 import { useChatHistory } from "./lib/useChatHistory";
 import { GREETING, type Msg } from "./lib/chatMessages";
-import { useRoute, type Page } from "./lib/route";
+import { isLearnPage, useRoute, type Page } from "./lib/route";
+import LearnNav from "./components/LearnNav";
 import { supabase } from "./lib/supabase";
 import Home from "./components/Home";
 import type { Guest } from "./components/MyGrapes";
@@ -17,6 +18,9 @@ const Chat = lazy(() => import("./components/Chat"));
 const MyGrapes = lazy(() => import("./components/MyGrapes"));
 const Settings = lazy(() => import("./components/Settings"));
 const QuizzesPage = lazy(() => import("./components/QuizzesPage"));
+const StatsPage = lazy(() => import("./components/learn/StatsPage"));
+const TastePage = lazy(() => import("./components/learn/TastePage"));
+const BiologyPage = lazy(() => import("./components/learn/BiologyPage"));
 
 // The main sections, in tab order. "Make Your Wine" joins between Grapes and Quizzes when it's built.
 const TABS: { page: Page; icon: string; label: string }[] = [
@@ -81,6 +85,13 @@ export default function App() {
     contentRef.current?.scrollTo({ top: 0 });
   }, [page]);
 
+  // The Grapes tab stays lit on every Learn page.
+  const active = (tab: Page) => page === tab || (tab === "home" && isLearnPage(page));
+  const ask = (q: string) => {
+    setAutoAsk(q);
+    go("chat");
+  };
+
   const openSheet = () => {
     setSheetOpen(true);
     hideTip();
@@ -116,9 +127,9 @@ export default function App() {
         {TABS.map((t) => (
           <button
             key={t.page}
-            className={`tab ${page === t.page ? "active" : ""}`}
+            className={`tab ${active(t.page) ? "active" : ""}`}
             onClick={() => go(t.page)}
-            aria-current={page === t.page ? "page" : undefined}
+            aria-current={active(t.page) ? "page" : undefined}
           >
             <span className="icon" aria-hidden="true">
               {t.icon}
@@ -136,16 +147,11 @@ export default function App() {
 
       <main ref={contentRef} className={`content ${page === "chat" ? "flush" : ""}`}>
         <Suspense fallback={<p className="muted center loading">Loading…</p>}>
-          {page === "home" && (
-            <Home
-              onChat={() => go("chat")}
-              onMyGrapes={() => go("mine")}
-              onAsk={(q) => {
-                setAutoAsk(q);
-                go("chat");
-              }}
-            />
-          )}
+          {isLearnPage(page) && <LearnNav page={page} go={go} />}
+          {page === "home" && <Home onChat={() => go("chat")} onMyGrapes={() => go("mine")} onAsk={ask} go={go} />}
+          {page === "stats" && <StatsPage />}
+          {page === "taste" && <TastePage onAsk={ask} />}
+          {page === "biology" && <BiologyPage />}
           {page === "quizzes" && <QuizzesPage user={auth.user} onLogin={() => setLogin("in")} />}
           {page === "chat" && (
             <Chat

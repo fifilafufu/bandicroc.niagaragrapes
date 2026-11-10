@@ -45,3 +45,47 @@ export const BALANCE_2024 = {
   topTenShare: 70,
   source: "oiv-2024" as SourceId,
 };
+
+// More OIV 2024 figures (Statistical Brief 2024: text and Tables 3 and 7 to 9).
+export const OIV_2024_MORE = {
+  vineyardMha: 7.1, // million hectares under vines, all uses
+  tradeMt: 5.0, // fresh grapes exported worldwide
+  tradeBnEur: 9.9,
+  // Fresh grape exporters by volume, thousand tonnes (Table 3)
+  exporters: [
+    { name: "China", kt: 594 },
+    { name: "Peru", kt: 554 },
+    { name: "Chile", kt: 523 },
+    { name: "South Africa", kt: 416 },
+    { name: "Netherlands", kt: 409 },
+    { name: "Italy", kt: 389 },
+    { name: "India", kt: 310 },
+    { name: "USA", kt: 263 },
+    { name: "Uzbekistan", kt: 219 },
+    { name: "Mexico", kt: 204 },
+  ],
+  topImporters: [
+    { name: "USA", kt: 777 },
+    { name: "Netherlands", kt: 500 },
+    { name: "Germany", kt: 354 },
+  ],
+  // Table grapes, million tonnes; these five grow 67% of the world's 33.3 Mt
+  tableProducers: [
+    { name: "China", mt: 14.2 },
+    { name: "India", mt: 3.2 },
+    { name: "Egypt", mt: 1.8 },
+    { name: "Türkiye", mt: 1.8 },
+    { name: "Uzbekistan", mt: 1.4 },
+  ],
+  tableTop5Share: 67,
+  // Dried grapes (raisins), thousand tonnes; these five make 75% of the world's 1.3 Mt
+  driedProducers: [
+    { name: "Türkiye", kt: 315 },
+    { name: "USA", kt: 228 },
+    { name: "China", kt: 170 },
+    { name: "Iran", kt: 164 },
+    { name: "South Africa", kt: 94 },
+  ],
+  driedTop5Share: 75,
+  source: "oiv-2024" as SourceId,
+};

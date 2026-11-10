@@ -51,7 +51,7 @@ export default function WorldMap() {
       </h2>
       <p>
         FAO counted {data ? `${(data.worldKt / 1000).toFixed(1)} million tonnes` : "about 76 million tonnes"} of grapes grown in{" "}
-        {data?.year ?? 2024}. (OIV's estimate is 77.7: the two count slightly differently.) China grows the most by far, then Italy, Spain, the US and France. Tap a country to see its harvest.
+        {data?.year ?? 2024}. (OIV's estimate is 77.7: the two count slightly differently.) China grows the most by far. Tap a country to see its harvest; the top ten are listed below.
       </p>
 
       {failed ? (
@@ -117,7 +117,7 @@ export default function WorldMap() {
           </div>
 
           <ol className="map-top">
-            {ranked.slice(0, 5).map((c) => (
+            {ranked.slice(0, 10).map((c) => (
               <li key={c.name}>
                 <button className={picked === c.name ? "on" : ""} onClick={() => setPicked(c.name)}>
                   <span>{nice(c.name)}</span>

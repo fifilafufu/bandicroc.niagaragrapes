@@ -1,7 +1,6 @@
 import { wikiUrl } from "../../../shared/grapes";
 
-// Facts: Wikipedia "Grape" (flesh 75–85% water, yeast on the skins, clusters of 15–300, berries
-// appear within ~60 days, véraison ~45 days), "Vitis" (twining plants; each pollinated flower in a
+// Facts: Wikipedia "Grape" (flesh 75–85% water, yeast on the skins, clusters of 15–300), "Vitis" (twining plants; each pollinated flower in a
 // bunch becomes a berry) and "Vitis vinifera" (a liana growing 12–15 m), "Grape seed oil".
 
 function Label({ x, y, title, sub, anchor = "start" }: { x: number; y: number; title: string; sub?: string; anchor?: "start" | "end" }) {
@@ -104,26 +103,6 @@ export default function GrapeAnatomy() {
         can climb <b>12–15 m</b>; on farms it's trained along wires.
       </p>
       <Vine />
-
-      <div className="timeline" aria-label="From flower to grape">
-        <div>
-          <span className="t-icon">🌼</span>
-          <b>Flowers</b>
-          <span>tiny flowers grow in bunches</span>
-        </div>
-        <div className="t-arrow" aria-hidden="true">→</div>
-        <div>
-          <span className="t-icon">🟢</span>
-          <b>~60 days</b>
-          <span>each pollinated flower becomes a hard green berry</span>
-        </div>
-        <div className="t-arrow" aria-hidden="true">→</div>
-        <div>
-          <span className="t-icon">🍇</span>
-          <b>~45 days</b>
-          <span>ripening: berries grow, colour up and get sweet</span>
-        </div>
-      </div>
 
       <p className="sources-line">
         <a href={wikiUrl("Grape")} target="_blank" rel="noreferrer">

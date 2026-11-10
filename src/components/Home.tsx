@@ -5,9 +5,7 @@ import SourceLine from "./SourceLine";
 import { readPref, writePref } from "../lib/prefs";
 import GrapeGallery from "./GrapeGallery";
 import ColourCompare from "./visuals/ColourCompare";
-import GrapeAnatomy from "./visuals/GrapeAnatomy";
-import UsesTree from "./visuals/UsesTree";
-import WorldMap from "./visuals/WorldMap";
+import type { Page } from "../lib/route";
 import VarietiesExplainer from "./visuals/VarietiesExplainer";
 
 // Short checked facts for the "Did you know?" card.
@@ -119,7 +117,9 @@ const SECTIONS: Section[] = [
 
 const WELCOME_KEY = "welcome-dismissed";
 
-export default function Home({ onChat, onMyGrapes, onAsk }: { onChat: () => void; onMyGrapes: () => void; onAsk: (q: string) => void }) {
+type Props = { onChat: () => void; onMyGrapes: () => void; onAsk: (q: string) => void; go: (p: Page) => void };
+
+export default function Home({ onChat, onMyGrapes, onAsk, go }: Props) {
   const [fact, setFact] = useState(() => Math.floor(Math.random() * DID_YOU_KNOW.length));
   const [welcome, setWelcome] = useState(() => readPref(WELCOME_KEY) !== "1");
   const closeWelcome = () => {
@@ -192,9 +192,16 @@ export default function Home({ onChat, onMyGrapes, onAsk }: { onChat: () => void
             <VarietiesExplainer key="explainer" />,
             <GrapeGallery key="gallery" onAsk={onAsk} />,
           ];
-        if (s.title === "What we use them for") return <UsesTree key="uses" />;
-        if (s.title === "Where they grow") return <WorldMap key="map" />;
-        if (s.title === "What is a grape?") return [<Topic key={s.title} s={s} />, <GrapeAnatomy key="anatomy" />];
+        // Numbers and biology have their own pages now: show a short card that links there.
+        if (s.title === "What we use them for") return null;
+        if (s.title === "Where they grow")
+          return <MoreCard key="stats" icon="📊" title="Statistics" text="Where grapes grow, what they're used for, and who sells the most." onOpen={() => go("stats")} />;
+        if (s.title === "What is a grape?")
+          return [
+            <Topic key={s.title} s={s} />,
+            <MoreCard key="bio" icon="🌱" title="Biology" text="Grape species, inside a grape, and the vine's year from budbreak to harvest." onOpen={() => go("biology")} />,
+            <MoreCard key="taste" icon="👅" title="Taste" text="Why some grapes taste “foxy”, and which grape tastes of pepper, lychee or grass." onOpen={() => go("taste")} />,
+          ];
         return <Topic key={s.title} s={s} />;
       })}
 
@@ -231,5 +238,22 @@ function Topic({ s }: { s: Section }) {
       ))}
       <SourceLine ids={s.src} wiki={s.wiki} />
     </article>
+  );
+}
+
+function MoreCard({ icon, title, text, onOpen }: { icon: string; title: string; text: string; onOpen: () => void }) {
+  return (
+    <button className="card more-card" onClick={onOpen}>
+      <span className="more-icon" aria-hidden="true">
+        {icon}
+      </span>
+      <span>
+        <b>{title}</b>
+        <span className="muted small">{text}</span>
+      </span>
+      <span className="more-arrow" aria-hidden="true">
+        →
+      </span>
+    </button>
   );
 }

@@ -5,11 +5,11 @@ import SourceLine from "../SourceLine";
 // copied by cuttings; crossings vs hybrids), "Grape" (table vs wine grapes) and "Vitis riparia".
 
 const LADDER = [
-  { step: "Genus", name: "Vitis", text: "All grapevines. Muscadines (like Scuppernong) are close cousins in Muscadinia." },
+  { step: "Genus", name: "Vitis", text: "All grapevines. Muscadines (like Scuppernong) form their own subgroup, Muscadinia; some botanists count them as a separate genus." },
   {
     step: "Species",
     name: "Wild kinds of vine",
-    text: "Vitis vinifera (Europe and Western Asia: almost all wine grapes), Vitis labrusca (North America: the musky “foxy” taste), Vitis riparia (North America: very cold hardy, used for rootstocks and breeding).",
+    text: "Vitis vinifera (Europe and Western Asia: most wine and table grapes), Vitis labrusca (North America: the musky “foxy” taste), Vitis riparia (North America: very cold hardy, used for rootstocks and breeding).",
   },
   {
     step: "Variety",
