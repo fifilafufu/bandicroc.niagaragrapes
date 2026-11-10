@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { accountsAvailable, displayName, logOut as logOutHere, type User } from "../lib/account";
+import { useLang } from "../lib/lang";
 
 // Top-right account button: your name with an icon. Tap it for settings, switching account and logging out.
 // Logged out it says "Log in".
@@ -17,6 +18,7 @@ export default function AccountMenu({ user, onLogin, onSettings, onMyGrapes, onL
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { t } = useLang();
 
   // Close on a tap outside or Escape.
   useEffect(() => {
@@ -54,12 +56,12 @@ export default function AccountMenu({ user, onLogin, onSettings, onMyGrapes, onL
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={user ? `Account: ${name}` : "Log in or account options"}
+        aria-label={user ? t("account.label", { name: name! }) : t("account.loginOrOptions")}
       >
         <span className="avatar" aria-hidden="true">
           {name ? name[0].toUpperCase() : "👤"}
         </span>
-        <span className="account-name">{name ?? "Log in"}</span>
+        <span className="account-name">{name ?? t("account.logIn")}</span>
         <span className="caret-down" aria-hidden="true">
           ▾
         </span>
@@ -79,33 +81,33 @@ export default function AccountMenu({ user, onLogin, onSettings, onMyGrapes, onL
                 </div>
               </div>
               <button role="menuitem" onClick={go(onMyGrapes)}>
-                🧺 My Grapes
+                {t("account.myGrapes")}
               </button>
               <button role="menuitem" onClick={go(onSettings)}>
-                ⚙️ Settings
+                {t("account.settings")}
               </button>
               <button role="menuitem" onClick={() => logOut(true)} disabled={busy}>
-                🔄 Change account
+                {t("account.change")}
               </button>
               <button role="menuitem" className="danger" onClick={() => logOut(false)} disabled={busy}>
-                {busy ? "Logging out…" : "👋 Log out"}
+                {busy ? t("account.loggingOut") : t("account.logOut")}
               </button>
             </>
           ) : (
             <>
-              <p className="muted small account-note">Log in to save your grapes and chats on all your devices.</p>
+              <p className="muted small account-note">{t("account.note")}</p>
               {accountsAvailable && (
                 <>
                   <button role="menuitem" className="strong" onClick={go(() => onLogin("in"))}>
-                    🔑 Log in
+                    {t("account.logInBtn")}
                   </button>
                   <button role="menuitem" onClick={go(() => onLogin("up"))}>
-                    ✨ Create a free account
+                    {t("account.create")}
                   </button>
                 </>
               )}
               <button role="menuitem" onClick={go(onSettings)}>
-                ⚙️ Settings
+                {t("account.settings")}
               </button>
             </>
           )}

@@ -77,7 +77,7 @@ export function useAuthAndFavourite() {
 
   const saveFavourite = useCallback(
     async (grape: string) => {
-      if (!supabase || !user) return "Log in first.";
+      if (!supabase || !user) return "err.logInFirst" as const;
       const { error } = await supabase
         .from("favourites")
         .upsert({ user_id: user.id, grape, updated_at: new Date().toISOString() });
@@ -90,7 +90,7 @@ export function useAuthAndFavourite() {
 
   const saveSecret = useCallback(
     async (message: string) => {
-      if (!supabase || !user) return "Log in first.";
+      if (!supabase || !user) return "err.logInFirst" as const;
       const updatedAt = new Date().toISOString();
       const { error } = await supabase
         .from("secret_messages")

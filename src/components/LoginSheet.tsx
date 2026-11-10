@@ -1,11 +1,14 @@
 import { LoginForm } from "./auth";
+import { useLang } from "../lib/lang";
+import type { TextKey } from "../../shared/i18n";
 
 // Login / sign-up in a sheet that slides up over any screen.
 export function LoginSheet({ mode, onClose }: { mode: "in" | "up"; onClose: () => void }) {
+  const { t } = useLang();
   return (
     <div className="sheet-backdrop" onClick={onClose}>
-      <div className="sheet login-sheet" role="dialog" aria-modal="true" aria-label="Log in" onClick={(e) => e.stopPropagation()}>
-        <button className="close corner" onClick={onClose} aria-label="Close">
+      <div className="sheet login-sheet" role="dialog" aria-modal="true" aria-label={t("login.title")} onClick={(e) => e.stopPropagation()}>
+        <button className="close corner" onClick={onClose} aria-label={t("app.close")}>
           ✕
         </button>
         <LoginForm initialMode={mode} />
@@ -15,24 +18,24 @@ export function LoginSheet({ mode, onClose }: { mode: "in" | "up"; onClose: () =
 }
 
 // Shown when someone who isn't logged in picks a grape or writes notes: it works, but only until they leave.
-export function SavePrompt({ what, onLogin, onClose }: { what: string; onLogin: () => void; onClose: () => void }) {
+export function SavePrompt({ what, onLogin, onClose }: { what: TextKey; onLogin: () => void; onClose: () => void }) {
+  const { t } = useLang();
   return (
     <div className="sheet-backdrop" onClick={onClose}>
       <div className="sheet save-prompt" role="alertdialog" aria-modal="true" aria-labelledby="save-title" onClick={(e) => e.stopPropagation()}>
         <p className="quiz-big" aria-hidden="true">
           🧺
         </p>
-        <h2 id="save-title">Log in to save it</h2>
+        <h2 id="save-title">{t("login.saveTitle")}</h2>
         <p className="muted">
-          {what} is kept for now, but it will disappear when you close the app. Log in (or create a free account) to keep it on
-          all your devices. We'll save what you've done so far.
+          {t("login.saveText", { what: t(what) })}
         </p>
         <div className="hero-actions">
           <button className="primary" onClick={onLogin}>
-            🔑 Log in to save
+            {t("login.saveBtn")}
           </button>
           <button className="secondary" onClick={onClose}>
-            Not now
+            {t("login.notNow")}
           </button>
         </div>
       </div>

@@ -39,8 +39,9 @@ Build steps in order. Tick a step (`- [x]`) only when its "Done when" checks pas
 
 Rules for every step: numbers, units and sources stay exactly as in English; grape, species and source names are not translated; wine and vine terms follow Polish Wikipedia, otherwise they stay in English. No em dashes in Polish text either.
 
-- [ ] **6.1 Language switch.** A small, free text helper (no paid service), `shared/i18n/` with `en` and `pl` word lists, a `useLang` hook in `src/lib/`, and an EN / PL switch next to the Log in button, kept in device storage. Default: the phone's language if it is Polish, otherwise English.
+- [x] **6.1 Language switch.** A small, free text helper (no paid service), `shared/i18n/` with `en` and `pl` word lists, a `useLang` hook in `src/lib/`, and an EN / PL switch next to the Log in button, kept in device storage. Default: the phone's language if it is Polish, otherwise English.
   - Done when: the switch changes the tab bar, title bar, Settings and login sheet; the choice survives a reload; a missing Polish string falls back to English instead of showing a key.
+  - Built: `shared/i18n/` (`en.ts` full list, `pl.ts` partial, `translate` and `pick` helpers), `useLang` in `src/lib/lang.ts`, EN / PL switch in the title bar and in Settings. Also translated: account menu, My Grapes, notes, install sheet header and account errors. The per-browser install steps (`src/lib/install.ts`) stay in English until the Polish menu names on each phone are checked.
 - [ ] **6.2 Overview and Learn pages.** Home (facts, numbers, sections), Statistics, Taste, Biology.
   - Done when: these pages read fully in Polish; every number and source link matches the English page.
 - [ ] **6.3 Varieties and Grow Your Grape.** Gallery, explainer, variety passports, care guides.

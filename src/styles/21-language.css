@@ -1,0 +1,26 @@
+/* EN / PL switch in the title bar, next to the account button. */
+.lang-switch {
+  margin-left: auto;
+  display: flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.fav-pill + .lang-switch { margin-left: 8px; }
+.lang-switch + .account { margin-left: 6px; }
+.lang-switch button {
+  border: 0;
+  background: none;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+}
+.lang-switch button.on { background: var(--accent); color: var(--accent-text); }

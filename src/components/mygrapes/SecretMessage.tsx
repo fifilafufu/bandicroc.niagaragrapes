@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import type { Secret } from "../../lib/useAuthAndFavourite";
 import Counter from "../Counter";
+import { useLang } from "../../lib/lang";
+import type { TextKey } from "../../../shared/i18n";
 
 const SECRET_MAX = 1000;
 
@@ -10,6 +12,7 @@ export default function SecretMessage({ secret, missing, save, guest }: { secret
   const saved = secret?.message ?? "";
   const [draft, setDraft] = useState<string | null>(null); // null = not editing, show the synced text
   const [busy, setBusy] = useState(false);
+  const { t, lang } = useLang();
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const value = draft ?? saved;
   const changed = draft !== null && draft !== saved;
@@ -20,24 +23,24 @@ export default function SecretMessage({ secret, missing, save, guest }: { secret
     setBusy(true);
     const error = await save(value);
     setBusy(false);
-    if (error) setMsg({ ok: false, text: error });
+    if (error) setMsg({ ok: false, text: t(error as TextKey) });
     else {
       setDraft(null);
-      setMsg({ ok: true, text: !value.trim() ? "Cleared ✓" : guest ? "Kept for now ✓ Log in to save it for good." : "Saved ✓ Your other devices update live." });
+      setMsg({ ok: true, text: !value.trim() ? t("notes.cleared") : guest ? t("notes.keptGuest") : t("notes.saved") });
     }
   }
 
   return (
     <section className="card">
-      <h2>📝 Notes about grapes</h2>
+      <h2>{t("notes.title")}</h2>
       {missing ? (
-        <p className="muted">Notes aren't available right now.</p>
+        <p className="muted">{t("notes.missing")}</p>
       ) : (
         <>
           <p className="muted small">
             {guest
-              ? "Your grape notebook: tastings, favourites to try, facts you learned. Not logged in, so it's kept only until you close the app."
-              : "Your private grape notebook: tastings, favourites to try, facts you learned. Only you can read it, and it syncs to every device you're logged in on."}
+              ? t("notes.guest")
+              : t("notes.user")}
           </p>
           <form onSubmit={submit}>
             <textarea
@@ -47,21 +50,21 @@ export default function SecretMessage({ secret, missing, save, guest }: { secret
                 setDraft(e.target.value);
                 setMsg(null);
               }}
-              placeholder="e.g. Tried Cotton Candy grapes today: really do taste like candy! Next: find Muscat…"
+              placeholder={t("notes.placeholder")}
               maxLength={SECRET_MAX}
-              aria-label="Notes about grapes"
+              aria-label={t("notes.label")}
             />
             <div className="secret-meta">
               <span className="muted small">
                 {changed
-                  ? "Unsaved changes"
+                  ? t("notes.unsaved")
                   : secret?.updatedAt
-                    ? `${guest ? "Kept" : "Saved"} ${new Date(secret.updatedAt).toLocaleString()}`
-                    : "Nothing saved yet"}
+                    ? t(guest ? "notes.keptAt" : "notes.savedAt", { when: new Date(secret.updatedAt).toLocaleString(lang) })
+                    : t("notes.nothing")}
               </span>
               <Counter length={value.length} max={SECRET_MAX} always />
               <button className="primary small-btn" disabled={busy || !changed}>
-                {busy ? "Saving…" : "Save"}
+                {busy ? t("mine.saving") : t("notes.save")}
               </button>
             </div>
           </form>

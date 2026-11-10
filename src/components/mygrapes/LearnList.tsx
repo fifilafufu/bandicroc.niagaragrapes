@@ -1,13 +1,15 @@
 import { GRAPES, wikiUrl } from "../../../shared/grapes";
+import { useLang } from "../../lib/lang";
 
 // Links to every grape's Wikipedia article.
 export default function LearnList() {
+  const { t } = useLang();
   return (
     <details className="card collapsible">
       <summary>
-        <span>📖 Learn about each grape</span>
+        <span>{t("mine.learnTitle")}</span>
       </summary>
-      <p className="muted small">Every grape here has a Wikipedia article. Grape Bot reads them too.</p>
+      <p className="muted small">{t("mine.learnNote")}</p>
       <ul className="wiki-list">
         {GRAPES.map((g) => (
           <li key={g.name}>

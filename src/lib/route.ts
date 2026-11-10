@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import type { TextKey } from "../../shared/i18n";
 
 // A tiny hash router: each section has its own address (e.g. #/quizzes), so links can be shared
 // and the phone's back button goes back to the previous section instead of closing the app.
@@ -15,21 +16,21 @@ export const GAME_PAGES = ["quizzes", "wine"] as const satisfies readonly Page[]
 export const isGamePage = (p: Page) => (GAME_PAGES as readonly Page[]).includes(p);
 
 // The buttons shown at the top of the Grapes and Games tabs.
-export type SubNavItem = { page: Page; label: string };
+export type SubNavItem = { page: Page; label: TextKey };
 
 export const LEARN_ITEMS: SubNavItem[] = [
-  { page: "home", label: "🍇 Overview" },
-  { page: "stats", label: "📊 Statistics" },
-  { page: "taste", label: "👅 Taste" },
-  { page: "biology", label: "🌱 Biology" },
-  { page: "winemaking", label: "🍷 Winemaking" },
-  { page: "basics", label: "🥂 Wine basics" },
-  { page: "grow", label: "🌿 Grow" },
+  { page: "home", label: "nav.home" },
+  { page: "stats", label: "nav.stats" },
+  { page: "taste", label: "nav.taste" },
+  { page: "biology", label: "nav.biology" },
+  { page: "winemaking", label: "nav.winemaking" },
+  { page: "basics", label: "nav.basics" },
+  { page: "grow", label: "nav.grow" },
 ];
 
 export const GAME_ITEMS: SubNavItem[] = [
-  { page: "quizzes", label: "🎯 Quizzes" },
-  { page: "wine", label: "🍷 Make Your Wine" },
+  { page: "quizzes", label: "nav.quizzes" },
+  { page: "wine", label: "nav.wine" },
 ];
 
 const PATHS: Record<Page, string> = {

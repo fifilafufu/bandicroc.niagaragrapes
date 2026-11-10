@@ -1,9 +1,10 @@
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 import { friendlyError } from "./errors";
+import type { TextKey } from "../../shared/i18n";
 
 // Everything about logging in and out, in one place. Screens call these instead of Supabase.
-// Each action resolves to an error message for the user, or null when it worked.
+// Each action resolves to an error (a text key, shown in the chosen language), or null when it worked.
 
 export type { User };
 
@@ -16,8 +17,8 @@ export const accountsAvailable = supabase !== null;
 
 const fail = (err: unknown) => friendlyError(err instanceof Error ? err.message : String(err));
 
-export async function logIn(email: string, password: string): Promise<string | null> {
-  if (!supabase) return "Logging in isn't available right now.";
+export async function logIn(email: string, password: string): Promise<TextKey | null> {
+  if (!supabase) return "err.noLogin";
   try {
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     return error ? friendlyError(error.message) : null;
@@ -27,8 +28,8 @@ export async function logIn(email: string, password: string): Promise<string | n
 }
 
 // needsConfirmation: true when the project asks new users to confirm their email first.
-export async function signUp(email: string, password: string): Promise<{ error: string | null; needsConfirmation: boolean }> {
-  if (!supabase) return { error: "Creating accounts isn't available right now.", needsConfirmation: false };
+export async function signUp(email: string, password: string): Promise<{ error: TextKey | null; needsConfirmation: boolean }> {
+  if (!supabase) return { error: "err.noSignUp", needsConfirmation: false };
   try {
     const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
     return { error: error ? friendlyError(error.message) : null, needsConfirmation: !error && !data.session };
@@ -37,8 +38,8 @@ export async function signUp(email: string, password: string): Promise<{ error: 
   }
 }
 
-export async function changePassword(password: string): Promise<string | null> {
-  if (!supabase) return "Changing the password isn't available right now.";
+export async function changePassword(password: string): Promise<TextKey | null> {
+  if (!supabase) return "err.noPassword";
   try {
     const { error } = await supabase.auth.updateUser({ password });
     return error ? friendlyError(error.message) : null;

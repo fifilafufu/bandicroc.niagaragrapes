@@ -13,6 +13,9 @@ import { useHideOnScroll } from "./lib/useHideOnScroll";
 import InstallSheet from "./components/InstallSheet";
 import AccountMenu from "./components/AccountMenu";
 import { LoginSheet, SavePrompt } from "./components/LoginSheet";
+import LangSwitch from "./components/LangSwitch";
+import { useLang } from "./lib/lang";
+import type { TextKey } from "../shared/i18n";
 
 // Sections other than the home page load only when first opened, so the app starts faster.
 const Chat = lazy(() => import("./components/Chat"));
@@ -28,17 +31,18 @@ const WineBasicsPage = lazy(() => import("./components/learn/WineBasicsPage"));
 const GrowPage = lazy(() => import("./components/learn/GrowPage"));
 
 // The main sections, in tab order. Kept to four: new pages go inside a tab, not next to it.
-const TABS: { page: Page; icon: string; label: string }[] = [
-  { page: "home", icon: "🍇", label: "Grapes" },
-  { page: "quizzes", icon: "🎮", label: "Games" },
-  { page: "chat", icon: "💬", label: "Grape Bot" },
-  { page: "mine", icon: "🧺", label: "My Grapes" },
+const TABS: { page: Page; icon: string; label: TextKey }[] = [
+  { page: "home", icon: "🍇", label: "tab.grapes" },
+  { page: "quizzes", icon: "🎮", label: "tab.games" },
+  { page: "chat", icon: "💬", label: "tab.bot" },
+  { page: "mine", icon: "🧺", label: "tab.mine" },
 ];
 
 const isPhone = () => ["ios", "android"].includes(detect().os);
 
 export default function App() {
   const [page, go] = useRoute();
+  const { t } = useLang();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showTip, setShowTip] = useState(() => isPhone() && !tipDismissed());
   // Kept here so the conversation survives switching sections; "Clear chat" and logging out reset it.
@@ -49,7 +53,7 @@ export default function App() {
   const [guest, setGuest] = useState<Guest>(NO_GUEST);
   const [login, setLogin] = useState<"in" | "up" | null>(null);
   // "Log in to save" popup after a guest saves something; "Not now" stops it for this visit.
-  const [savePrompt, setSavePrompt] = useState<string | null>(null);
+  const [savePrompt, setSavePrompt] = useState<TextKey | null>(null);
   const promptOff = useRef(false);
   const auth = useAuthAndFavourite();
   const { installed } = useInstall();
@@ -102,15 +106,16 @@ export default function App() {
         style={barOffset ? { marginTop: barOffset } : undefined}
         aria-hidden={barOffset ? true : undefined}
       >
-        <button className="brand-btn" onClick={() => go("home")} aria-label="Grapes home">
+        <button className="brand-btn" onClick={() => go("home")} aria-label={t("app.home")}>
           <img src="/favicon.svg" alt="" width={28} height={28} />
           <span className="brand">Grapes</span>
         </button>
         {auth.favourite && (
-          <button className="fav-pill" onClick={() => go("mine")} aria-label={`Favourite grape: ${auth.favourite}`}>
+          <button className="fav-pill" onClick={() => go("mine")} aria-label={t("app.favourite", { name: auth.favourite })}>
             ♥ {auth.favourite}
           </button>
         )}
+        <LangSwitch />
         <AccountMenu
           user={auth.user}
           onLogin={setLogin}
@@ -121,32 +126,32 @@ export default function App() {
       </header>
 
       {/* Phones: a tab bar at the bottom (easy to reach with a thumb). Wide screens: the same tabs under the top bar. */}
-      <nav className="tabbar" aria-label="Main">
-        {TABS.map((t) => (
+      <nav className="tabbar" aria-label={t("app.mainNav")}>
+        {TABS.map((tab) => (
           <button
-            key={t.page}
-            className={`tab ${active(t.page) ? "active" : ""}`}
-            onClick={() => go(t.page)}
-            aria-current={active(t.page) ? "page" : undefined}
+            key={tab.page}
+            className={`tab ${active(tab.page) ? "active" : ""}`}
+            onClick={() => go(tab.page)}
+            aria-current={active(tab.page) ? "page" : undefined}
           >
             <span className="icon" aria-hidden="true">
-              {t.icon}
+              {tab.icon}
             </span>
-            <span>{t.label}</span>
+            <span>{t(tab.label)}</span>
           </button>
         ))}
       </nav>
 
       {!online && (
         <div className="offline" role="status">
-          📡 You're offline. Pages you've opened still work; Grape Bot and saving need internet.
+          {t("app.offline")}
         </div>
       )}
 
       <main ref={contentRef} className={`content ${page === "chat" ? "flush" : ""}`}>
-        <Suspense fallback={<p className="muted center loading">Loading…</p>}>
-          {isLearnPage(page) && <SubNav items={LEARN_ITEMS} page={page} go={go} label="Learn about grapes" />}
-          {isGamePage(page) && <SubNav items={GAME_ITEMS} page={page} go={go} label="Games" />}
+        <Suspense fallback={<p className="muted center loading">{t("app.loading")}</p>}>
+          {isLearnPage(page) && <SubNav items={LEARN_ITEMS} page={page} go={go} label={t("nav.learn")} />}
+          {isGamePage(page) && <SubNav items={GAME_ITEMS} page={page} go={go} label={t("nav.games")} />}
           {page === "home" && <Home onChat={() => go("chat")} onMyGrapes={() => go("mine")} onAsk={ask} go={go} />}
           {page === "stats" && <StatsPage />}
           {page === "taste" && <TastePage onAsk={ask} />}
@@ -192,11 +197,11 @@ export default function App() {
 
       {showTip && !installed && (
         <div className="tip" role="status">
-          <span>📲 Add Grapes to your home screen</span>
+          <span>{t("app.tipInstall")}</span>
           <button className="primary small-btn" onClick={openSheet}>
-            How?
+            {t("app.tipHow")}
           </button>
-          <button className="close" onClick={hideTip} aria-label="Dismiss">
+          <button className="close" onClick={hideTip} aria-label={t("app.dismiss")}>
             ✕
           </button>
         </div>

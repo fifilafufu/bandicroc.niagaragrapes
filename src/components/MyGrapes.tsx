@@ -7,6 +7,8 @@ import SecretMessage from "./mygrapes/SecretMessage";
 import LearnList from "./mygrapes/LearnList";
 import WinesCard from "./mygrapes/WinesCard";
 import type { Guest } from "../lib/useGuestMerge";
+import { useLang } from "../lib/lang";
+import type { TextKey } from "../../shared/i18n";
 
 
 
@@ -23,14 +25,15 @@ type Props = {
   setGuest: React.Dispatch<React.SetStateAction<Guest>>;
   onLogin: (mode: "in" | "up") => void;
   // Tells the app a guest just saved something, so it can ask them to log in.
-  onGuestSaved: (what: string) => void;
+  onGuestSaved: (what: TextKey) => void;
   // Opens Make Your Wine, where saved wines are listed.
   onWines: () => void;
 };
 
 export default function MyGrapes(props: Props) {
   const { user, ready, guest, setGuest } = props;
-  if (accountsAvailable && !ready) return <p className="muted center">Loading…</p>;
+  const { t } = useLang();
+  if (accountsAvailable && !ready) return <p className="muted center">{t("app.loading")}</p>;
 
   if (user)
     return (
@@ -53,18 +56,18 @@ export default function MyGrapes(props: Props) {
       <section className="card guest-banner" role="note">
         <span aria-hidden="true">⏳</span>
         <div>
-          <b>You're not logged in</b>
+          <b>{t("mine.notLoggedIn")}</b>
           <p className="muted small">
-            You can pick a favourite and write notes, but they disappear when you close the app.
-            {accountsAvailable ? " Log in to keep them on all your devices." : " Saving isn't available right now."}
+            {t("mine.guestText")}
+            {accountsAvailable ? t("mine.guestLogIn") : t("mine.guestNoSave")}
           </p>
           {accountsAvailable && (
             <div className="hero-actions left">
               <button className="primary small-btn" onClick={() => props.onLogin("in")}>
-                🔑 Log in to save
+                {t("mine.logInSave")}
               </button>
               <button className="link" onClick={() => props.onLogin("up")}>
-                Create a free account
+                {t("mine.create")}
               </button>
             </div>
           )}
@@ -75,14 +78,14 @@ export default function MyGrapes(props: Props) {
         favourite={guest.favourite}
         saveFavourite={async (grape) => {
           setGuest((g) => ({ ...g, favourite: grape }));
-          props.onGuestSaved("Your favourite grape");
+          props.onGuestSaved("mine.whatFav");
           return null;
         }}
         secret={{ message: guest.notes, updatedAt: guest.notesAt }}
         secretMissing={false}
         saveSecret={async (message) => {
           setGuest((g) => ({ ...g, notes: message, notesAt: new Date().toISOString() }));
-          props.onGuestSaved("Your note");
+          props.onGuestSaved("mine.whatNote");
           return null;
         }}
       />
@@ -98,6 +101,7 @@ function Picks(props: PicksProps) {
   const { favourite, saveFavourite, guest } = props;
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLang();
 
   // Collapsed it only shows your pick; open it to choose another. Starts open if nothing is picked yet.
   const [pickerOpen, setPickerOpen] = useState(!favourite);
@@ -133,13 +137,13 @@ function Picks(props: PicksProps) {
             if (!favourite) e.preventDefault();
           }}
         >
-          <span>🍇 Favourite grape</span>
-          <span className={`fav-choice ${favourite ? "" : "none"}`}>{favourite ?? "Pick one below"}</span>
+          <span>{t("mine.favTitle")}</span>
+          <span className={`fav-choice ${favourite ? "" : "none"}`}>{favourite ?? t("mine.pickOne")}</span>
         </summary>
         <p className="muted small">
           {guest
-            ? "Kept until you close the app. Log in to save it to your account."
-            : "Saved to your account. Change it here and your other devices update live."}
+            ? t("mine.favGuest")
+            : t("mine.favSaved")}
         </p>
         <div className="grape-grid">
           {GRAPES.map(({ name }) => (
@@ -150,11 +154,11 @@ function Picks(props: PicksProps) {
               disabled={saving !== null}
               aria-pressed={favourite === name}
             >
-              {saving === name ? "Saving…" : name}
+              {saving === name ? t("mine.saving") : name}
             </button>
           ))}
         </div>
-        {error && <p className="notice" role="alert">{error}</p>}
+        {error && <p className="notice" role="alert">{t(error as TextKey)}</p>}
       </details>
 
       <SecretMessage secret={props.secret} missing={props.secretMissing} save={props.saveSecret} guest={guest} />

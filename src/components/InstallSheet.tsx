@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { detect, guideFor, useInstall } from "../lib/install";
+import { useLang } from "../lib/lang";
 
 export default function InstallSheet({ onClose }: { onClose: () => void }) {
   const { canPrompt, installed, prompt } = useInstall();
@@ -7,6 +8,7 @@ export default function InstallSheet({ onClose }: { onClose: () => void }) {
   const guide = guideFor(os, browser);
   const [copied, setCopied] = useState(false);
   const link = window.location.origin;
+  const { t } = useLang();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -19,7 +21,7 @@ export default function InstallSheet({ onClose }: { onClose: () => void }) {
       await navigator.clipboard.writeText(link);
       setCopied(true);
     } catch {
-      window.prompt("Copy this link:", link);
+      window.prompt(t("install.copyPrompt"), link);
     }
   }
 
@@ -29,27 +31,27 @@ export default function InstallSheet({ onClose }: { onClose: () => void }) {
         <div className="sheet-head">
           <img src="/pwa-64x64.png" alt="" width={44} height={44} />
           <div>
-            <h2 id="sheet-title">Get the Grapes app</h2>
-            <p className="muted small">Free. Opens full screen, with its own icon.</p>
+            <h2 id="sheet-title">{t("install.title")}</h2>
+            <p className="muted small">{t("install.sub")}</p>
           </div>
-          <button className="close" onClick={onClose} aria-label="Close">
+          <button className="close" onClick={onClose} aria-label={t("app.close")}>
             ✕
           </button>
         </div>
 
         {installed ? (
-          <p className="success">✓ You're using the installed app. You're all set!</p>
+          <p className="success">{t("install.done")}</p>
         ) : canPrompt ? (
           <>
             <button className="primary big" onClick={async () => (await prompt()) && onClose()}>
-              Install
+              {t("install.install")}
             </button>
-            <p className="muted small center">One tap: your browser will ask you to confirm.</p>
+            <p className="muted small center">{t("install.oneTap")}</p>
           </>
         ) : guide.supported ? (
           <>
             <p className="small">
-              Steps for <b>{guide.label}</b>:
+              {t("install.stepsFor")} <b>{guide.label}</b>
             </p>
             <ol className="steps">
               {guide.steps.map((s) => (
@@ -58,27 +60,26 @@ export default function InstallSheet({ onClose }: { onClose: () => void }) {
             </ol>
             {guide.instead && (
               <button className="secondary" onClick={copy}>
-                {copied ? "✓ Link copied" : "Copy link"}
+                {copied ? t("share.copied") : t("share.copy")}
               </button>
             )}
           </>
         ) : (
           <>
             <p>
-              <b>{guide.label}</b> can't install this as a real full-screen app. At most it makes a shortcut that opens
-              the browser.
+              <b>{guide.label}</b> {t("install.cantPrefix")}
             </p>
             <ol className="steps">
-              <li>Tap “Copy link” below.</li>
+              <li>{t("install.step1")}</li>
               <li>
-                Open <b>{guide.instead}</b> and paste the link into the address bar.
+                {t("install.step2a")} <b>{guide.instead}</b> {t("install.step2b")}
               </li>
-              <li>Tap “Get app” there and follow the steps.</li>
+              <li>{t("install.step3")}</li>
             </ol>
             <button className="primary big" onClick={copy}>
-              {copied ? "✓ Link copied" : "Copy link"}
+              {copied ? t("share.copied") : t("share.copy")}
             </button>
-            <p className="muted small center">You can still use the app right here in this browser.</p>
+            <p className="muted small center">{t("install.stillHere")}</p>
           </>
         )}
       </div>

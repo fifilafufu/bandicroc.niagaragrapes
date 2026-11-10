@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { accountsAvailable, changePassword, logIn, signUp } from "../lib/account";
 import { looksLikeEmail } from "../lib/errors";
+import { useLang } from "../lib/lang";
 
 // Password field with a show/hide button, so people can check what they typed.
 export function PasswordInput(props: {
@@ -11,6 +12,7 @@ export function PasswordInput(props: {
   label: string;
 }) {
   const [visible, setVisible] = useState(false);
+  const { t } = useLang();
   return (
     <div className="password-field">
       <input
@@ -26,10 +28,10 @@ export function PasswordInput(props: {
         type="button"
         className="reveal"
         onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Hide password" : "Show password"}
+        aria-label={visible ? t("login.hidePassword") : t("login.showPassword")}
         aria-pressed={visible}
       >
-        {visible ? "Hide" : "Show"}
+        {visible ? t("login.hide") : t("login.show")}
       </button>
     </div>
   );
@@ -37,6 +39,7 @@ export function PasswordInput(props: {
 
 export function LoginForm({ initialMode = "in" }: { initialMode?: "in" | "up" } = {}) {
   const [mode, setMode] = useState<"in" | "up">(initialMode);
+  const { t } = useLang();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -46,20 +49,20 @@ export function LoginForm({ initialMode = "in" }: { initialMode?: "in" | "up" } 
     e.preventDefault();
     if (!accountsAvailable || busy) return;
     // Our own checks first, so empty or odd input gets a clear message.
-    if (!email.trim()) return setMsg({ ok: false, text: "Type your email address." });
-    if (!looksLikeEmail(email)) return setMsg({ ok: false, text: "That doesn't look like an email address." });
-    if (!password) return setMsg({ ok: false, text: "Type your password." });
-    if (mode === "up" && password.length < 6) return setMsg({ ok: false, text: "Your password needs at least 6 characters." });
+    if (!email.trim()) return setMsg({ ok: false, text: t("login.typeEmail") });
+    if (!looksLikeEmail(email)) return setMsg({ ok: false, text: t("err.badEmail") });
+    if (!password) return setMsg({ ok: false, text: t("login.typePassword") });
+    if (mode === "up" && password.length < 6) return setMsg({ ok: false, text: t("err.short") });
 
     setBusy(true);
     setMsg(null);
     if (mode === "in") {
       const error = await logIn(email, password);
-      if (error) setMsg({ ok: false, text: error });
+      if (error) setMsg({ ok: false, text: t(error) });
     } else {
       const { error, needsConfirmation } = await signUp(email, password);
-      if (error) setMsg({ ok: false, text: error });
-      else if (needsConfirmation) setMsg({ ok: true, text: "Check your email to confirm your account, then log in." });
+      if (error) setMsg({ ok: false, text: t(error) });
+      else if (needsConfirmation) setMsg({ ok: true, text: t("login.checkEmail") });
     }
     setBusy(false);
   }
@@ -71,13 +74,13 @@ export function LoginForm({ initialMode = "in" }: { initialMode?: "in" | "up" } 
 
   return (
     <section className="card">
-      <h2>{mode === "in" ? "Log in" : "Create an account"}</h2>
+      <h2>{mode === "in" ? t("login.title") : t("login.createTitle")}</h2>
       <form className="form" onSubmit={submit} noValidate>
         <input
           type="email"
           inputMode="email"
-          placeholder="Email"
-          aria-label="Email"
+          placeholder={t("login.email")}
+          aria-label={t("login.email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           maxLength={254}
@@ -86,17 +89,17 @@ export function LoginForm({ initialMode = "in" }: { initialMode?: "in" | "up" } 
         <PasswordInput
           value={password}
           onChange={setPassword}
-          label="Password"
-          placeholder={mode === "up" ? "Password (6+ characters)" : "Password"}
+          label={t("login.password")}
+          placeholder={mode === "up" ? t("login.passwordNew") : t("login.password")}
           autoComplete={mode === "in" ? "current-password" : "new-password"}
         />
         <button className="primary" disabled={busy}>
-          {busy ? "Please wait…" : mode === "in" ? "Log in" : "Create account"}
+          {busy ? t("login.wait") : mode === "in" ? t("account.logIn") : t("login.create")}
         </button>
       </form>
       {msg && <p className={msg.ok ? "success" : "notice"} role="alert">{msg.text}</p>}
       <button className="link" onClick={switchMode}>
-        {mode === "in" ? "New here? Create an account" : "Already have an account? Log in"}
+        {mode === "in" ? t("login.toCreate") : t("login.toLogIn")}
       </button>
     </section>
   );
@@ -108,16 +111,17 @@ export function ChangePassword() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const { t } = useLang();
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!accountsAvailable || busy) return;
-    if (password.length < 6) return setMsg({ ok: false, text: "Your new password needs at least 6 characters." });
+    if (password.length < 6) return setMsg({ ok: false, text: t("err.newShort") });
     setBusy(true);
     const error = await changePassword(password);
-    if (error) setMsg({ ok: false, text: error });
+    if (error) setMsg({ ok: false, text: t(error) });
     else {
-      setMsg({ ok: true, text: "Saved ✓ Use the new password next time you log in." });
+      setMsg({ ok: true, text: t("password.saved") });
       setPassword("");
     }
     setBusy(false);
@@ -125,9 +129,9 @@ export function ChangePassword() {
 
   return (
     <section>
-      <h3>🔑 Change or reset password</h3>
+      <h3>{t("password.title")}</h3>
       <p className="muted small">
-        Forgot it? Passwords are stored scrambled, so they can't be shown, not even to us. Set a new one while you're logged in.
+        {t("password.note")}
       </p>
       <form className="form" onSubmit={submit} noValidate>
         <PasswordInput
@@ -136,12 +140,12 @@ export function ChangePassword() {
             setPassword(v);
             setMsg(null);
           }}
-          label="New password"
-          placeholder="New password (6+ characters)"
+          label={t("password.new")}
+          placeholder={t("password.newPlaceholder")}
           autoComplete="new-password"
         />
         <button className="secondary" disabled={busy}>
-          {busy ? "Saving…" : "Save new password"}
+          {busy ? t("password.saving") : t("password.save")}
         </button>
       </form>
       {msg && <p className={msg.ok ? "success" : "notice"} role="alert">{msg.text}</p>}
