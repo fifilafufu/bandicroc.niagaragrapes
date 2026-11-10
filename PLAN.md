@@ -34,6 +34,23 @@ Build steps in order. Tick a step (`- [x]`) only when its "Done when" checks pas
 - [ ] **5.10 Grape Bot sources.** The bot answers from the curated data (varieties, growing, winemaking, wine basics) and shows source chips sent by the server; `scripts/test-bot.mjs` updated.
   - Done when: `npm run test:bot` passes against the dev server; no source link in an answer comes from the AI's own text.
 
+## Phase 6: Polish language (approved 2026-11-10)
+
+Rules for every step: numbers, units and sources stay exactly as in English; grape, species and source names are not translated; wine and vine terms follow Polish Wikipedia, otherwise they stay in English. No em dashes in Polish text either.
+
+- [ ] **6.1 Language switch.** A small, free text helper (no paid service), `shared/i18n/` with `en` and `pl` word lists, a `useLang` hook in `src/lib/`, and an EN / PL switch next to the Log in button, kept in device storage. Default: the phone's language if it is Polish, otherwise English.
+  - Done when: the switch changes the tab bar, title bar, Settings and login sheet; the choice survives a reload; a missing Polish string falls back to English instead of showing a key.
+- [ ] **6.2 Overview and Learn pages.** Home (facts, numbers, sections), Statistics, Taste, Biology.
+  - Done when: these pages read fully in Polish; every number and source link matches the English page.
+- [ ] **6.3 Varieties and Grow Your Grape.** Gallery, explainer, variety passports, care guides.
+  - Done when: all 27 grapes show Polish text; names, VIVC links and photo credits are unchanged.
+- [ ] **6.4 Winemaking, Wine basics and Make Your Wine.**
+  - Done when: steps, diagrams, tasting notes and label words are in Polish; `npm run test:wine` passes.
+- [ ] **6.5 Quizzes.** All 227 questions, answers, explanations and the scoreboard jokes.
+  - Done when: every question has a Polish version with the same right answer and source; scores are shared between languages.
+- [ ] **6.6 Grape Bot and final check.** Bot greeting, suggestions and error messages in Polish; the bot is told the chosen language.
+  - Done when: a Polish speaker (the user or a tester) reads every page at phone size and finds no English left except names and sources.
+
 ## Notes for later steps
 
 - OIV shares are of grapes **available** after harvest losses (2024: 77.7 Mt grown, 5.9 Mt lost, 71.8 Mt used).

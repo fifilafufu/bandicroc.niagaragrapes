@@ -7,6 +7,7 @@
 - **Live:** https://bandicroc-niagaragrapes.pages.dev
 - **Repo:** https://github.com/fifilafufu/bandicroc.niagaragrapes
 - **Runs on:** Android, iPhone and Windows, in the browser or installed as an app (PWA). No app stores.
+- **Languages:** English and Polish (Polish is being added in Phase 6). A language switch sits next to the Log in button; the choice is kept on the device.
 
 ## Who it's for
 
@@ -44,7 +45,7 @@ Layout rules: the Grapes/Games button row stays pinned while scrolling; the titl
 
 SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe to run again).
 
-**On the device only** (localStorage): theme, dismissed tips, quiz questions already seen, jokes heard, and a guest's quiz scores and saved wines (moved to the account at login).
+**On the device only** (localStorage): theme, language, dismissed tips, quiz questions already seen, jokes heard, and a guest's quiz scores and saved wines (moved to the account at login).
 
 **In the repo** (curated, versioned, works offline):
 
@@ -82,6 +83,7 @@ Supabase is reached only from `src/lib/`, protected by row-level security. Full 
 - Wine numbers use OIV units: acidity in g/L as tartaric acid, sugar in g/L, alcohol in % vol, pressure in bar.
 - Each value records its source and the date it was checked. Missing data stays empty or is marked **Estimate**; nothing is guessed silently.
 - Photos are real (Wikimedia Commons) with author and licence shown, or diagrams drawn in code.
+- Translations keep every number, unit and source exactly as in English. Grape variety names, species names and source titles are not translated. Polish wording for wine and vine terms follows Polish Wikipedia where it has an article; any term without a checked Polish equivalent stays in English.
 
 ## Definition of done (MVP)
 
@@ -106,4 +108,4 @@ The MVP is done when all of these are true on the live site:
 - **No app stores** (Apple, Google Play, Microsoft Store). Installing is from the browser.
 - **No scraping at scale or live fetching** of OIV, VIVC, FAO or extension sites from the app. Their data is curated into the repo by scripts or by hand.
 - **No personal data beyond what the features need** (email for login, plus the tables above). No tracking or ads.
-- **No docs in any language but English.** README.md, SPEC.md, PLAN.md and CLAUDE.md are English only. (The app's UI is English; Grape Bot replies in the user's language.)
+- **No docs in any language but English.** README.md, SPEC.md, PLAN.md and CLAUDE.md are English only. (The app itself is in English and Polish; Grape Bot replies in the user's language.)
