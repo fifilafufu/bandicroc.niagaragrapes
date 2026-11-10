@@ -76,3 +76,28 @@
 .quiz-diagram-label { font-size: 15px; font-weight: 800; fill: #fff; stroke: rgba(0, 0, 0, 0.6); stroke-width: 3px; paint-order: stroke; pointer-events: none; }
 .quiz-diagram-label.right { fill: #e9ffd0; }
 .quiz-diagram-label.wrong { fill: #ffd6cf; }
+
+/* Scoreboard on the Quizzes card */
+.quiz-board { margin-top: 12px; }
+.quiz-board-headline { margin: 0 0 8px; }
+.quiz-board-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 640px) { .quiz-board-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.quiz-board-tile {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  cursor: pointer;
+}
+.quiz-board-tile:hover { border-color: var(--accent); }
+.quiz-board-tile.unplayed { opacity: 0.7; border-style: dashed; }
+.quiz-board-tile.perfect { border-color: var(--accent); background: var(--accent-soft); }
+.quiz-board-score { font-size: 1.5rem; font-weight: 800; color: var(--accent-strong); line-height: 1.1; }
+.quiz-board-tile.unplayed .quiz-board-score { color: var(--muted); }
+.quiz-board-line { font-size: 0.78rem; overflow-wrap: anywhere; }

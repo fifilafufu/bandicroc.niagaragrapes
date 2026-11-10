@@ -6,6 +6,7 @@ import { saveLevel, savedLevel } from "../lib/quiz";
 import { summary, useQuizResults } from "../lib/useQuizResults";
 import QuizPicker from "./quiz/QuizPicker";
 import QuizRound from "./quiz/QuizRound";
+import QuizScoreboard from "./quiz/QuizScoreboard";
 
 // The Quizzes section. Scores are saved to the account when logged in (see useQuizResults).
 export default function QuizzesPage({ user, onLogin }: { user: User | null; onLogin: () => void }) {
@@ -18,9 +19,12 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
   };
 
   const scores: Partial<Record<Category, string>> = {};
+  const bests: Partial<Record<Category, { score: number; total: number }>> = {};
   for (const c of CATEGORIES) {
     const s = summary(results, `cat:${c.id}`);
-    if (s) scores[c.id] = `Best ${s.best.score} / ${s.best.total} · ${s.rounds} ${s.rounds === 1 ? "round" : "rounds"}`;
+    if (!s) continue;
+    bests[c.id] = s.best;
+    scores[c.id] = `Best ${s.best.score} / ${s.best.total} · ${s.rounds} ${s.rounds === 1 ? "round" : "rounds"}`;
   }
 
   return (
@@ -41,6 +45,7 @@ export default function QuizzesPage({ user, onLogin }: { user: User | null; onLo
             </p>
           )
         )}
+        {!cat && <QuizScoreboard bests={bests} onPick={setCat} />}
       </section>
       {cat ? (
         <QuizRound
