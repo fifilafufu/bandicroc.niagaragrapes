@@ -1,0 +1,9 @@
+# Security headers for every page, sent by Cloudflare Pages.
+# nosniff: browsers trust our file types. DENY: other sites can't show the app in a frame.
+# Referrer: other sites only see our domain, never the page address. Permissions: no camera, mic or location.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=31536000

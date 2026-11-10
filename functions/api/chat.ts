@@ -79,6 +79,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
         if (!wrote) controller.enqueue(line({ type: "text", text: "Hmm, I lost my train of thought. Ask me again? 🍇" }));
         controller.enqueue(line({ type: "done", model }));
       } catch (error) {
+        // The real error stays in the server log; the browser only gets a friendly line.
         console.error("Grape Bot error:", error);
         controller.enqueue(
           line({
@@ -86,7 +87,6 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
             text: wrote
               ? " …(I got cut off. Try asking again.)"
               : "I'm all out of grape juice for now (the free AI limit may be used up). Try again later! 🍇",
-            detail: error instanceof Error ? error.message.slice(0, 200) : String(error).slice(0, 200),
           }),
         );
       } finally {

@@ -59,7 +59,7 @@ SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe 
 | `shared/quiz/` | quiz questions: hand-written (`bank.ts`, `numbers.ts`) and built from the data files above (`fromVarieties.ts`, `fromPages.ts`), each with its source |
 | `src/data/worldMap.json` | FAO production per country (built by `scripts/build-map.mjs`) |
 
-Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape Bot runs on Cloudflare Workers AI, with OpenRouter free models as backup.
+Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape Bot runs on Cloudflare Workers AI (Meta Llama models, through the `AI` binding: no key), trying the next model in `server/grapeBot/settings.ts` if one fails. OpenRouter free models are a manual backup: set `AI_PROVIDER` to `openrouter` and the `OPENROUTER_API_KEY` secret in Cloudflare.
 
 ## Code structure
 

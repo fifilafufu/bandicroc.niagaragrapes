@@ -27,6 +27,15 @@ Frontend, backend and data stay separate, and imports only flow one way: screens
 - **No dead code.** Remove unused files, exports and commented-out code in the same change.
 - Check before committing: no file in `src/components/` imports `supabase` or calls `fetch`; nothing in `shared/`, `server/` or `functions/` imports from `src/`.
 
+## Security rules
+- **No secrets in the frontend or the repo.** Anything in `src/`, `shared/`, `public/` or a `VITE_` variable ends up in the browser, where anyone can read it. The only keys allowed there are public by design: the Supabase URL and its publishable (anon) key.
+- **Secret keys live only on the server**, as Cloudflare Pages secrets (e.g. `OPENROUTER_API_KEY`), read in `server/` or `functions/` through `env`. For local testing they go in `.dev.vars` or `.env`, which are git-ignored. Never commit them, print them, or put them in `wrangler.toml` `[vars]` (that file is public).
+- **Never use the Supabase service-role / secret key** anywhere in this project. Every table has row-level security so each user reaches only their own rows, and `anon` gets no access (see "New Supabase tables" above).
+- **Server errors stay on the server.** API replies to the browser carry a friendly message only, never raw error text, stack traces or provider responses (`console.error` them instead).
+- **Treat all input as untrusted.** `/api/chat` checks and caps every field before it reaches the prompt (`server/grapeBot/request.ts`). AI and user text is shown as plain text: no `dangerouslySetInnerHTML`, `innerHTML` or `eval`.
+- **Security headers** for the site are in `public/_headers`; keep them when changing hosting.
+- Before committing, also check: `git grep` finds no key-like strings (`sk-`, `sb_secret_`, `service_role`, private keys), and the built `dist/` has no server secret names in it.
+
 ## Documentation rules
 - All project docs (README.md, SPEC.md, PLAN.md, CLAUDE.md) are in English only.
 - Do not update README.md during a phase.
