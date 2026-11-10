@@ -24,3 +24,7 @@
   cursor: pointer;
 }
 .lang-switch button.on { background: var(--accent); color: var(--accent-text); }
+
+/* Polish capitalises only the first word of a heading like "Czerwone, wytrawne". */
+:lang(pl) .wine-style { text-transform: none; }
+:lang(pl) .wine-style::first-letter { text-transform: uppercase; }

@@ -47,8 +47,9 @@ Rules for every step: numbers, units and sources stay exactly as in English; gra
   - Built: Polish text in `shared/i18n/pl/` (overview, varieties, biology) and `shared/i18n/en.ts`/`pl.ts`; country names from the browser's own CLDR names via `shared/i18n/countryCodes.json`; numbers written the Polish way with the same values. Source link titles stay in English (they name English sources).
 - [ ] **6.3 Varieties and Grow Your Grape.** Gallery, explainer, variety passports, care guides.
   - Done when: all 27 grapes show Polish text; names, VIVC links and photo credits are unchanged.
-- [ ] **6.4 Winemaking, Wine basics and Make Your Wine.**
+- [x] **6.4 Winemaking, Wine basics and Make Your Wine.**
   - Done when: steps, diagrams, tasting notes and label words are in Polish; `npm run test:wine` passes.
+  - Built: `shared/i18n/pl/wine.ts` (steps, styles, wine parts, EU label words in their Polish legal form) and `pl/wineSim.ts` (tasting note, colour words, notes, Polish plurals). The simulator and its tests stay in English; the Polish layer only rewords its results. Colour words not checked in Polish (garnet, tawny) show the English word.
 - [ ] **6.5 Quizzes.** All 227 questions, answers, explanations and the scoreboard jokes.
   - Done when: every question has a Polish version with the same right answer and source; scores are shared between languages.
 - [ ] **6.6 Grape Bot and final check.** Bot greeting, suggestions and error messages in Polish; the bot is told the chosen language.

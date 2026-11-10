@@ -5,10 +5,14 @@ import { brixToSugar, defaultInputs, describe, makeWine, MODEL_VERSION, SKIN_STE
 import { abvFromSugar } from "../../../shared/wine";
 import { useSavedWines, type SavedWine } from "../../lib/useSavedWines";
 import { photoOf } from "../../../shared/varieties";
-import SourceLine from "../SourceLine";
 import WineGlass from "./WineGlass";
+import WineHowItWorks from "./WineHowItWorks";
 import { Range, Segmented } from "./Controls";
 import { GROUPS } from "../../../shared/simGroups";
+import { useLang } from "../../lib/lang";
+import { num } from "../../../shared/i18n/countries";
+import { pluralForm } from "../../../shared/i18n";
+import { BASIS_PL, colourPl, countPl, describePl, bodyPl, GROUPS_PL, notePl, skinLabelPl, styleNamePl, sweetnessPl } from "../../../shared/i18n/pl/wineSim";
 
 // Make Your Wine: choose a grape and how to make it, and see the wine that comes out.
 // All the maths is in shared/wineSim.ts (tested by scripts/test-wine.ts).
@@ -16,13 +20,19 @@ import { GROUPS } from "../../../shared/simGroups";
 export default function MakeWinePage({ user, favourite, onLogin }: { user: User | null; favourite: string | null; onLogin: () => void }) {
   const start = simGrape(favourite) ?? simGrape("Cabernet Sauvignon")!;
   const [grape, setGrape] = useState<SimGrape>(start);
+  const { t, lang } = useLang();
+  const pl = lang === "pl";
   const [inp, setInp] = useState<Inputs>(() => defaultInputs(start));
   const [name, setName] = useState("");
   const [saved, setSaved] = useState(false);
   const { wines, save, remove, synced } = useSavedWines(user);
 
   const wine = useMemo(() => makeWine(grape, inp), [grape, inp]);
-  const note = useMemo(() => describe(grape, wine), [grape, wine]);
+  const note = useMemo(() => (pl ? describePl(grape, wine) : describe(grape, wine)), [grape, wine, pl]);
+  const colour = (words: string) => (pl ? colourPl(words) : words);
+  // English counts as before; Polish uses its own plural forms.
+  const months = (n: number) => (pl ? countPl(n, "month") : `${n} months`);
+  const years = (n: number) => (pl ? countPl(n, "year") : `${n} ${pluralForm("en", n) === "one" ? "year" : "years"}`);
   const set = <K extends keyof Inputs>(k: K) => (v: Inputs[K]) => {
     setInp((o) => ({ ...o, [k]: v }));
     setSaved(false);
@@ -44,12 +54,13 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
 
   const skinIndex = Math.max(0, SKIN_STEPS.indexOf(inp.skinDays));
   const sugar = brixToSugar(inp.brix);
-  const favNote = favourite && !simGrape(favourite) ? `${favourite} isn't in the simulator${TABLE_ONLY.includes(favourite) ? " (it's grown for eating)" : ""}.` : null;
+  const favNote = favourite && !simGrape(favourite) ? t(TABLE_ONLY.includes(favourite) ? "mw.notInTable" : "mw.notIn", { name: favourite }) : null;
   const photo = photoOf(grape.name);
-  const styleName = `${wine.sweetnessWord} ${wine.bubblesWord === "still" ? "" : wine.bubblesWord.split(" (")[0] + " "}${wine.style === "orange" ? "orange" : wine.style}`;
+  const styleNameEn = `${wine.sweetnessWord} ${wine.bubblesWord === "still" ? "" : wine.bubblesWord.split(" (")[0] + " "}${wine.style === "orange" ? "orange" : wine.style}`;
+  const styleName = pl ? styleNamePl(wine) : styleNameEn;
 
   async function onSave() {
-    const label = name.trim() || `My ${grape.name}`;
+    const label = name.trim() || t("mw.myWine", { name: grape.name });
     await save({
       name: label.slice(0, 40),
       grape: grape.name,
@@ -63,8 +74,8 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
   return (
     <div className="stack make-wine">
       <section className="card">
-        <h1 className="page-title">🍷 Make Your Wine</h1>
-        <p className="muted">Pick a grape, decide how to make it, and watch the wine change. The rules come from real winemaking: alcohol only comes from sugar, tannin only from skins and oak.</p>
+        <h1 className="page-title">{t("mw.title")}</h1>
+        <p className="muted">{t("mw.sub")}</p>
         {favNote && <p className="muted small">{favNote}</p>}
       </section>
 
@@ -75,22 +86,22 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
             rim={wine.colour.rim}
             rimWidth={wine.colour.rimWidth}
             pressureBar={wine.pressureBar}
-            label={`A glass of ${wine.colour.words} wine${wine.pressureBar ? " with bubbles" : ""}`}
+            label={t(wine.pressureBar ? "mw.glassBubbles" : "mw.glass", { colour: colour(wine.colour.words) })}
           />
           <p className="wine-style">{styleName}</p>
-          <p className="muted small center">Colour: {wine.colour.words}</p>
+          <p className="muted small center">{t("mw.colour", { colour: colour(wine.colour.words) })}</p>
           <div className="big-numbers">
             <div>
-              <b>{wine.abv.toFixed(1)}%</b>
-              <span>alcohol</span>
+              <b>{num(wine.abv, lang, 1)}%</b>
+              <span>{t("mw.alcohol")}</span>
             </div>
             <div>
               <b>{Math.round(wine.residualSugar)} g/L</b>
-              <span>sugar left</span>
+              <span>{t("mw.sugarLeft")}</span>
             </div>
             <div>
-              <b>{wine.body}</b>
-              <span>body</span>
+              <b>{pl ? bodyPl(wine.body) : wine.body}</b>
+              <span>{t("mw.body")}</span>
             </div>
           </div>
           <div className="tasting">
@@ -99,7 +110,7 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
             ))}
             {wine.notes.map((n) => (
               <p key={n} className="callout small">
-                {n}
+                {pl ? notePl(n) : n}
               </p>
             ))}
           </div>
@@ -107,10 +118,10 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
 
         <section className="card wine-controls">
           <label className="slider">
-            <span>Grape</span>
+            <span>{t("mw.grape")}</span>
             <select value={grape.name} onChange={(e) => pickGrape(e.target.value)}>
               {GROUPS.map((gr) => (
-                <optgroup key={gr.label} label={gr.label}>
+                <optgroup key={gr.label} label={pl ? (GROUPS_PL[gr.label] ?? gr.label) : gr.label}>
                   {gr.names.filter((n) => SIM_GRAPES.some((s) => s.name === n)).map((n) => (
                     <option key={n} value={n}>
                       {n}
@@ -123,68 +134,69 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
           <div className="grape-basis">
             {photo && <img src={photo.thumb} alt="" />}
             <span className="muted small">
-              {grape.basis} Usually picked at {grape.brix} °Brix, acidity {grape.ta} g/L.{grape.estimate && <b className="estimate"> Estimate</b>}
+              {pl ? (BASIS_PL[grape.name] ?? grape.basis) : grape.basis} {t("mw.usually", { brix: num(grape.brix, lang), ta: num(grape.ta, lang) })}
+              {grape.estimate && <b className="estimate"> {t("mw.estimate")}</b>}
             </span>
           </div>
 
-          <h3>1. Harvest</h3>
+          <h3>{t("mw.s1")}</h3>
           <Range
-            label="Ripeness"
+            label={t("mw.ripeness")}
             value={inp.brix}
             min={grape.brix - 4}
             max={grape.brix + 6}
             step={0.5}
             onChange={set("brix")}
-            show={`${inp.brix} °Brix`}
-            hint={`${Math.round(sugar)} g/L sugar, up to ${abvFromSugar(sugar).toFixed(1)}% alcohol`}
+            show={`${num(inp.brix, lang)} °Brix`}
+            hint={t("mw.ripeHint", { sugar: Math.round(sugar), abv: num(abvFromSugar(sugar), lang, 1) })}
           />
 
-          <h3>2. Skin contact</h3>
-          <Range label="Juice on the skins" value={skinIndex} min={0} max={SKIN_STEPS.length - 1} onChange={(i) => set("skinDays")(SKIN_STEPS[i])} show={skinLabel(inp.skinDays)} hint={grape.colour >= 0.4 ? "short = rosé, long = red" : "long = orange wine"} />
+          <h3>{t("mw.s2")}</h3>
+          <Range label={t("mw.skins")} value={skinIndex} min={0} max={SKIN_STEPS.length - 1} onChange={(i) => set("skinDays")(SKIN_STEPS[i])} show={pl ? skinLabelPl(inp.skinDays) : skinLabel(inp.skinDays)} hint={grape.colour >= 0.4 ? t("mw.skinHintDark") : t("mw.skinHintLight")} />
 
-          <h3>3. Fermentation</h3>
-          <Range label="Sugar the yeast eats" value={inp.fermentPct} min={0} max={100} onChange={set("fermentPct")} show={`${inp.fermentPct}%`} hint="stop early for a sweeter, lighter wine" />
-          <span className="field-label">Malolactic fermentation (softens acidity)</span>
-          <Segmented label="Malolactic fermentation" value={inp.mlf} onChange={set("mlf")} options={[{ v: 0, label: "None" }, { v: 0.5, label: "Half" }, { v: 1, label: "Full" }]} />
+          <h3>{t("mw.s3")}</h3>
+          <Range label={t("mw.yeastEats")} value={inp.fermentPct} min={0} max={100} onChange={set("fermentPct")} show={`${inp.fermentPct}%`} hint={t("mw.yeastHint")} />
+          <span className="field-label">{t("mw.mlfField")}</span>
+          <Segmented label={t("mw.mlf")} value={inp.mlf} onChange={set("mlf")} options={[{ v: 0, label: t("mw.none") }, { v: 0.5, label: t("mw.half") }, { v: 1, label: t("mw.full") }]} />
 
-          <h3>4. Ageing</h3>
-          <span className="field-label">Oak barrels</span>
-          <Segmented label="Oak" value={inp.oak} onChange={set("oak")} options={[{ v: "none", label: "None (steel)" }, { v: "old", label: "Old oak" }, { v: "new", label: "New oak" }]} />
-          {inp.oak !== "none" && <Range label="Time in oak" value={inp.oakMonths} min={3} max={36} onChange={set("oakMonths")} show={`${inp.oakMonths} months`} />}
-          <Range label="Age in the bottle" value={inp.bottleYears} min={0} max={30} onChange={set("bottleYears")} show={`${inp.bottleYears} ${inp.bottleYears === 1 ? "year" : "years"}`} />
+          <h3>{t("mw.s4")}</h3>
+          <span className="field-label">{t("mw.oakField")}</span>
+          <Segmented label={t("mw.oak")} value={inp.oak} onChange={set("oak")} options={[{ v: "none", label: t("mw.steel") }, { v: "old", label: t("mw.oldOak") }, { v: "new", label: t("mw.newOak") }]} />
+          {inp.oak !== "none" && <Range label={t("mw.oakTime")} value={inp.oakMonths} min={3} max={36} onChange={set("oakMonths")} show={months(inp.oakMonths)} />}
+          <Range label={t("mw.bottleAge")} value={inp.bottleYears} min={0} max={30} onChange={set("bottleYears")} show={years(inp.bottleYears)} />
 
-          <h3>5. Bubbles</h3>
-          <Segmented label="Bubbles" value={inp.bubbles} onChange={set("bubbles")} options={[{ v: "still", label: "Still" }, { v: "semi", label: "Semi-sparkling" }, { v: "sparkling", label: "Sparkling" }]} />
+          <h3>{t("mw.s5")}</h3>
+          <Segmented label={t("mw.bubbles")} value={inp.bubbles} onChange={set("bubbles")} options={[{ v: "still", label: t("mw.still") }, { v: "semi", label: t("mw.semi") }, { v: "sparkling", label: t("mw.sparkling") }]} />
           {inp.bubbles === "sparkling" && (
             <>
-              <Range label="Time on the lees" value={inp.leesMonths} min={9} max={60} onChange={set("leesMonths")} show={`${inp.leesMonths} months`} />
-              <Range label="Dosage" value={inp.dosage} min={0} max={50} onChange={set("dosage")} show={`${inp.dosage} g/L sugar`} hint="sets brut, demi-sec…" />
+              <Range label={t("mw.lees")} value={inp.leesMonths} min={9} max={60} onChange={set("leesMonths")} show={months(inp.leesMonths)} />
+              <Range label={t("mw.dosage")} value={inp.dosage} min={0} max={50} onChange={set("dosage")} show={t("mw.dosageShow", { n: inp.dosage })} hint={t("mw.dosageHint")} />
             </>
           )}
 
-          <h3>Save it</h3>
+          <h3>{t("mw.saveTitle")}</h3>
           <div className="save-row">
-            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder={`My ${grape.name}`} aria-label="Wine name" />
+            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder={t("mw.myWine", { name: grape.name })} aria-label={t("mw.wineName")} />
             <button className="primary" onClick={onSave} disabled={saved}>
-              {saved ? "Saved ✓" : "Save wine"}
+              {saved ? t("mw.saved") : t("mw.save")}
             </button>
           </div>
           {!user && accountsAvailable && (
             <p className="muted small">
-              Saved on this device.{" "}
+              {t("mw.onDevice")}{" "}
               <button className="link inline" onClick={onLogin}>
-                Log in
+                {t("mw.logIn")}
               </button>{" "}
-              to keep your wines on all your devices.
+              {t("mw.keepAll")}
             </p>
           )}
-          {user && !synced && <p className="muted small">Saved on this device (account sync isn't set up yet).</p>}
+          {user && !synced && <p className="muted small">{t("mw.noSync")}</p>}
         </section>
       </div>
 
       {wines.length > 0 && (
         <section className="card">
-          <h2>🍾 Your wines</h2>
+          <h2>{t("mw.yours")}</h2>
           <ul className="wine-list">
             {wines.map((w) => (
               <li key={w.id}>
@@ -192,13 +204,13 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
                 <span>
                   <b>{w.name}</b>
                   <span className="muted small">
-                    {w.grape} · {w.result.abv}% · {w.result.sweetness} · {w.result.words}
+                    {w.grape} · {num(w.result.abv, lang)}% · {pl ? sweetnessPl(w.result.sweetness) : w.result.sweetness} · {colour(w.result.words)}
                   </span>
                 </span>
                 <button className="link inline" onClick={() => load(w)}>
-                  Open
+                  {t("mw.open")}
                 </button>
-                <button className="link inline danger" onClick={() => remove(w.id)} aria-label={`Delete ${w.name}`}>
+                <button className="link inline danger" onClick={() => remove(w.id)} aria-label={t("mw.delete", { name: w.name })}>
                   ✕
                 </button>
               </li>
@@ -207,39 +219,7 @@ export default function MakeWinePage({ user, favourite, onLogin }: { user: User 
         </section>
       )}
 
-      <details className="card how-it-works">
-        <summary>How this works</summary>
-        <ul>
-          <li>
-            <b>Sugar:</b> ripeness in °Brix becomes grams of sugar per litre using the OIV table. Usual ripeness comes from Wikipedia's ripeness article (reds near 22 °Brix, whites near 20) and, for Concord, from growers' reports of 16 to 17 °Brix.
-          </li>
-          <li>
-            <b>Alcohol:</b> sugar (g/L) × 0.05943 = % alcohol (OIV). Only sugar the yeast eats becomes alcohol; yeast stops at about 15.5%.
-          </li>
-          <li>
-            <b>Acidity:</b> falls and pH rises as grapes ripen. Malolactic fermentation turns part of the acid (malic) into a softer one (lactic).
-          </li>
-          <li>
-            <b>Colour and tannin:</b> come only from skins (and tannin also from oak). Colour comes out within days, tannin more slowly. With age, reds turn from purple to ruby, garnet, tawny and brick, lightest at the rim; whites deepen from lemon to gold and amber, faster in oak.
-          </li>
-          <li>
-            <b>Bubbles:</b> 18 g/L of sugar fermented in a closed bottle makes about 6 bar; semi-sparkling wine has 1 to 2.5. Label words (dry, brut…) follow EU rules.
-          </li>
-          <li>
-            <b>A teaching model:</b> the directions are real, the exact numbers are simplified. Grapes marked “Estimate” have no grape-specific source yet. Model version {MODEL_VERSION}.
-          </li>
-        </ul>
-        <SourceLine
-          ids={["oiv-sugar-alcohol", "eu-2019-33", "gp-concord-2014", "oiv-code"]}
-          wiki={[
-            { label: "Ripeness in viticulture", title: "Ripeness in viticulture" },
-            { label: "Traditional method", title: "Traditional method" },
-            { label: "Sparkling wine", title: "Sparkling wine" },
-            { label: "Phenolic content in wine", title: "Phenolic content in wine" },
-            { label: "Oak (wine)", title: "Oak (wine)" },
-          ]}
-        />
-      </details>
+      <WineHowItWorks />
     </div>
   );
 }
