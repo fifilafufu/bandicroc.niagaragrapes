@@ -1,37 +1,39 @@
-import { wikiUrl } from "../../../shared/grapes";
+import { BALANCE_2024 as B } from "../../../shared/grapeUses";
+import UsesShareChart from "../charts/UsesShareChart";
+import SourceLine from "../SourceLine";
 
-// Facts: Wikipedia "Grape" (2023: 72.5 million tonnes; about 71% wine, 27% fresh fruit, 2% dried;
-// also juice, jam, vinegar, oil), "Grape seed oil" (made from seeds, a wine-making by-product),
-// "Grape seed extract" (an industrial derivative of the seeds, sold as a supplement), "Vinotherapy"
-// (beauty treatment using pips and pulp from wine-making), "Vinegar" ("sour wine").
-
-const TOTAL = 72.5; // million tonnes in 2023
+// Where the world's grapes go, using the OIV grape balance sheet for 2024. OIV counts juice and
+// musts as "pressed", together with wine. By-products (seed oil, extract, vinotherapy) come from
+// wine-making leftovers: Wikipedia "Grape seed oil", "Grape seed extract", "Vinotherapy".
 
 const BRANCHES = [
   {
+    key: "pressed",
     icon: "🍷",
-    name: "Wine",
-    pct: 71,
-    colour: "#7b2d4a",
-    leaves: ["Wine", "Vinegar (made from wine)"],
+    name: "Pressed",
+    pct: B.shares.pressed,
+    mt: B.pressed,
+    leaves: [`Wine: ${B.wine} M t of grapes → ${B.wineHl} million hl`, `Musts & juices: ${B.mustsJuices} M t (juice, jelly)`, "Vinegar (made from wine)"],
     extra: {
       title: "From the leftovers (seeds, skins, pulp):",
       leaves: ["🍳 Grape seed oil (cooking)", "💊 Grape seed extract (supplements)", "🧴 Vinotherapy (cosmetics)"],
     },
   },
   {
+    key: "table",
     icon: "🍽️",
-    name: "Fresh",
-    pct: 27,
-    colour: "#5b8a2d",
-    leaves: ["Eaten as table grapes", "Juice, jam & jelly"],
+    name: "Table",
+    pct: B.shares.table,
+    mt: B.table,
+    leaves: ["Eaten fresh as table grapes"],
   },
   {
+    key: "dried",
     icon: "☀️",
     name: "Dried",
-    pct: 2,
-    colour: "#c08a2b",
-    leaves: ["Raisins", "Sultanas", "Currants"],
+    pct: B.shares.dried,
+    mt: B.driedFresh,
+    leaves: ["Raisins, sultanas, currants", `${B.driedFresh} M t of fresh grapes → ${B.driedProduct} M t dried (about 4 kg make 1 kg)`],
   },
 ];
 
@@ -39,23 +41,26 @@ export default function UsesTree() {
   return (
     <section className="card visual">
       <h2>🌳 Where the world's grapes go</h2>
-      <p className="muted small">Every grape grown in a year, split by what it's used for.</p>
+      <p className="muted small">
+        In {B.year} the world grew {B.produced} million tonnes of grapes. About {B.lost} M t were lost along the way, so the split below is
+        of the {B.available} M t that were used.
+      </p>
 
       <div className="tree">
         <div className="tree-root">
           <span className="t-icon">🍇</span>
-          <b>{TOTAL} million tonnes</b>
-          <span>grown worldwide in 2023</span>
+          <b>{B.available} million tonnes</b>
+          <span>used in {B.year}</span>
         </div>
 
         <div className="tree-branches">
           {BRANCHES.map((b) => (
-            <div key={b.name} className="tree-branch" style={{ ["--branch" as string]: b.colour }}>
+            <div key={b.name} className={`tree-branch s-${b.key}`}>
               <div className="tree-node">
                 <span className="t-icon">{b.icon}</span>
                 <b className="pct">{b.pct}%</b>
                 <span className="branch-name">{b.name}</span>
-                <span className="tonnes">≈ {((TOTAL * b.pct) / 100).toFixed(1)} M t</span>
+                <span className="tonnes">{b.mt} M t</span>
                 <span className="bar" aria-hidden="true">
                   <i style={{ width: `${b.pct}%` }} />
                 </span>
@@ -81,24 +86,20 @@ export default function UsesTree() {
       </div>
 
       <p className="muted small note">
-        Why no separate % for cosmetics or medicine? There's no reliable world figure: they're made from wine-making leftovers (seeds,
-        skins, pulp), so they come out of the 71%.
+        Older books say about 71% of grapes become wine. That figure is out of date: wine's share has been falling, while table-grape
+        growing has more than doubled since 2000, led by China.
       </p>
 
-      <p className="sources-line">
-        <a href={wikiUrl("Grape")} target="_blank" rel="noreferrer">
-          📖 Grape: production
-        </a>
-        <a href={wikiUrl("Grape seed oil")} target="_blank" rel="noreferrer">
-          📖 Grape seed oil
-        </a>
-        <a href={wikiUrl("Grape seed extract")} target="_blank" rel="noreferrer">
-          📖 Grape seed extract
-        </a>
-        <a href={wikiUrl("Vinotherapy")} target="_blank" rel="noreferrer">
-          📖 Vinotherapy
-        </a>
-      </p>
+      <UsesShareChart />
+
+      <SourceLine
+        ids={[B.source]}
+        wiki={[
+          { label: "Grape seed oil", title: "Grape seed oil" },
+          { label: "Grape seed extract", title: "Grape seed extract" },
+          { label: "Vinotherapy", title: "Vinotherapy" },
+        ]}
+      />
     </section>
   );
 }

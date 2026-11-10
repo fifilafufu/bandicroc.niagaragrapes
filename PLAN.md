@@ -228,3 +228,33 @@ I'll go through a checklist on the live link: private window, logged out, empty 
 
 **D. Language**
 9. Testers were Polish using the English app. The Polish UI switch (postponed earlier) is worth reconsidering. Grape Bot already answers in Polish.
+
+---
+
+## Phase 5: Grapes app, big update (approved 2026-11-10)
+
+**Name:** the app is now called **Grapes**. The web address stays `bandicroc-niagaragrapes.pages.dev`.
+
+**Rules:** no AI-generated images (only real photos with licence and attribution, or diagrams drawn in code); no paid services; works on Android, iPhone and Windows, in the browser and installed; no em dashes in UI text or code comments; every fact shown traces to a source.
+
+**Data standard:** stored the way OIV and AWRI do it. Variety traits use OIV descriptors (e.g. berry skin colour: blanc, rose, gris, rouge, noir, as in VIVC). Wine numbers use OIV units (acidity g/L as tartaric, residual sugar g/L, alcohol % vol, pressure bar). Each value records its source and the date checked; missing data stays empty, never guessed. Curated data lives in the repo (`shared/`), not in Supabase, because free Supabase projects pause after a week of no use and the installed app must work offline. Supabase only holds user data.
+
+### Build order (each part is built, tested, committed and deployed on its own)
+| Part | What | Status |
+|---|---|---|
+| 1 | Fix outdated numbers with OIV data, source list, OIV uses chart, OIV colour classes, rename to Grapes | ✅ done |
+| 2 | Navigation: 5 tabs (Grapes, Make Wine, Quizzes, Grape Bot, My Grapes; Settings in the account menu), bottom bar on phones, top bar on wide screens, hash routing (Android back button), Quizzes tab, `quiz_results` table | next |
+| 3 | Variety data (VIVC id, species, colour, taste, wine chemistry, photos with licences) + "How varieties work" explainer; 26 varieties: the current 16 + Merlot, Sauvignon Blanc, Syrah, Tempranillo, Grenache, Marquette, Frontenac, Seyval Blanc, Vidal Blanc, Regent or Solaris | |
+| 4 | Learn pages: Statistics (FAOSTAT by country), Taste (labrusca "foxy" vs vinifera), Biology (species, berry anatomy, growth cycle wheel) | |
+| 5 | Winemaking flow (red, white, rosé, sparkling) and the Wine basics structure diagram, on a shared wine model | |
+| 6 | Make Your Wine simulator + `saved_wines` table (inputs, result, model version; guests on device, copied on login) | |
+| 7 | Grow Your Grape: per-variety hardiness, vigour, ripening, diseases, rootstock, training, pruning, calendar; vine training diagrams with pruning cuts | |
+| 8 | Quizzes: categories, photo ID, ordering, matching, diagram taps, number estimates; questions generated from the data | |
+| 9 | Grape Bot cites curated sources (chips come from the server, never from the model) | |
+
+### Part 1 findings (checked against the sources)
+- **Uses (OIV):** shares are of grapes *available* after harvest losses. 2024: 77.7 Mt grown, 5.9 Mt lost, 71.8 Mt used: 47% pressed (wine 30.5 + musts and juices 2.8 Mt), 46% table (33.3 Mt), 7% dried (5.2 Mt fresh, 1.3 Mt of dried fruit). 2022: 50/42/8. 2021: 52/41/7. 2018: 57/36/7. 2000: table 26%. 2025 (provisional): table 48%. The old "71% wine" figure is gone everywhere.
+- **Producers (OIV 2024):** China 17.0 Mt (22%), Italy 7.3, USA 6.4; top ten = 70%. FAO counts 75.9 Mt for 2024 (map); the two are labelled separately and never mixed.
+- **Varieties by area (OIV Focus 2017, 2015 data):** Kyoho 365,000 ha, Cabernet Sauvignon 341,000, Sultanina 273,000, Merlot 266,000. "Sultana is the most planted" was wrong.
+- **VIVC colours checked:** Niagara 8537 blanc, Concord 2801 noir, Catawba 2346 rouge, Delaware 3498 rouge, Red Globe 9972 rouge, Gewürztraminer 12609 rose, Pinot Gris 9275 gris (Wikipedia says rose), Shine Muscat 22688 blanc (VIVC pedigree Akitsu 21 × Hakunan), Scuppernong 10847 blanc (Muscadinia rotundifolia), Sultanina 12051 blanc, Cabernet Sauvignon 1929 noir. Kyoho: no exact prime-name match yet.
+- **Still to fix later:** Wikipedia photos show no licence or author yet (Part 3); growth timings in the anatomy card are vague (Part 4).

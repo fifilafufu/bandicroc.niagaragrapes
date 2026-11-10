@@ -29,7 +29,7 @@ export default function InstallSheet({ onClose }: { onClose: () => void }) {
         <div className="sheet-head">
           <img src="/pwa-64x64.png" alt="" width={44} height={44} />
           <div>
-            <h2 id="sheet-title">Get the Niagara Grapes app</h2>
+            <h2 id="sheet-title">Get the Grapes app</h2>
             <p className="muted small">Free. Opens full screen, with its own icon.</p>
           </div>
           <button className="close" onClick={onClose} aria-label="Close">

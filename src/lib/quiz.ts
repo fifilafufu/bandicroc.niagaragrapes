@@ -5,6 +5,7 @@
 // so rounds don't repeat (remembered on this device).
 
 import { readPref, writePref } from "./prefs";
+import type { SourceId } from "../../shared/sources";
 
 export type Level = "newbie" | "intermediate" | "pro";
 
@@ -14,6 +15,7 @@ export type QuizQuestion = {
   answer: number; // index into options
   why: string;
   wiki: string;
+  src?: SourceId; // a data source, shown next to the Wikipedia link
 };
 
 export const LEVELS: { id: Level; emoji: string; name: string; blurb: string }[] = [
@@ -34,8 +36,8 @@ const BANK: Record<Level, QuizQuestion[]> = {
     { q: "How many grapes can one bunch hold?", options: ["Exactly 12", "2 to 5", "15 to 300", "Over 5,000"], answer: 2, why: "A bunch can hold anywhere from 15 to 300 grapes.", wiki: "Grape" },
     { q: "What is Grape Bot's favourite grape?", options: ["Merlot", "Niagara", "Red Globe", "Kyoho"], answer: 1, why: "Niagara, of course! Sweet, green-gold and musky. 💚", wiki: "Niagara (grape)" },
     { q: "Ripe grapes come in many colours. Which one is NOT a grape colour?", options: ["Pink", "Yellow", "Orange", "Silver"], answer: 3, why: "Ripe grapes can be crimson, black, dark blue, yellow, green, orange or pink, but not silver.", wiki: "Grape" },
-    { q: "What happens to most of the world's grapes?", options: ["Eaten fresh", "Made into wine", "Dried into raisins", "Fed to animals"], answer: 1, why: "About 71% become wine, 27% are eaten fresh and 2% are dried.", wiki: "Grape" },
-    { q: "Which country grows the most grapes?", options: ["France", "USA", "China", "Spain"], answer: 2, why: "China grows the most by far: almost a fifth of all the world's grapes.", wiki: "Grape" },
+    { q: "Which TWO uses take almost all of the world's grapes?",options: ["Wine and eating fresh", "Raisins and jam", "Juice and vinegar", "Oil and cosmetics"], answer: 0, why: "In 2024, 47% were pressed (mostly for wine) and 46% were eaten fresh. Only 7% were dried (OIV).", wiki: "Grape", src: "oiv-2024" },
+    { q: "Which country grows the most grapes?", options: ["France", "USA", "China", "Spain"], answer: 2, why: "China grows the most by far: 17.0 of 77.7 million tonnes in 2024, more than a fifth (OIV).", wiki: "Grape", src: "oiv-2024" },
     { q: "In Spain, people eat 12 grapes on New Year's Eve to…", options: ["Count down the hours", "Bring luck for each coming month", "Celebrate the harvest", "Honour 12 saints"], answer: 1, why: "One grape per bell strike at midnight, each one for luck in a coming month.", wiki: "Twelve Grapes" },
     { q: "Table grapes (the ones we eat) are usually…", options: ["Tiny and sour", "Large, seedless and thin-skinned", "Hard and dry", "Always purple"], answer: 1, why: "Table grapes are bred for eating: usually large, seedless and thin-skinned.", wiki: "Grape" },
     { q: "Which of these is NOT made from grapes?", options: ["Raisins", "Grape-seed oil", "Vinegar", "Maple syrup"], answer: 3, why: "Grapes give us raisins, juice, jam, vinegar and grape-seed oil. Maple syrup comes from maple trees.", wiki: "Grape" },
@@ -47,9 +49,9 @@ const BANK: Record<Level, QuizQuestion[]> = {
     { q: "What do ripe Niagara grapes taste like?", options: ["Sour", "Bitter", "Sweet and musky (\"foxy\")", "Salty"], answer: 2, why: "Ripe Niagara grapes are sweet with a musky \"foxy\" flavour. Only unripe ones taste tart.", wiki: "Niagara (grape)" },
     { q: "Roughly how long have people been growing grapes?", options: ["About 500 years", "About 2,000 years", "About 8,000 years", "About 50,000 years"], answer: 2, why: "Grape growing began approximately 8,000 years ago.", wiki: "Grape" },
     { q: "Dionysus (the Roman Bacchus) was the Greek god of…", options: ["The sea", "War", "Wine-making and festivity", "The sun"], answer: 2, why: "Dionysus was the god of wine-making, fruit, fertility and festivity.", wiki: "Dionysus" },
-    { q: "About what share of the world's grapes become wine?", options: ["About 10%", "About 35%", "About 71%", "About 99%"], answer: 2, why: "About 71% become wine, 27% are eaten fresh and 2% are dried.", wiki: "Grape" },
-    { q: "After China, which country grows the most grapes?", options: ["Italy", "Brazil", "Germany", "Australia"], answer: 0, why: "Italy is second, ahead of Spain, the US and France (FAO 2024).", wiki: "Grape" },
-    { q: "Which grape is believed to be the most widely planted in the world?", options: ["Niagara", "Sultana (Thompson Seedless)", "Pinot Noir", "Kyoho"], answer: 1, why: "The Sultana, also called Thompson Seedless, is believed to be the most widely planted grape.", wiki: "Sultana (grape)" },
+    { q: "About what share of the world's grapes were pressed for wine and juice in 2024?", options: ["About 10%", "About 47%", "About 71%", "About 99%"], answer: 1, why: "47% were pressed, 46% eaten fresh and 7% dried. The old \"71% wine\" figure is out of date (OIV 2024).", wiki: "Grape", src: "oiv-2024" },
+    { q: "After China, which country grows the most grapes?", options: ["Italy", "Brazil", "Germany", "Australia"], answer: 0, why: "Italy is second with 7.3 million tonnes, ahead of the USA (OIV 2024).", wiki: "Grape", src: "oiv-2024" },
+    { q: "Which grape is the world's most used grape for table grapes and raisins?", options: ["Niagara", "Sultana (Thompson Seedless)", "Pinot Noir", "Concord"], answer: 1, why: "Sultanina (Sultana, Thompson Seedless) covers about 273,000 ha and is the top grape for eating and drying (OIV, 2015 data).", wiki: "Sultana (grape)", src: "oiv-varieties-2017" },
     { q: "Shine Muscat and Kyoho are table grapes from…", options: ["Japan", "Chile", "Italy", "Canada"], answer: 0, why: "Both are Japanese table grapes, popular across East Asia.", wiki: "Shine Muscat" },
     { q: "Gewürztraminer wines famously smell of…", options: ["Smoke", "Lychees", "Mint", "Coconut"], answer: 1, why: "Gewürztraminer and lychees share the same aroma compounds.", wiki: "Gewürztraminer" },
     { q: "Pinot Noir is a thin-skinned grape known for being…", options: ["Hard to grow", "Always seedless", "Bright orange", "Grown only in deserts"], answer: 0, why: "Pinot Noir is a thin-skinned black grape that is hard to grow.", wiki: "Pinot noir" },
@@ -71,8 +73,8 @@ const BANK: Record<Level, QuizQuestion[]> = {
     { q: "Shine Muscat was bred from Muscat of Alexandria and which very sugary American grape?", options: ["Steuben", "Concord", "Catawba", "Niagara"], answer: 0, why: "Shine Muscat (registered 2006) comes from Muscat of Alexandria × Steuben.", wiki: "Shine Muscat" },
     { q: "Gewürztraminer has a pink-to-red skin, but it makes…", options: ["Red wine", "White wine", "Only juice", "Only raisins"], answer: 1, why: "Despite its pink-red skin, Gewürztraminer is used for white wines.", wiki: "Gewürztraminer" },
     { q: "Spain's 12-grapes New Year custom was popularised in which year?", options: ["1492", "1809", "1909", "1999"], answer: 2, why: "Grape growers with a huge harvest to sell popularised it in 1909.", wiki: "Twelve Grapes" },
-    { q: "Which two countries were the biggest grape exporters?", options: ["Peru and Chile", "China and India", "France and Germany", "USA and Canada"], answer: 0, why: "Peru and Chile were the top exporters, each shipping more than half a million tonnes.", wiki: "Grape" },
-    { q: "What share of the world's grapes is dried into raisins, currants and sultanas?", options: ["About 2%", "About 15%", "About 27%", "About 50%"], answer: 0, why: "Only about 2% are dried. 71% become wine and 27% are eaten fresh.", wiki: "Raisin" },
+    { q: "Which grape variety covers the most vineyard area in the world?", options: ["Kyoho", "Chardonnay", "Niagara", "Riesling"], answer: 0, why: "Kyoho, a Japanese table grape grown mostly in China, covered about 365,000 ha, just ahead of Cabernet Sauvignon (OIV, 2015 data).", wiki: "Kyoho (grape)", src: "oiv-varieties-2017" },
+    { q: "What share of the world's grapes is dried into raisins, currants and sultanas?", options: ["About 7%", "About 20%", "About 30%", "About 50%"], answer: 0, why: "About 7% in 2024. It takes about 4 kg of fresh grapes to make 1 kg of raisins (OIV).", wiki: "Raisin", src: "oiv-2024" },
     { q: "Chardonnay grapes taste fairly neutral. Chardonnay wine gets most of its flavour from…", options: ["Climate and oak", "Added sugar", "Food colouring", "The bottle shape"], answer: 0, why: "Cool climates give apple and citrus, warm ones tropical fruit, and oak makes it buttery.", wiki: "Chardonnay" },
     { q: "The Delaware grape is especially famed for which wine?", options: ["Sparkling wine", "Port", "Red table wine", "Brandy"], answer: 0, why: "Delaware is used as a table grape and for wines, and is famed for sparkling wine.", wiki: "Delaware (grape)" },
     { q: "Kyoho grapes are slip-skin with large bitter seeds, so they're usually…", options: ["Peeled and eaten as a dessert", "Only made into wine", "Dried for a year", "Eaten with the seeds crunched"], answer: 0, why: "Kyoho is usually peeled and eaten as a dessert in Japan, Taiwan, China and Korea.", wiki: "Kyoho (grape)" },

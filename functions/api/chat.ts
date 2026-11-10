@@ -1,4 +1,4 @@
-// POST /api/chat — Grape Bot, an educational grape tutor grounded in live Wikipedia.
+// POST /api/chat: Grape Bot, an educational grape tutor grounded in live Wikipedia and checked facts.
 // Runs on Cloudflare Pages Functions. The prompt and any API keys stay on the server.
 //
 // Usage is kept low on purpose: only the intro of 1–2 matching articles is sent, Wikipedia
@@ -21,6 +21,7 @@ import {
   wikiUrl,
   type Grape,
 } from "../../shared/grapes";
+import { SOURCES } from "../../shared/sources";
 import { pickJoke, wantsJoke, type Joke } from "../../shared/jokes";
 
 interface Env {
@@ -194,7 +195,7 @@ function systemPrompt(favourite: string | null, titles: string[], articles: Arti
     ? articles.map((a) => `### ${a.title}\n${a.text}`).join("\n\n")
     : "(No Wikipedia text available right now.)";
 
-  return `You are Grape Bot, a friendly and accurate grape tutor inside the Niagara Grapes app.
+  return `You are Grape Bot, a friendly and accurate grape tutor inside the Grapes app.
 
 Rules:
 - You talk about anything that involves grapes: varieties, colours, growing, history, uses, nutrition, taste, cooking, juice, raisins, wine, health, pets, beauty and spa, culture, and fun or silly "what if" questions about grapes. Answer silly questions playfully but with real facts. Only if a question has nothing to do with grapes, say in one sentence that you only know about grapes and suggest a grape question.
@@ -290,7 +291,7 @@ async function streamOpenRouter(env: Env, messages: { role: string; content: str
     headers: {
       Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
-      "X-Title": "Niagara Grapes",
+      "X-Title": "Grapes",
     },
     body: JSON.stringify({ model, messages, max_tokens: MAX_ANSWER_TOKENS, stream: true }),
   });
@@ -328,7 +329,13 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   const meta = {
     type: "meta",
-    sources: articles.map(({ title, url }) => ({ title, url })),
+    sources: [
+      ...articles.map(({ title, url }) => ({ title, url })),
+      // General questions are also answered from the checked OIV figures, so cite them.
+      ...(picked.titles.some((t) => findGrapeByWiki(t) !== null)
+        ? []
+        : [{ title: "OIV: grapes in 2024", url: SOURCES["oiv-2024"].url, data: true }]),
+    ],
     // Grapes named in this question: the app shows a photo the first time each one comes up.
     grapes: picked.latestGrapes.map((g) => g.wiki),
     followUps: followUps(picked.focusGrape, picked.topic, picked.userTexts, polish),

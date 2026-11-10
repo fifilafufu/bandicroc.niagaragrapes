@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { wikiUrl } from "../../shared/grapes";
+import type { SourceId } from "../../shared/sources";
+import SourceLine from "./SourceLine";
 import { readPref, writePref } from "../lib/prefs";
 import GrapeGallery from "./GrapeGallery";
 import ColourCompare from "./visuals/ColourCompare";
@@ -12,24 +14,25 @@ const DID_YOU_KNOW = [
   "Grapes first come from the Middle East / Western Asia, where people started growing them 6,000–8,000 years ago.",
   "\"White\" grapes are actually green: they're purple grapes with two pigment genes switched off.",
   "Grapes and raisins are toxic to dogs. Never share them with your dog!",
-  "China grows the most grapes in the world: 19% of the 72.5 million tonnes grown in 2023.",
+  "China grows the most grapes in the world: 17.0 of the 77.7 million tonnes grown in 2024, about 22% (OIV).",
   "The oldest known winery, Areni-1 in Armenia, is about 6,000 years old (c. 4100 BCE).",
   "In Spain, people eat 12 grapes at midnight on New Year's Eve, one for luck in each month.",
   "A bunch can hold anywhere from 15 to 300 grapes.",
   "Ripe grapes can be crimson, black, dark blue, yellow, green, orange or pink.",
   "Vinotherapy is a real beauty treatment that uses grape pips and pulp from wine-making.",
-  "The most widely planted grape is believed to be the Sultana, also called Thompson Seedless.",
+  "The grape with the most vineyard area in the world is Kyoho, a Japanese table grape grown mostly in China (OIV, 2015 data).",
+  "Fewer grapes become wine than before: 47% were pressed for wine and juice in 2024, while 46% were eaten fresh (OIV).",
 ];
 
-// Every fact below was checked against the linked Wikipedia articles (November 2026).
+// Checked against the linked sources (November 2026). Grape totals and uses: OIV 2024.
 const STATS = [
   { value: "8,000", label: "years of growing grapes" },
-  { value: "72.5M", label: "tonnes grown in 2023" },
-  { value: "71%", label: "of grapes become wine" },
+  { value: "77.7M", label: "tonnes grown in 2024 (OIV)" },
+  { value: "47%", label: "pressed for wine & juice (OIV 2024)" },
   { value: "15–300", label: "grapes per bunch" },
 ];
 
-type Section = { emoji: string; title: string; body: string[]; wiki: { label: string; title: string }[] };
+type Section = { emoji: string; title: string; body: string[]; wiki: { label: string; title: string }[]; src?: SourceId[] };
 
 const SECTIONS: Section[] = [
   {
@@ -66,16 +69,16 @@ const SECTIONS: Section[] = [
     emoji: "🌍",
     title: "Where they grow",
     body: [
-      "In 2023 the world grew 72.5 million tonnes of grapes. China grew the most (19%), with Italy and France also major growers.",
-      "Peru and Chile were the biggest exporters, each shipping more than half a million tonnes.",
+      "In 2024 the world grew 77.7 million tonnes of grapes. China grew the most (17.0 M t, about 22%), followed by Italy and the USA.",
     ],
     wiki: [{ label: "Grape: production", title: "Grape" }],
+    src: ["oiv-2024"],
   },
   {
     emoji: "🍷",
     title: "What we use them for",
     body: [
-      "About 71% of the world's grapes become wine, 27% are eaten fresh and 2% are dried into raisins, currants and sultanas.",
+      "In 2024, 47% of the world's grapes were pressed for wine, musts and juice, 46% were eaten fresh and 7% were dried into raisins, currants and sultanas.",
       "Grapes also give us juice, jam and jelly, vinegar and grape-seed oil.",
     ],
     wiki: [
@@ -88,9 +91,10 @@ const SECTIONS: Section[] = [
     title: "Table grapes vs wine grapes",
     body: [
       "Table grapes are bred for eating: usually large, seedless and thin-skinned. Wine grapes are picked very sweet, at about 24% sugar.",
-      "The most widely planted grape is believed to be the Sultana, also called Thompson Seedless.",
+      "The grape with the most vineyard area is Kyoho, a table grape, ahead of the wine grape Cabernet Sauvignon and the Sultana (Thompson Seedless), according to OIV's variety survey (2015 data).",
     ],
     wiki: [{ label: "Grape: table and wine grapes", title: "Grape" }],
+    src: ["oiv-varieties-2017"],
   },
   {
     emoji: "✨",
@@ -177,6 +181,7 @@ export default function Home({ onChat, onMyGrapes, onAsk }: { onChat: () => void
           </div>
         ))}
       </section>
+      <SourceLine ids={["oiv-2024"]} wiki={[{ label: "Grape", title: "Grape" }]} />
 
       {SECTIONS.map((s) => {
         // Some topics are shown as pictures and numbers instead of text.
@@ -219,13 +224,7 @@ function Topic({ s }: { s: Section }) {
       {s.body.map((p) => (
         <p key={p}>{p}</p>
       ))}
-      <p className="sources-line">
-        {s.wiki.map((w) => (
-          <a key={w.label} href={wikiUrl(w.title)} target="_blank" rel="noreferrer">
-            📖 {w.label}
-          </a>
-        ))}
-      </p>
+      <SourceLine ids={s.src} wiki={s.wiki} />
     </article>
   );
 }

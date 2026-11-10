@@ -5,7 +5,7 @@ import { fetchSummary } from "../lib/wiki";
 import { readPref, writePref } from "../lib/prefs";
 import { findGrapeByWiki, wikiUrl } from "../../shared/grapes";
 
-type Source = { title: string; url: string };
+type Source = { title: string; url: string; data?: boolean }; // data: a statistics source (OIV, FAO), not Wikipedia
 type Photo = { wiki: string; name: string; src: string };
 export type Msg = {
   role: "user" | "assistant";
@@ -235,7 +235,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
                       <div className="sources">
                         {m.sources.map((s) => (
                           <a key={s.url} href={s.url} target="_blank" rel="noreferrer">
-                            📖 {s.title}
+                            {s.data ? "📊" : "📖"} {s.title}
                           </a>
                         ))}
                       </div>
@@ -308,7 +308,7 @@ function AnswerTools({ text }: { text: string }) {
   }
   async function share() {
     try {
-      await navigator.share({ text: `${text}\n\n— Grape Bot 🍇 https://bandicroc-niagaragrapes.pages.dev` });
+      await navigator.share({ text: `${text}\n\nGrape Bot 🍇 https://bandicroc-niagaragrapes.pages.dev` });
     } catch {
       /* closed the share sheet */
     }

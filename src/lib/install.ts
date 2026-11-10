@@ -153,7 +153,7 @@ export function guideFor(os: OS, browser: Browser): Guide {
       label,
       supported: true,
       steps: [
-        "Already have a Niagara Grapes icon that opens with the browser bar? Long-press it → Remove, first.",
+        "Already have a Grapes icon that opens with the browser bar? Long-press it → Remove, first.",
         "Tap the menu ⋮ (top right; in Samsung Internet it's ≡ at the bottom).",
         "Tap “Install app” (or “Add to Home screen”).",
         "If it asks “Install” or “Create shortcut”, choose INSTALL. A shortcut opens in the browser; Install opens full screen.",
@@ -168,7 +168,7 @@ export function guideFor(os: OS, browser: Browser): Guide {
       supported: true,
       steps: [
         "Click the install icon ⊕ at the right end of the address bar.",
-        "Or open the menu ⋯ → “Apps” → “Install Niagara Grapes”.",
+        "Or open the menu ⋯ → “Apps” → “Install Grapes”.",
       ],
     };
   }

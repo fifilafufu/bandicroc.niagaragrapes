@@ -1,32 +1,40 @@
 import { useEffect, useState } from "react";
 import Bunch from "./Bunch";
-import { findGrape, wikiUrl } from "../../../shared/grapes";
 import { fetchSummary } from "../../lib/wiki";
+import SourceLine from "../SourceLine";
 
-// Facts: Wikipedia "Grape" (colours, white grapes derive from purple via two genes) and
-// "Vitis vinifera" (5,000–10,000 varieties as of 2012; more than 3,000 white cultivars).
-// One real grape for each colour (all in the gallery; colours from their Wikipedia articles).
-const COLOURS = [
-  { name: "Green", hex: "#9fc24a", grape: "Niagara" },
-  { name: "Yellow", hex: "#e6cf4c", grape: "Shine Muscat" },
-  { name: "Orange", hex: "#e3913a", grape: "Scuppernong", note: "bronze" },
-  { name: "Pink", hex: "#e79bb0", grape: "Gewürztraminer" },
-  { name: "Crimson", hex: "#b0243c", grape: "Red Globe" },
-  { name: "Dark blue", hex: "#2f3f7a", grape: "Concord" },
-  { name: "Black", hex: "#241a2e", grape: "Kyoho" },
+// Grape skin colours the way grape scientists record them: the five OIV classes (OIV descriptor
+// "berry: colour of skin"), as used by VIVC. Every example below was checked on its VIVC passport
+// page (2026-11-10). Other facts: Wikipedia "Grape" (white grapes come from purple ones with two
+// genes switched off) and "Vitis vinifera" (5,000 to 10,000 varieties as of 2012).
+
+const vivc = (id: number) => `https://www.vivc.de/index.php?r=passport%2Fview&id=${id}`;
+
+const CLASSES = [
+  {
+    cls: "Blanc",
+    meaning: "white",
+    note: "really green to yellow, even bronze",
+    hex: "#b9cf5a",
+    grape: "Niagara",
+    wiki: "Niagara (grape)",
+    vivcId: 8537,
+    also: "Shine Muscat, Scuppernong, Sultana",
+  },
+  { cls: "Rose", meaning: "pink", note: "pale pink skin", hex: "#e79bb0", grape: "Gewürztraminer", wiki: "Gewürztraminer", vivcId: 12609 },
+  { cls: "Gris", meaning: "grey", note: "greyish pink to brownish", hex: "#a58a8f", grape: "Pinot Gris", wiki: "Pinot gris", vivcId: 9275 },
+  { cls: "Rouge", meaning: "red", note: "light to deep red", hex: "#b0243c", grape: "Red Globe", wiki: "Red Globe", vivcId: 9972, also: "Catawba, Delaware" },
+  { cls: "Noir", meaning: "black", note: "really dark blue to blue-black", hex: "#2b2140", grape: "Concord", wiki: "Concord grape", vivcId: 2801, also: "Cabernet Sauvignon" },
 ];
 
 export default function ColourCompare({ onAsk }: { onAsk: (question: string) => void }) {
   const [photos, setPhotos] = useState<Record<string, string>>({});
   useEffect(() => {
     let cancelled = false;
-    for (const c of COLOURS) {
-      const g = findGrape(c.grape);
-      if (g)
-        fetchSummary(g.wiki).then((s) => {
-          if (!cancelled && s?.thumbnail) setPhotos((p) => ({ ...p, [c.grape]: s.thumbnail!.source }));
-        });
-    }
+    for (const c of CLASSES)
+      fetchSummary(c.wiki).then((s) => {
+        if (!cancelled && s?.thumbnail) setPhotos((p) => ({ ...p, [c.grape]: s.thumbnail!.source }));
+      });
     return () => {
       cancelled = true;
     };
@@ -35,7 +43,7 @@ export default function ColourCompare({ onAsk }: { onAsk: (question: string) => 
   return (
     <section className="card visual">
       <h2>🎨 “White” vs “black” grapes</h2>
-      <p className="muted small">Not just two kinds: they're two ends of a whole rainbow.</p>
+      <p className="muted small">Not just two kinds: they're two ends of a whole range.</p>
 
       <div className="vs">
         <figure>
@@ -73,41 +81,52 @@ export default function ColourCompare({ onAsk }: { onAsk: (question: string) => 
           <span>“white” (green) varieties</span>
         </div>
         <div>
-          <b>7</b>
-          <span>skin colours, from green to black</span>
+          <b>5</b>
+          <span>official skin colour classes</span>
         </div>
       </div>
 
-      <h3 className="swatch-title">One grape for every colour</h3>
-      <div className="swatches" role="list" aria-label="Grape skin colours, each with an example grape">
-        {COLOURS.map((c) => (
+      <h3 className="swatch-title">The 5 official skin colours</h3>
+      <p className="muted small">
+        Grape scientists sort every variety into one of five classes, using the French names from the international grape catalogue. Each
+        has a real example.
+      </p>
+      <div className="swatches" role="list" aria-label="The five official grape skin colour classes, each with an example grape">
+        {CLASSES.map((c) => (
           <button
-            key={c.name}
+            key={c.cls}
             role="listitem"
             className="swatch"
             style={{ ["--sw" as string]: c.hex }}
             onClick={() => onAsk(`Tell me about ${c.grape} grapes`)}
-            aria-label={`${c.name}: ${c.grape}. Ask Grape Bot about it`}
+            aria-label={`${c.cls} (${c.meaning}): for example ${c.grape}. Ask Grape Bot about it`}
           >
             <i>{photos[c.grape] && <img src={photos[c.grape]} alt="" />}</i>
-            <b>{c.name}</b>
-            <span>
-              {c.grape.replace("Gewürztraminer", "Gewürz­traminer")}
-              {c.note && <em> ({c.note})</em>}
-            </span>
+            <b>{c.cls}</b>
+            <span className="swatch-meaning">{c.meaning}</span>
+            <span>{c.grape.replace("Gewürztraminer", "Gewürz­traminer")}</span>
           </button>
         ))}
       </div>
+      <ul className="class-notes">
+        {CLASSES.map((c) => (
+          <li key={c.cls}>
+            <b>{c.cls}</b> ({c.meaning}): {c.note}.{c.also && <> Also: {c.also}.</>}{" "}
+            <a href={vivc(c.vivcId)} target="_blank" rel="noreferrer">
+              {c.grape} in VIVC
+            </a>
+          </li>
+        ))}
+      </ul>
       <p className="muted small">Tap a colour to ask Grape Bot about that grape.</p>
 
-      <p className="sources-line">
-        <a href={wikiUrl("Grape")} target="_blank" rel="noreferrer">
-          📖 Grape
-        </a>
-        <a href={wikiUrl("Vitis vinifera")} target="_blank" rel="noreferrer">
-          📖 Vitis vinifera
-        </a>
-      </p>
+      <SourceLine
+        ids={["vivc"]}
+        wiki={[
+          { label: "Grape", title: "Grape" },
+          { label: "Vitis vinifera", title: "Vitis vinifera" },
+        ]}
+      />
     </section>
   );
 }

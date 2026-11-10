@@ -36,7 +36,9 @@ for (const f of shapes) {
   const d = path(f);
   if (!d) continue;
   const data = iso3 && latest[iso3] && latest[iso3].year >= 2020 ? latest[iso3] : null;
-  out.push({ name: f.properties.name, d: round(d), t: data ? Math.round(data.tonnes / 1000) : 0 });
+  // y: the year of this country's figure, only when it is older than the world total's year.
+  const y = data && data.year !== +world[2] ? data.year : undefined;
+  out.push({ name: f.properties.name, d: round(d), t: data ? Math.round(data.tonnes / 1000) : 0, ...(y ? { y } : {}) });
 }
 
 mkdirSync(new URL("../src/data/", import.meta.url), { recursive: true });

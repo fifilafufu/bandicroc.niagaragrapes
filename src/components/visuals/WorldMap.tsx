@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { wikiUrl } from "../../../shared/grapes";
+import SourceLine from "../SourceLine";
 
 // "Where grapes grow" as a world map: each country coloured by how many grapes it grew.
 // The paths are pre-drawn by scripts/build-map.mjs (FAO data via Our World in Data) and loaded
 // only when this card is shown, so the rest of the app stays light.
 
-type Country = { name: string; d: string; t: number }; // t = thousand tonnes
+type Country = { name: string; d: string; t: number; y?: number }; // t = thousand tonnes; y = data year, if older than the map's
 type MapData = { width: number; height: number; year: number; worldKt: number; countries: Country[] };
 
 // Thousand tonnes. Darker purple = more grapes.
@@ -50,8 +50,8 @@ export default function WorldMap() {
         <span aria-hidden="true">🌍</span> Where they grow
       </h2>
       <p>
-        The world grew {data ? `${(data.worldKt / 1000).toFixed(1)} million tonnes` : "about 76 million tonnes"} of grapes in{" "}
-        {data?.year ?? 2024}. China grows the most by far, then Italy, Spain, the US and France. Tap a country to see its harvest.
+        FAO counted {data ? `${(data.worldKt / 1000).toFixed(1)} million tonnes` : "about 76 million tonnes"} of grapes grown in{" "}
+        {data?.year ?? 2024}. (OIV's estimate is 77.7: the two count slightly differently.) China grows the most by far, then Italy, Spain, the US and France. Tap a country to see its harvest.
       </p>
 
       {failed ? (
@@ -77,7 +77,7 @@ export default function WorldMap() {
                   onClick={() => setPicked(c.name)}
                   onMouseEnter={() => setPicked(c.name)}
                 >
-                  <title>{`${nice(c.name)}: ${c.t ? tonnes(c.t) : "few or no grapes"}`}</title>
+                  <title>{`${nice(c.name)}: ${c.t ? tonnes(c.t) : "few or no grapes"}${c.y ? ` (${c.y} data)` : ""}`}</title>
                 </path>
               );
             })}
@@ -89,7 +89,10 @@ export default function WorldMap() {
                 <b>{nice(current.name)}</b>{" "}
                 {current.t ? (
                   <>
-                    · {tonnes(current.t)} <span className="muted">(#{rank} in the world)</span>
+                    · {tonnes(current.t)}{" "}
+                    <span className="muted">
+                      (#{rank} in the world{current.y ? `, ${current.y} data` : ""})
+                    </span>
                   </>
                 ) : (
                   <span className="muted">· grows few or no grapes</span>
@@ -127,14 +130,7 @@ export default function WorldMap() {
         </>
       )}
 
-      <p className="sources-line">
-        <a href={wikiUrl("Grape")} target="_blank" rel="noreferrer">
-          📖 Grape: production
-        </a>
-        <a href="https://ourworldindata.org/grapher/grapes-production" target="_blank" rel="noreferrer">
-          📊 FAO data (Our World in Data)
-        </a>
-      </p>
+      <SourceLine ids={["fao-owid", "oiv-2024"]} />
     </article>
   );
 }

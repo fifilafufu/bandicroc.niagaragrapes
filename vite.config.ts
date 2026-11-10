@@ -16,9 +16,9 @@ export default defineConfig({
       includeAssets: ["favicon.svg", "favicon.ico", "apple-touch-icon-180x180.png"],
       manifest: {
         id: "/",
-        name: "Niagara Grapes",
+        name: "Grapes",
         short_name: "Grapes",
-        description: "All about Niagara grapes, with Grape Bot to chat with.",
+        description: "All about grapes: facts, charts and Grape Bot to chat with.",
         theme_color: "#5b8a2d",
         background_color: "#f7f5ec",
         display: "standalone",

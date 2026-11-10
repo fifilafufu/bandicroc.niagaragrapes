@@ -1,6 +1,6 @@
-# Niagara Grapes 🍇
+# Grapes 🍇
 
-A small installable web app (PWA) about Niagara grapes. It runs on Android, iPhone and Windows, in the browser or installed. It has:
+A small installable web app (PWA) about grapes in general. It runs on Android, iPhone and Windows, in the browser or installed. It has:
 
 - **Grape Bot:** an AI chatbot (Cloudflare Workers AI, free tier) that loves Niagara grapes.
 - **Login + favourite grape:** Supabase auth with a `favourites` table protected by **row-level security**. Your favourite syncs live to every device you're logged in on.

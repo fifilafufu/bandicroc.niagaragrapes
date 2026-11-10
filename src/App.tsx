@@ -81,9 +81,9 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <button className="brand-btn" onClick={() => setTab("home")} aria-label="Niagara Grapes home">
+        <button className="brand-btn" onClick={() => setTab("home")} aria-label="Grapes home">
           <img src="/favicon.svg" alt="" width={28} height={28} />
-          <span className="brand">Niagara Grapes</span>
+          <span className="brand">Grapes</span>
         </button>
         {auth.favourite && (
           <button className="fav-pill" onClick={() => setTab("mine")} aria-label={`Favourite grape: ${auth.favourite}`}>
@@ -145,7 +145,7 @@ export default function App() {
 
       {showTip && !installed && (
         <div className="tip" role="status">
-          <span>📲 Add Niagara Grapes to your home screen</span>
+          <span>📲 Add Grapes to your home screen</span>
           <button className="primary small-btn" onClick={openSheet}>
             How?
           </button>

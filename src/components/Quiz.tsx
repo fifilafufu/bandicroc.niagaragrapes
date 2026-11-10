@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { LEVELS, markSeen, newRound, scoreMessage, type Level } from "../lib/quiz";
-import { wikiUrl } from "../../shared/grapes";
+import SourceLine from "./SourceLine";
 
 export default function Quiz({ onExit }: { onExit: () => void }) {
   const [level, setLevel] = useState<Level | null>(null);
@@ -131,11 +131,7 @@ function Round(props: { level: Level; onExit: () => void; onLevels: () => void; 
             <p>
               <b>{picked === q.answer ? "Correct!" : "Not quite."}</b> {q.why}
             </p>
-            <p className="sources-line">
-              <a href={wikiUrl(q.wiki)} target="_blank" rel="noreferrer">
-                📖 {q.wiki}
-              </a>
-            </p>
+            <SourceLine ids={q.src ? [q.src] : []} wiki={[{ label: q.wiki, title: q.wiki }]} />
             <button className="primary" onClick={next}>
               {index + 1 === round.length ? "See my score" : "Next question"}
             </button>

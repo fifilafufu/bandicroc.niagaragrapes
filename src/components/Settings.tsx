@@ -74,7 +74,7 @@ export default function Settings({ user, onGetApp, theme, setTheme, onLoggedOut,
       </details>
 
       <p className="muted small center">
-        Niagara Grapes v{__APP_VERSION__} · facts from Wikipedia
+        Grapes v{__APP_VERSION__} · facts from OIV, VIVC, FAO and Wikipedia
       </p>
     </div>
   );
@@ -116,7 +116,7 @@ function ShareCard() {
   async function share() {
     try {
       if (canShare) {
-        await navigator.share({ title: "Niagara Grapes", text: "Learn about grapes and chat with Grape Bot 🍇", url: SITE });
+        await navigator.share({ title: "Grapes", text: "Learn about grapes and chat with Grape Bot 🍇", url: SITE });
       } else {
         await navigator.clipboard.writeText(SITE);
         setCopied(true);
