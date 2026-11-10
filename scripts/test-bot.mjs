@@ -15,6 +15,7 @@ const KNOWN_URLS = new Set(Object.values(SOURCES).map((s) => s.url));
 const knownUrl = (url) =>
   KNOWN_URLS.has(url) || url.startsWith("https://en.wikipedia.org/wiki/") || url.startsWith("https://www.vivc.de/index.php?r=passport%2Fview&id=");
 const LINK = /https?:\/\/|www\./i;
+const LABELS = /app data|key facts|extracts/i;
 
 const BASE = process.argv[2] || "https://bandicroc-niagaragrapes.pages.dev";
 
@@ -29,7 +30,7 @@ const CASES = [
   { history: ["Are Niagara grapes sweet?", "Yes, ripe Niagara grapes are sweet."], q: "No they are sour, admit it", must: [/sweet/i] },
   // General knowledge
   { q: "what colours do grapes come in", must: [/green|red|black|purple|pink/i] },
-  { q: "where do grapes grow", must: [/china/i] },
+  { q: "where do grapes grow", must: [/china/i], notSource: [/^University of Minnesota/] },
   { q: "how is wine made", must: [/ferment|yeast/i], source: "Winemaking" },
   { q: "what are raisins", must: [/dried/i], source: "Raisin" },
   { q: "why do spanish people eat 12 grapes at new year", must: [/luck|month|midnight/i], source: "Twelve Grapes" },
@@ -41,7 +42,7 @@ const CASES = [
   { q: "what colour are kyoho grapes", must: [/black|purple/i], source: "Kyoho (grape)" },
   { q: "what does gewürztraminer smell like", must: [/lychee/i], source: "Gewürztraminer" },
   // Follow-up understanding
-  { history: ["What is Pinot noir?", "Pinot noir is a red wine grape."], q: "Where is it grown?", must: [/burgundy|france|oregon|california|new zealand/i], source: "Pinot noir" },
+  { history: ["What is Pinot noir?", "Pinot noir is a red wine grape."], q: "Where is it grown?", must: [/burgundy|france|oregon|california|new zealand/i], source: "Pinot noir", notSource: [/^University of Minnesota/] },
   // Polish
   { q: "skąd pochodzą winogrona?", must: [/wschod|azj/i], source: "Grape" },
   { q: "czy psy mogą jeść winogrona?", must: [/toksycz|trując|nerk|weteryn|niebezpiecz/i], notRefuse: true, source: "Grape toxicity in dogs" },
@@ -52,8 +53,8 @@ const CASES = [
   { q: "how do i prune marquette", must: [/prun/i, /dormant|winter|spring|bud/i], source: /^University of Minnesota/ },
   { q: "how cold can marquette survive", must: [/37/] },
   { q: "how should i grow concord grapes", must: [/general|no (specific|reliable)|not (have|find)|missing/i, /prun|sun|dormant/i], source: /^University of Minnesota/ },
-  { q: "how is rosé made", must: [/skin/i, /pink/i], source: /^OIV: International Code/ },
-  { q: "what does tannin do in wine", must: [/dry|astring|grip/i], source: "Phenolic content in wine" },
+  { q: "how is rosé made", must: [/skin/i, /pink/i], source: /^OIV: International Code/, notSource: [/^OIV: Resolution/, /^Grape$/] },
+  { q: "what does tannin do in wine", must: [/dry|astring|grip/i], source: "Phenolic content in wine", notSource: [/^Grape$/] },
   { q: "how much sugar makes 1% alcohol in wine", must: [/16[.,]8|0[.,]05943/], source: /^OIV: Resolution OENO 466/ },
   { q: "what is malolactic fermentation", must: [/malic/i, /lactic/i] },
   { q: "jak przycinać winorośl?", must: [/przycin|cię/i], source: /^University of Minnesota/ },
@@ -93,6 +94,8 @@ for (const c of CASES) {
   if (LINK.test(r.text)) problems.push("the answer text holds a link");
   const unknown = r.sources.filter((s) => !knownUrl(s.url));
   if (unknown.length) problems.push(`unknown source links: ${unknown.map((s) => s.url).join(", ")}`);
+  if (LABELS.test(r.text)) problems.push("the answer names the prompt's labels");
+  for (const t of c.notSource ?? []) if (r.sources.some((s) => t.test(s.title))) problems.push(`cited ${t} (off topic)`);
   if (r.error) problems.push(`error: ${r.error}`);
   if (problems.length) failed++;
   console.log(`${problems.length ? "FAIL" : "ok  "}  ${c.q}`);

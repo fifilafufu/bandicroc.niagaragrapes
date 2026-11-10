@@ -19,7 +19,8 @@ const wikiChip = (title: string): Chip => ({ title, url: wikiUrl(title) });
 const any = (text: string, words: string[]) => words.some((w) => mentions(text, w));
 
 // Words that show what a question is about (English and Polish word starts).
-const GROWING = ["grow", "plant", "prune", "pruning", "trellis", "frost", "winter", "cold", "hardy", "hardiness", "disease", "mildew", "rot", "garden", "rootstock", "phylloxera", "care", "vigour", "vigor", "ripen", "upraw", "sadz", "przycin", "mróz", "mroz", "zim", "chorob", "mączniak", "ogród", "ogrod", "podkład", "filoksera"];
+// Not plain "grow": "where do grapes grow" and "where is it grown" are about places, not gardening.
+const GROWING = ["how to grow", "how do i grow", "how should i grow", "how can i grow", "i grow", "growing", "plant", "prune", "pruning", "trellis", "frost", "winter", "cold", "hardy", "hardiness", "disease", "mildew", "rot", "garden", "rootstock", "phylloxera", "care", "vigour", "vigor", "ripen", "upraw", "sadz", "przycin", "mróz", "mroz", "zim", "chorob", "mączniak", "ogród", "ogrod", "podkład", "filoksera"];
 const ABOUT = ["what is", "what are", "tell me about", "co to", "opowiedz", "czym jest"];
 const PASSPORT = ["parent", "bred", "cross", "origin", "come from", "species", "hybrid", "colour", "color", "vivc", "rodzic", "skrzyżow", "pochodz", "gatun", "kolor", "mieszańc"];
 const MADE = ["made", "make", "making", "process", "produce", "steps", "robi", "powstaj", "produk", "wytwarza"];
@@ -118,10 +119,9 @@ function winemakingNotes(text: string, out: Knowledge) {
   for (const s of styles.length ? styles : general ? STYLES : []) {
     const list = s.steps.map((st) => `${STEPS[st.id].name}${st.note ? ` (${st.note})` : ""}${st.sometimes ? " [sometimes]" : ""}`);
     out.notes.push(`${s.name} wine: ${s.blurb} Steps in order: ${list.join(" → ")}.`);
-    // A style is cited by its data sources (e.g. the OIV code) and the Winemaking article.
-    if (styles.length) s.steps.forEach((st) => STEPS[st.id].src?.forEach((id) => out.chips.push(sourceChip(id))));
   }
-  if (styles.length) out.chips.push(wikiChip("Winemaking"));
+  // A style is cited by the OIV code (its step wording) and the Winemaking article.
+  if (styles.length) out.chips.push(sourceChip("oiv-code"), wikiChip("Winemaking"));
   for (const id of steps) {
     out.notes.push(`${STEPS[id].name}: ${STEPS[id].what} Why: ${STEPS[id].why}`);
     stepChips(id, out);

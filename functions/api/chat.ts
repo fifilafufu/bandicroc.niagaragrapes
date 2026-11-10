@@ -12,7 +12,7 @@
 //
 // The work is split into modules in server/grapeBot/; this file only handles the request.
 
-import { findGrapeByWiki } from "../../shared/grapes";
+import { GENERAL_GRAPE_ARTICLE, findGrapeByWiki } from "../../shared/grapes";
 import { SOURCES } from "../../shared/sources";
 import { pickJoke, wantsJoke } from "../../shared/jokes";
 import { fetchArticle, pickArticles } from "../../server/grapeBot/articles";
@@ -40,20 +40,23 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   if (!parsed) return json({ error: "Invalid messages" }, 400);
 
   const picked = pickArticles(parsed.messages, parsed.favourite);
-  const articles = (await Promise.all(picked.titles.map((t) => fetchArticle(t, ctx).catch(() => null)))).filter(
-    (a): a is Article => a !== null,
-  );
+  const appData = curatedKnowledge(picked.latest, picked.grapes);
+  // The general "Grape" article is only a fallback: skip it (and its OIV chip) when the app data answers.
+  const general = picked.titles.length === 1 && picked.titles[0] === GENERAL_GRAPE_ARTICLE;
+  const skipGeneral = general && appData.notes.length > 0;
+  const articles = skipGeneral
+    ? []
+    : (await Promise.all(picked.titles.map((t) => fetchArticle(t, ctx).catch(() => null)))).filter((a): a is Article => a !== null);
   // Asked for a joke: pick one from the hand-written bank that this device hasn't heard yet.
   const polish = isPolish(picked.latest);
   const joke = wantsJoke(picked.latest) ? pickJoke(polish ? "pl" : "en", parsed.seenJokes) : null;
-  const appData = curatedKnowledge(picked.latest, picked.grapes);
   const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles, appData.notes, joke) }, ...parsed.messages];
 
   // Source links: the Wikipedia articles read, the app data used, and the OIV figures for general questions.
   const chips: Chip[] = [
     ...appData.chips,
     ...articles.map(({ title, url }) => ({ title, url })),
-    ...(picked.titles.some((t) => findGrapeByWiki(t) !== null) ? [] : [{ title: "OIV: grapes in 2024", url: SOURCES["oiv-2024"].url, data: true }]),
+    ...(skipGeneral || picked.titles.some((t) => findGrapeByWiki(t) !== null) ? [] : [{ title: "OIV: grapes in 2024", url: SOURCES["oiv-2024"].url, data: true }]),
   ];
 
   const meta = {
