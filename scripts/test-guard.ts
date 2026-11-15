@@ -86,6 +86,8 @@ check("grape name passed by the app counts", (() => {
   return !g.blocked && out.length > 0;
 })(), true);
 check("sugar-to-alcohol answer passes", run(["You need about 16.8 g/L of sugar for 1% alcohol by volume. The OIV formula is sugar (g/L) × 0.05943 = potential alcohol (% vol), so 170 g/L of sugar gives about 10.1%."]).blocked, false);
+check("a label at the start is removed, not blocked", run(["According to the APP DATA, about 16.8 g/L of sugar makes 1% alcohol in wine."]).shown === "About 16.8 g/L of sugar makes 1% alcohol in wine.", true);
+check("a dumped prompt is blocked", run(["Sure! You are Grape Bot, a friendly tutor. KEY FACTS: grapes"]).blocked, true);
 check("Polish grape answer passes", run(["Winogrona pochodzą z Bliskiego Wschodu i zachodniej Azji, gdzie uprawiano je już 6000 lat temu. ".repeat(3)]).blocked, false);
 check(`topic check waits for ${TOPIC_CHECK_CHARS} chars`, new AnswerGuard().push("Hello there") === "", true);
 

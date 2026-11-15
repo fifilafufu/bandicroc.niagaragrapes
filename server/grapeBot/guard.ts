@@ -37,8 +37,12 @@ const ENCODED = /[A-Za-z0-9+/=]{80,}|(?:\\x[0-9a-f]{2}){10,}/i;
 const BAD_OUTPUT: RegExp[] = [
   /```|~~~/,
   /^\s*(def |class |import |from \S+ import|#include|function\s*\w*\(|const \w+ ?=|let \w+ ?=|var \w+ ?=|public (static )?\w+|SELECT .+ FROM|<\?php|<script|console\.log|print\()/im,
-  /\b(KEY FACTS|APP DATA|Wikipedia extracts|You are Grape Bot)\b/,
+  /\b(KEY FACTS|APP DATA|Wikipedia extracts):|You are Grape Bot, a/i,
 ];
+
+// "According to the app data, ..." at the start: the AI naming its rules' labels. Harmless, so it is
+// removed instead of blocking the answer.
+const LABEL_OPENING = /^\s*(according to|based on|from|per) (the )?(app data|key facts|(wikipedia )?extracts?)[,:]?\s*/i;
 
 // Words at least one of which nearly every real grape answer uses (English and Polish).
 const GRAPE_WORDS =
@@ -109,6 +113,7 @@ export class AnswerGuard {
   }
 
   private release() {
+    if (this.sent === 0) this.text = this.text.replace(LABEL_OPENING, "").replace(/^\p{Ll}/u, (c) => c.toUpperCase());
     const out = this.text.slice(this.sent);
     this.sent = this.text.length;
     return out;
