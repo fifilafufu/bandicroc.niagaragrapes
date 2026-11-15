@@ -87,6 +87,8 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           if (photos.length) patchLast(gen, (m) => ({ ...m, photos }));
         } else if (ev.type === "text" || ev.type === "error") {
           patchLast(gen, (m) => ({ ...m, content: m.content + (ev.text ?? "") }));
+        } else if (ev.type === "replace") {
+          patchLast(gen, (m) => ({ ...m, content: ev.text ?? "", sources: ev.sources ?? [], photos: undefined }));
         }
       }
       patchLast(gen, (m) => ({ ...m, pending: false, content: m.content.trim() || t("chat.wrong") }));

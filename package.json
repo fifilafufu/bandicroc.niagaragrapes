@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "deploy": "npm run build && wrangler pages deploy dist",
     "test:bot": "node scripts/test-bot.mjs",
-    "test:wine": "node scripts/test-wine.ts"
+    "test:wine": "node scripts/test-wine.ts",
+    "test:guard": "node scripts/test-guard.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",

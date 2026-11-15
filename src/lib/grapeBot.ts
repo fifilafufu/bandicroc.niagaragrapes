@@ -6,11 +6,12 @@ import type { Lang } from "../../shared/i18n";
 
 // Talking to Grape Bot's server function (functions/api/chat.ts). The reply streams as one JSON
 // object per line: a "meta" event (sources, follow-ups, grapes, joke), then "text" pieces, then
-// "done" or "error". The chat screen only displays what this module hands it.
+// "done" or "error" ("replace" takes back an answer the server's guard stopped). The chat screen only displays what this module hands it.
 
 export type BotEvent =
   | { type: "meta"; sources?: Msg["sources"]; followUps?: string[]; grapes?: string[]; joke?: string | null }
   | { type: "text" | "error"; text?: string }
+  | { type: "replace"; text?: string; sources?: Msg["sources"] }
   | { type: "done"; model?: string };
 
 // Jokes this device has heard, so Grape Bot tells a new one each time (see shared/jokes.ts).

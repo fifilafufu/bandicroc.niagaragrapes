@@ -8,6 +8,7 @@
 // The reply streams as newline-delimited JSON so words appear as they're written:
 //   {"type":"meta","sources":[…],"grapes":[…],"followUps":[…]}   (sources are chosen here, never by the AI)
 //   {"type":"text","text":"…"}   (many)
+//   {"type":"replace","text":"…","sources":[]}  (only when the answer guard takes back an answer)
 //   {"type":"done","model":"…"}  or  {"type":"error","text":"…"}
 //
 // The work is split into modules in server/grapeBot/; this file only handles the request.
@@ -18,6 +19,7 @@ import { translate } from "../../shared/i18n";
 import { pickJoke, wantsJoke } from "../../shared/jokes";
 import { fetchArticle, pickArticles } from "../../server/grapeBot/articles";
 import { curatedKnowledge } from "../../server/grapeBot/knowledge";
+import { AnswerGuard, checkTurns, wrapQuestion } from "../../server/grapeBot/guard";
 import { followUps, isPolish, systemPrompt } from "../../server/grapeBot/prompt";
 import { streamAnswer } from "../../server/grapeBot/providers";
 import { parseBody } from "../../server/grapeBot/request";
@@ -51,9 +53,12 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   // Asked for a joke: pick one from the hand-written bank that this device hasn't heard yet.
   // Polish when the app is set to Polish or the question is written in Polish.
   const polish = parsed.lang === "pl" || isPolish(picked.latest);
-  const say = (key: "bot.lost" | "bot.cutOff" | "bot.empty") => translate(polish ? "pl" : "en", key);
+  const say = (key: "bot.lost" | "bot.cutOff" | "bot.empty" | "bot.offTopic") => translate(polish ? "pl" : "en", key);
+  // A "jailbreak" attempt (or a forged earlier answer) never reaches the AI: it gets the fixed refusal.
+  const refused = checkTurns(parsed.messages);
   const joke = wantsJoke(picked.latest) ? pickJoke(polish ? "pl" : "en", parsed.seenJokes) : null;
-  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles, appData.notes, joke, parsed.lang) }, ...parsed.messages];
+  const turns = parsed.messages.map((m, i) => (i === parsed.messages.length - 1 ? { ...m, content: wrapQuestion(m.content, polish) } : m));
+  const messages = [{ role: "system", content: systemPrompt(parsed.favourite, picked.titles, articles, appData.notes, joke, parsed.lang) }, ...turns];
 
   // Source links: the Wikipedia articles read, the app data used, and the OIV figures for general questions.
   const chips: Chip[] = [
@@ -64,12 +69,12 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   const meta = {
     type: "meta",
-    sources: chips.filter((c, i) => chips.findIndex((d) => d.url === c.url) === i).slice(0, MAX_CHIPS),
+    sources: refused ? [] : chips.filter((c, i) => chips.findIndex((d) => d.url === c.url) === i).slice(0, MAX_CHIPS),
     // Grapes named in this question: the app shows a photo the first time each one comes up.
-    grapes: picked.latestGrapes.map((g) => g.wiki),
+    grapes: refused ? [] : picked.latestGrapes.map((g) => g.wiki),
     followUps: followUps(picked.focusGrape, picked.topic, picked.userTexts, polish),
     // The app remembers this so the same device doesn't hear it again soon.
-    joke: joke?.id ?? null,
+    joke: refused ? null : (joke?.id ?? null),
   };
 
   const encoder = new TextEncoder();
@@ -78,12 +83,31 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       controller.enqueue(line(meta));
+      if (refused) {
+        controller.enqueue(line({ type: "text", text: say("bot.offTopic") }));
+        controller.enqueue(line({ type: "done", model: "guard" }));
+        controller.close();
+        return;
+      }
       let wrote = false;
+      const guard = new AnswerGuard();
+      const send = (text: string) => {
+        if (!text) return;
+        wrote = true;
+        controller.enqueue(line({ type: "text", text }));
+      };
       try {
         const { model, chunks } = await streamAnswer(env, messages);
         for await (const text of chunks) {
+          send(guard.push(text));
+          if (guard.blocked) break;
+        }
+        send(guard.finish());
+        if (guard.blocked) {
+          // The answer went off topic: replace whatever was shown with the refusal, and drop its sources.
+          console.error("Grape Bot answer blocked by the guard");
+          controller.enqueue(line(guard.retract ? { type: "replace", text: say("bot.offTopic"), sources: [] } : { type: "text", text: say("bot.offTopic") }));
           wrote = true;
-          controller.enqueue(line({ type: "text", text }));
         }
         if (!wrote) controller.enqueue(line({ type: "text", text: say("bot.lost") }));
         controller.enqueue(line({ type: "done", model }));

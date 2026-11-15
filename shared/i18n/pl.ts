@@ -216,6 +216,7 @@ export const PL: Partial<Record<TextKey, string>> = {
   "chat.s4": "Jaka jest moja ulubiona odmiana?",
   "bot.lost": "Hmm, zgubiłem wątek. Zapytasz jeszcze raz? 🍇",
   "bot.cutOff": " …(Coś mi przerwało. Zapytaj jeszcze raz.)",
+  "bot.offTopic": "Zajmuję się tylko winogronami, więc w tym nie pomogę. Zapytaj mnie o winogrona, winorośl albo wino! 🍇",
   "bot.empty": "Na razie skończył mi się sok winogronowy (darmowy limit AI mógł się wyczerpać). Spróbuj później! 🍇",
   "src.checked": "{title} ({year}). Sprawdzono {date}.",
   "col.title": "🎨 „Białe” i „czarne” winogrona",

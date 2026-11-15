@@ -60,14 +60,14 @@ SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe 
 | `shared/quiz/` | quiz questions: hand-written (`bank.ts`, `numbers.ts`) and built from the data files above (`fromVarieties.ts`, `fromPages.ts`), each with its source |
 | `src/data/worldMap.json` | FAO production per country (built by `scripts/build-map.mjs`) |
 
-Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape Bot runs on Cloudflare Workers AI (Meta Llama models, through the `AI` binding: no key), trying the next model in `server/grapeBot/settings.ts` if one fails. When every Workers AI model fails (e.g. the free daily allowance is used up), it switches automatically to an OpenRouter free model, if the `OPENROUTER_API_KEY` secret is set in Cloudflare.
+Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape Bot runs on Cloudflare Workers AI (Meta Llama models, through the `AI` binding: no key), trying the next model in `server/grapeBot/settings.ts` if one fails. When every Workers AI model fails (e.g. the free daily allowance is used up), it switches automatically to an OpenRouter free model, if the `OPENROUTER_API_KEY` secret is set in Cloudflare. Grape Bot only talks about grapes: `server/grapeBot/guard.ts` answers "jailbreak" attempts (and forged earlier answers) with a fixed refusal without calling the AI, repeats the rules after each question, and replaces any answer that turns into code, leaks the rules or never mentions grapes.
 
 ## Code structure
 
 | Folder | Role | May import |
 |---|---|---|
 | `functions/` | Backend entry points: Cloudflare Pages Functions (each file is a web address, e.g. `/api/chat`) | `server/`, `shared/` |
-| `server/` | Backend modules (Grape Bot: request, articles, prompt, AI providers) | `shared/` |
+| `server/` | Backend modules (Grape Bot: request, articles, prompt, AI providers, jailbreak guard) | `shared/` |
 | `src/components/` | Frontend screens: drawing and taps only | `src/lib/`, `shared/` |
 | `src/lib/` | Frontend data layer: account (`account.ts`), Grape Bot client (`grapeBot.ts`), synced lists (`useSyncedList.ts`), routing, device storage, hooks | `shared/` |
 | `src/styles/` | Styles, one file per feature | none |

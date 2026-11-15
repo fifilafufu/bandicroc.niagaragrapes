@@ -224,6 +224,7 @@ export const EN = {
   "chat.s4": "What's my favourite grape?",
   "bot.lost": "Hmm, I lost my train of thought. Ask me again? 🍇",
   "bot.cutOff": " …(I got cut off. Try asking again.)",
+  "bot.offTopic": "I only know about grapes, so that's one I can't help with. Ask me anything about grapes, vines or wine! 🍇",
   "bot.empty": "I'm all out of grape juice for now (the free AI limit may be used up). Try again later! 🍇",
   "src.checked": "{title} ({year}). Checked {date}.",
   "col.title": "🎨 “White” vs “black” grapes",
