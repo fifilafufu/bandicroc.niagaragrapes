@@ -42,7 +42,7 @@ const BAD_OUTPUT: RegExp[] = [
 
 // Words at least one of which nearly every real grape answer uses (English and Polish).
 const GRAPE_WORDS =
-  /grape|vine|vitis|wine|winery|vintner|raisin|sultana|currant|juice|berr|vineyard|viticult|ferment|tannin|harvest|ripe|niagara|concord|dionysus|bacchus|winogr|winor|wino|win[aeiouy]\b|wini|rodzyn|sok\w*|jagod|winnic|fermentac|dojrz|zbior|grona?\b|mildew|botrytis|phylloxer|rootstock|prun|hardi|cordon|trellis|cluster|oenolog|sommelier|mączniak|przycin|podkład|filokser|mrozoodporn/i;
+  /grape|vine|vitis|wine|winery|vintner|raisin|sultana|currant|juice|berr|vineyard|viticult|ferment|tannin|harvest|ripe|niagara|concord|dionysus|bacchus|winogr|winor|wino|win[aeiouy]\b|wini|rodzyn|sok\w*|jagod|winnic|fermentac|dojrz|zbior|grona?\b|mildew|botrytis|phylloxer|rootstock|prun|hardi|cordon|trellis|cluster|oenolog|sommelier|mączniak|przycin|podkład|filokser|mrozoodporn|alcohol|alkohol|yeast|drożdż|moszcz|\bmust\b|\boiv\b|\bvivc\b/i;
 
 // How much of an answer is held back before the topic check (shorter answers are checked whole).
 export const TOPIC_CHECK_CHARS = 200;

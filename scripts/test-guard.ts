@@ -85,6 +85,7 @@ check("grape name passed by the app counts", (() => {
   const out = g.push("Marquette can survive down to about -37 °C when fully dormant, which makes it one of the hardiest choices for cold places with long, harsh seasons and short summers.") + g.finish();
   return !g.blocked && out.length > 0;
 })(), true);
+check("sugar-to-alcohol answer passes", run(["You need about 16.8 g/L of sugar for 1% alcohol by volume. The OIV formula is sugar (g/L) × 0.05943 = potential alcohol (% vol), so 170 g/L of sugar gives about 10.1%."]).blocked, false);
 check("Polish grape answer passes", run(["Winogrona pochodzą z Bliskiego Wschodu i zachodniej Azji, gdzie uprawiano je już 6000 lat temu. ".repeat(3)]).blocked, false);
 check(`topic check waits for ${TOPIC_CHECK_CHARS} chars`, new AnswerGuard().push("Hello there") === "", true);
 

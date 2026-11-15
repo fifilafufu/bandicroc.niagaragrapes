@@ -15,7 +15,7 @@ const KNOWN_URLS = new Set(Object.values(SOURCES).map((s) => s.url));
 const knownUrl = (url) =>
   KNOWN_URLS.has(url) || url.startsWith("https://en.wikipedia.org/wiki/") || url.startsWith("https://www.vivc.de/index.php?r=passport%2Fview&id=");
 const LINK = /https?:\/\/|www\./i;
-const LABELS = /app data|key facts|extracts/i;
+const LABELS = /app data|key facts|wikipedia extracts|the extracts/i;
 
 const BASE = process.argv[2] || "https://bandicroc-niagaragrapes.pages.dev";
 
