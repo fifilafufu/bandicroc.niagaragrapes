@@ -76,7 +76,7 @@ async function ask(c) {
   messages.push({ role: "user", content: c.q });
   const res = await fetch(`${BASE}/api/chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Origin: new URL(BASE).origin },
     body: JSON.stringify({ messages }),
   });
   const out = { text: "", sources: [], followUps: [], grapes: [], error: null };

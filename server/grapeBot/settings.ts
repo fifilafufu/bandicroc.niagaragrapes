@@ -15,6 +15,7 @@ export type Chip = { title: string; url: string; data?: boolean };
 
 export const MAX_TURNS = 6;
 export const MAX_CHARS = 500;
+export const MAX_BODY_BYTES = 64 * 1024; // a full 40-message chat is well under this
 export const MAX_ARTICLES = 2;
 export const MAX_ARTICLE_CHARS = 1500;
 export const MAX_ANSWER_TOKENS = 300;

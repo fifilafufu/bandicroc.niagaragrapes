@@ -1,8 +1,29 @@
 // Reading and checking what the app sent to /api/chat.
 
 import { findGrape } from "../../shared/grapes";
-import { MAX_CHARS, MAX_TURNS, type Turn } from "./settings";
+import { MAX_BODY_BYTES, MAX_CHARS, MAX_TURNS, type Turn } from "./settings";
 import type { Lang } from "../../shared/i18n";
+
+// Only the app itself may call the bot: browsers always send Origin on a POST, and other websites
+// can't fake it. (A script can, so this stops other sites, not determined abusers.)
+// Local dev (`npm run dev:api` behind the Vite proxy on another port) is let through.
+export function fromOwnSite(request: Request): boolean {
+  const own = new URL(request.url);
+  if (own.hostname === "localhost" || own.hostname === "127.0.0.1") return true;
+  return request.headers.get("Origin") === own.origin;
+}
+
+// Reads the JSON body, refusing anything bigger than MAX_BODY_BYTES. Returns undefined if too big or not JSON.
+export async function readBody(request: Request): Promise<unknown> {
+  if (Number(request.headers.get("Content-Length") ?? 0) > MAX_BODY_BYTES) return undefined;
+  const text = await request.text();
+  if (text.length > MAX_BODY_BYTES) return undefined;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
+}
 
 export function parseBody(body: unknown): { messages: Turn[]; favourite: string | null; seenJokes: string[]; lang: Lang } | null {
   if (!body || typeof body !== "object") return null;

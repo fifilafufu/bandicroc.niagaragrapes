@@ -22,7 +22,7 @@ import { curatedKnowledge } from "../../server/grapeBot/knowledge";
 import { AnswerGuard, checkTurns, wrapQuestion } from "../../server/grapeBot/guard";
 import { followUps, isPolish, systemPrompt } from "../../server/grapeBot/prompt";
 import { streamAnswer } from "../../server/grapeBot/providers";
-import { parseBody } from "../../server/grapeBot/request";
+import { fromOwnSite, parseBody, readBody } from "../../server/grapeBot/request";
 import { MAX_CHIPS, type Article, type Chip, type Env } from "../../server/grapeBot/settings";
 
 const json = (data: unknown, status = 200) =>
@@ -36,12 +36,9 @@ const ON_TOPIC_WORDS = [...GRAPES, ...TOPICS].flatMap((x) => x.keywords).filter(
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const { request, env } = ctx;
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return json({ error: "Invalid JSON" }, 400);
-  }
+  if (!fromOwnSite(request)) return json({ error: "Not allowed" }, 403);
+  const body = await readBody(request);
+  if (body === undefined) return json({ error: "Invalid request" }, 400);
   const parsed = parseBody(body);
   if (!parsed) return json({ error: "Invalid messages" }, 400);
 
