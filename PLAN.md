@@ -63,8 +63,9 @@ Rules for every step: numbers, units and sources stay exactly as in English; gra
 
 - [x] **Jailbreak guard.** `server/grapeBot/guard.ts`: rule-changing questions and forged earlier answers get a fixed refusal without the AI; rules repeated after each question; answers checked while streaming.
   - Done when: `npm run test:guard` passes; `npm run test:bot` passes against the live site (38/38 on 2026-11-15).
-- [ ] **Same-site check and size cap.** `/api/chat` answers only the app's own site and refuses bodies over 64 KB.
+- [x] **Same-site check and size cap.** `/api/chat` answers only the app's own site and refuses bodies over 64 KB.
   - Done when: live, the app's chat still works and a request with another site's Origin gets 403.
+  - Checked live on 2026-11-15: the app's own requests work; another site's Origin and no Origin get 403; a 70 KB body gets 400.
 - [ ] **Grape juice.** Same daily allowance for everyone (about 50 answers), counted per scrambled internet address in Cloudflare D1; small talk free; meter in the chat; friendly message when empty.
   - Done when: the user has created the D1 database and its id is in `wrangler.toml`; live, the meter appears after an answer and drops about 2% per answer; "ok" or "thanks" gets an instant reply and doesn't change it.
 - Later, only if needed: seal the bot's answers so forged chat history is ignored (needs a Cloudflare secret and a `chat_history` column); Llama Guard safety check (costs AI allowance).
