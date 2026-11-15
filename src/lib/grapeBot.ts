@@ -12,7 +12,7 @@ export type BotEvent =
   | { type: "meta"; sources?: Msg["sources"]; followUps?: string[]; grapes?: string[]; joke?: string | null }
   | { type: "text" | "error"; text?: string }
   | { type: "replace"; text?: string; sources?: Msg["sources"] }
-  | { type: "done"; model?: string };
+  | { type: "done"; model?: string; juice?: number | null };
 
 // Jokes this device has heard, so Grape Bot tells a new one each time (see shared/jokes.ts).
 const JOKES_KEY = "jokes-heard";
@@ -27,6 +27,18 @@ function heardJokes(): string[] {
 export function rememberJoke(id: string) {
   const heard = heardJokes().filter((j) => j !== id);
   writePref(JOKES_KEY, JSON.stringify([...heard, id].slice(-60)));
+}
+
+// Today's grape juice (Grape Bot's daily allowance, % left), as last reported by the server, so the
+// meter shows again after a reload. Only kept for the day it was reported.
+const JUICE_KEY = "grape-juice";
+const today = () => new Date().toISOString().slice(0, 10);
+export function savedJuice(): number | null {
+  const [day, left] = (readPref(JUICE_KEY) ?? "").split("|");
+  return day === today() && left !== "" && !Number.isNaN(Number(left)) ? Number(left) : null;
+}
+export function saveJuice(left: number) {
+  writePref(JUICE_KEY, `${today()}|${left}`);
 }
 
 // Ask Grape Bot. Yields events as they arrive; throws if the server can't be reached.

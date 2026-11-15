@@ -45,7 +45,15 @@ Layout rules: the Grapes/Games button row stays pinned while scrolling; the titl
 
 SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe to run again).
 
-**On the device only** (localStorage): theme, language, dismissed tips, quiz questions already seen, jokes heard, and a guest's quiz scores and saved wines (moved to the account at login).
+**In Cloudflare D1** (server only, bound as `DB`; nobody can read or change it from the browser):
+
+| Table | What | Kept |
+|---|---|---|
+| `grape_juice` | Grape Bot's daily allowance: day, a scrambled internet address (SHA-256 of day + address, IPv6 by its /64 block; the address itself is never stored), drops used | today only; older rows are deleted |
+
+The table creates itself on first use. Without the `DB` binding the bot has no daily limit.
+
+**On the device only** (localStorage): theme, language, dismissed tips, quiz questions already seen, jokes heard, today's grape juice (for the meter), and a guest's quiz scores and saved wines (moved to the account at login).
 
 **In the repo** (curated, versioned, works offline):
 
@@ -60,7 +68,7 @@ SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe 
 | `shared/quiz/` | quiz questions: hand-written (`bank.ts`, `numbers.ts`) and built from the data files above (`fromVarieties.ts`, `fromPages.ts`), each with its source |
 | `src/data/worldMap.json` | FAO production per country (built by `scripts/build-map.mjs`) |
 
-Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape Bot runs on Cloudflare Workers AI (Meta Llama models, through the `AI` binding: no key), trying the next model in `server/grapeBot/settings.ts` if one fails. When every Workers AI model fails (e.g. the free daily allowance is used up), it switches automatically to an OpenRouter free model, if the `OPENROUTER_API_KEY` secret is set in Cloudflare. Grape Bot only talks about grapes: `server/grapeBot/guard.ts` answers "jailbreak" attempts (and forged earlier answers) with a fixed refusal without calling the AI, repeats the rules after each question, and replaces any answer that turns into code, leaks the rules or never mentions grapes.
+Live from the internet: Wikipedia summaries (Grape Bot and grape cards). Grape Bot runs on Cloudflare Workers AI (Meta Llama models, through the `AI` binding: no key), trying the next model in `server/grapeBot/settings.ts` if one fails. When every Workers AI model fails (e.g. the free daily allowance is used up), it switches automatically to an OpenRouter free model, if the `OPENROUTER_API_KEY` secret is set in Cloudflare. Grape Bot only talks about grapes: `server/grapeBot/guard.ts` answers "jailbreak" attempts (and forged earlier answers) with a fixed refusal without calling the AI, repeats the rules after each question, and replaces any answer that turns into code, leaks the rules or never mentions grapes. `/api/chat` only answers requests from the app's own site (Origin check) and refuses bodies over 64 KB. **Grape juice:** everyone, logged in or not, gets the same daily allowance of 500 drops (about 50 answers); an AI answer costs 4 drops plus 1 per 100 characters written (at most 12), while small talk ("ok", "thanks", "hi", "bye", in English and Polish), refusals and an empty meter are answered without the AI and cost nothing. The chat shows a meter with the share left today.
 
 ## Code structure
 

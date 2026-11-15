@@ -6,6 +6,8 @@ export interface Env {
   WORKERS_AI_MODEL?: string;
   OPENROUTER_MODEL?: string;
   OPENROUTER_API_KEY?: string;
+  // Free Cloudflare D1 database holding each visitor's daily grape juice. Without it there is no limit.
+  DB?: D1Database;
 }
 
 export type Turn = { role: "user" | "assistant"; content: string };
@@ -21,6 +23,12 @@ export const MAX_ARTICLE_CHARS = 1500;
 export const MAX_ANSWER_TOKENS = 300;
 export const MAX_DATA_GRAPES = 2; // grapes whose app data goes into one prompt
 export const MAX_CHIPS = 6; // source links under one answer
+// Grape juice: everyone's daily Grape Bot allowance, in drops. An AI answer costs JUICE_BASE drops
+// (the prompt) plus 1 drop per 100 characters written (at most JUICE_MAX_ANSWER), so a typical
+// answer costs about 10 and a day holds about 50. Small talk and refusals cost nothing.
+export const JUICE_PER_DAY = 500;
+export const JUICE_BASE = 4;
+export const JUICE_MAX_ANSWER = 12;
 export const WIKI_CACHE_SECONDS = 60 * 60 * 24;
 export const USER_AGENT = "bandicroc-niagaragrapes/1.0 (https://bandicroc-niagaragrapes.pages.dev)";
 

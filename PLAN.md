@@ -59,6 +59,16 @@ Rules for every step: numbers, units and sources stay exactly as in English; gra
   - Progress (2026-11-10): greeting, starter questions, buttons and error messages are in Polish; the app sends the chosen language and the server answers, suggests follow-ups and reports errors in it. Left: the Polish-speaker read-through.
   - Checked Polish terms (Polish Wikipedia, via each English article's Polish link): winorośl właściwa, winorośl lisia, winiarstwo, fermentacja jabłkowo-mlekowa, wino musujące, wino różowe, mączniak rzekomy, gronowiec szary, filoksera winiec, podkładka, antocyjany, maceracja, moszcz, taniny, winogrodnictwo, wino lodowe, rodzynki, jagoda, Dionizos. No Polish article (keep English): Vinotherapy, Twelve Grapes, Areni-1, sultana, currant, veraison, riddling, disgorging, residual sugar, black rot, traditional method.
 
+## Grape Bot protection (requested 2026-11-15)
+
+- [x] **Jailbreak guard.** `server/grapeBot/guard.ts`: rule-changing questions and forged earlier answers get a fixed refusal without the AI; rules repeated after each question; answers checked while streaming.
+  - Done when: `npm run test:guard` passes; `npm run test:bot` passes against the live site (38/38 on 2026-11-15).
+- [ ] **Same-site check and size cap.** `/api/chat` answers only the app's own site and refuses bodies over 64 KB.
+  - Done when: live, the app's chat still works and a request with another site's Origin gets 403.
+- [ ] **Grape juice.** Same daily allowance for everyone (about 50 answers), counted per scrambled internet address in Cloudflare D1; small talk free; meter in the chat; friendly message when empty.
+  - Done when: the user has created the D1 database and its id is in `wrangler.toml`; live, the meter appears after an answer and drops about 2% per answer; "ok" or "thanks" gets an instant reply and doesn't change it.
+- Later, only if needed: seal the bot's answers so forged chat history is ignored (needs a Cloudflare secret and a `chat_history` column); Llama Guard safety check (costs AI allowance).
+
 ## Notes for later steps
 
 - OIV shares are of grapes **available** after harvest losses (2024: 77.7 Mt grown, 5.9 Mt lost, 71.8 Mt used).

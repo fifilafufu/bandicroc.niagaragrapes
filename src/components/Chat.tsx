@@ -1,9 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import Counter from "./Counter";
-import AnswerTools from "./AnswerTools";
-import { wikiUrl } from "../../shared/grapes";
-import { GREETING, isGreeting, plainAnswer, SUGGESTIONS, type Msg } from "../lib/chatMessages";
-import { askGrapeBot, photosFor, rememberJoke } from "../lib/grapeBot";
+import ChatBubble from "./ChatBubble";
+import JuiceMeter from "./JuiceMeter";
+import { GREETING, SUGGESTIONS, type Msg } from "../lib/chatMessages";
+import { askGrapeBot, photosFor, rememberJoke, savedJuice, saveJuice } from "../lib/grapeBot";
 import { useLang } from "../lib/lang";
 
 const MAX = 500;
@@ -21,6 +21,8 @@ type Props = {
 export default function Chat({ favourite, loggedIn, messages, setMessages, autoAsk, onAutoAsked, onQuiz }: Props) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  // Today's grape juice, % left (null: unknown yet, or no daily limit on the server).
+  const [juice, setJuice] = useState<number | null>(savedJuice);
   const boxRef = useRef<HTMLTextAreaElement>(null);
   const { t, lang } = useLang();
   // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
@@ -87,6 +89,9 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           if (photos.length) patchLast(gen, (m) => ({ ...m, photos }));
         } else if (ev.type === "text" || ev.type === "error") {
           patchLast(gen, (m) => ({ ...m, content: m.content + (ev.text ?? "") }));
+        } else if (ev.type === "done" && typeof ev.juice === "number") {
+          setJuice(ev.juice);
+          saveJuice(ev.juice);
         } else if (ev.type === "replace") {
           patchLast(gen, (m) => ({ ...m, content: ev.text ?? "", sources: ev.sources ?? [], photos: undefined }));
         }
@@ -147,6 +152,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           🧹
         </button>
       </div>
+      {juice !== null && <JuiceMeter left={juice} />}
 
           <div
             className="messages"
@@ -157,49 +163,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
             onPointerDown={stopFollowing}
           >
             {messages.map((m, i) => (
-              <div key={i} className={`bubble ${m.role} ${m.pending && !m.content ? "typing" : ""}`}>
-                {m.pending && !m.content ? (
-                  <>
-                    <span />
-                    <span />
-                    <span />
-                  </>
-                ) : (
-                  <>
-                    {m.photos?.map((p) => (
-                      <span key={p.wiki} className="bubble-photo">
-                        <img src={p.src} alt={t("chat.photoOf", { name: p.name })} loading="lazy" />
-                        <span>
-                          <a href={wikiUrl(p.wiki)} target="_blank" rel="noreferrer">
-                            {p.name}
-                          </a>
-                          {p.credit && (
-                            <span className="photo-credit">
-                              {t("chat.photo")}{" "}
-                              <a href={p.credit.page} target="_blank" rel="noreferrer">
-                                {p.credit.author.slice(0, 40)}
-                              </a>
-                              , {p.credit.licence}
-                            </span>
-                          )}
-                        </span>
-                      </span>
-                    ))}
-                    {isGreeting(m) ? t("chat.greeting") : m.role === "assistant" ? plainAnswer(m.content) : m.content}
-                    {m.pending && <span className="caret" aria-hidden="true" />}
-                    {m.role === "assistant" && !m.pending && !isGreeting(m) && <AnswerTools text={plainAnswer(m.content)} />}
-                    {m.sources && m.sources.length > 0 && !m.pending && (
-                      <div className="sources">
-                        {m.sources.map((s) => (
-                          <a key={s.url} href={s.url} target="_blank" rel="noreferrer">
-                            {s.data ? "📊" : "📖"} {s.title}
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+              <ChatBubble key={i} m={m} />
             ))}
 
             {/* Follow-up questions under the latest answer; starter questions on an empty chat. */}

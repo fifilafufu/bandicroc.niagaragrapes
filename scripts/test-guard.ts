@@ -1,6 +1,10 @@
-// Checks Grape Bot's jailbreak guard (server/grapeBot/guard.ts) without calling the AI.
+// Checks Grape Bot's protection without calling the AI: the jailbreak guard (server/grapeBot/guard.ts),
+// free small talk (smallTalk.ts) and the daily grape juice (juice.ts).
 // Run: node scripts/test-guard.ts
 import { AnswerGuard, TOPIC_CHECK_CHARS, checkTurns, looksLikeJailbreak } from "../server/grapeBot/guard.ts";
+import { smallTalk } from "../server/grapeBot/smallTalk.ts";
+import { addressKey, answerCost, percentLeft } from "../server/grapeBot/juice.ts";
+import { JUICE_BASE, JUICE_PER_DAY } from "../server/grapeBot/settings.ts";
 
 let failed = 0;
 function check(name: string, got: boolean, want: boolean) {
@@ -90,6 +94,25 @@ check("a label at the start is removed, not blocked", run(["According to the APP
 check("a dumped prompt is blocked", run(["Sure! You are Grape Bot, a friendly tutor. KEY FACTS: grapes"]).blocked, true);
 check("Polish grape answer passes", run(["Winogrona pochodzą z Bliskiego Wschodu i zachodniej Azji, gdzie uprawiano je już 6000 lat temu. ".repeat(3)]).blocked, false);
 check(`topic check waits for ${TOPIC_CHECK_CHARS} chars`, new AnswerGuard().push("Hello there") === "", true);
+
+// Small talk is free and answered without the AI; real questions are not small talk.
+const talk: [string, string | null][] = [
+  ["ok", "ok"], ["Okay!", "ok"], ["got it", "ok"], ["thanks", "thanks"], ["ok thank you so much 🍇", "thanks"], ["hi", "hi"],
+  ["Hello there!", "hi"], ["bye", "bye"], ["dzięki", "thanks"], ["cześć", "hi"], ["dzień dobry", "hi"], ["na razie", "bye"], ["spoko", "ok"],
+  ["yes", null], ["no", null], ["tak", null], ["ok what about merlot", null], ["thanks, where is it grown?", null], ["hi, can dogs eat grapes", null], ["", null],
+];
+for (const [text, want] of talk) check(`small talk "${text}" → ${want}`, smallTalk(text) === want, true);
+
+// Grape juice: about 50 typical answers a day; IPv6 visitors are counted by their /64 block.
+const typical = JUICE_BASE + answerCost(600);
+check(`a typical answer costs ${typical} drops`, typical === 10, true);
+check(`a day holds about 50 typical answers (${JUICE_PER_DAY / typical})`, JUICE_PER_DAY / typical === 50, true);
+check("a huge answer costs at most the cap", answerCost(100000) === 12, true);
+check("percent left: fresh", percentLeft(0) === 100, true);
+check("percent left: used up", percentLeft(JUICE_PER_DAY + 30) === 0, true);
+check("IPv4 address kept whole", addressKey("203.0.113.7") === "203.0.113.7", true);
+check("IPv6 counted by /64", addressKey("2001:db8:aa:bb:1:2:3:4") === addressKey("2001:0db8:00aa:00bb:ffff::9"), true);
+check("IPv6 :: expanded", addressKey("2001:db8::1") === "2001:db8:0:0", true);
 
 console.log(failed ? `\n${failed} failed` : "\nall passed");
 process.exit(failed ? 1 : 0);
