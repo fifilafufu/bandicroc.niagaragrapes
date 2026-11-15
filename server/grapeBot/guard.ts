@@ -13,6 +13,7 @@ import type { Turn } from "./settings";
 const JAILBREAK: RegExp[] = [
   /\b(ignore|disregard|forget|override|bypass)\b[^.?!\n]{0,40}\b(instructions?|rules?|prompts?|guidelines?|restrictions?|filters?|programming|directives?|system)\b/i,
   /\b(system|initial|hidden|original|developer)\s+(prompt|message|instructions?)\b/i,
+  /\bwhat (were|was|are|have) you (been )?(told|given|instructed|programmed)\b|\bbefore (this|our|the) (conversation|chat)\b/i,
   /\b(repeat|print|show|reveal|output|tell me|what (is|are|were))\b[^.?!\n]{0,30}\b(your|the)\s+(instructions?|rules|prompt)\b/i,
   /\b(jailbr[eo]ak\w*|dan mode|developer mode|dev mode|god mode|sudo mode|do anything now|aim mode|unfiltered|uncensored)\b/i,
   /\b(no|without|zero)\s+(restrictions|limitations|filters?|censorship|guardrails)\b/i,
@@ -41,7 +42,7 @@ const BAD_OUTPUT: RegExp[] = [
 
 // Words at least one of which nearly every real grape answer uses (English and Polish).
 const GRAPE_WORDS =
-  /grape|vine|vitis|wine|winery|vintner|raisin|sultana|currant|juice|berr|vineyard|viticult|ferment|tannin|harvest|ripe|niagara|concord|dionysus|bacchus|winogr|winor|wino|win[aeiouy]\b|wini|rodzyn|sok\w*|jagod|winnic|fermentac|dojrz|zbior|grona?\b/i;
+  /grape|vine|vitis|wine|winery|vintner|raisin|sultana|currant|juice|berr|vineyard|viticult|ferment|tannin|harvest|ripe|niagara|concord|dionysus|bacchus|winogr|winor|wino|win[aeiouy]\b|wini|rodzyn|sok\w*|jagod|winnic|fermentac|dojrz|zbior|grona?\b|mildew|botrytis|phylloxer|rootstock|prun|hardi|cordon|trellis|cluster|oenolog|sommelier|mączniak|przycin|podkład|filokser|mrozoodporn/i;
 
 // How much of an answer is held back before the topic check (shorter answers are checked whole).
 export const TOPIC_CHECK_CHARS = 200;
@@ -71,6 +72,12 @@ ${question.replace(/<\/?question>/gi, "")}
 // Checks an answer piece by piece as it streams. push() returns the text that is safe to send now
 // (the first TOPIC_CHECK_CHARS are held back until they mention grapes). Once blocked, it stays blocked.
 export class AnswerGuard {
+  // extraWords: more words that show an answer is on topic (the app passes its grape names).
+  private extraWords: string[];
+  constructor(extraWords: string[] = []) {
+    this.extraWords = extraWords;
+  }
+
   private text = "";
   private sent = 0;
   blocked = false;
@@ -80,20 +87,25 @@ export class AnswerGuard {
     this.text += chunk;
     if (BAD_OUTPUT.some((re) => re.test(this.text))) return this.block();
     if (this.sent === 0 && this.text.length < TOPIC_CHECK_CHARS) return "";
-    if (this.sent === 0 && !GRAPE_WORDS.test(this.text)) return this.block();
+    if (this.sent === 0 && !this.onTopic()) return this.block();
     return this.release();
   }
 
   // Call at the end of the answer: returns what was still held back (or "" if blocked).
   finish(): string {
     if (this.blocked) return "";
-    if (this.sent === 0 && this.text.trim() && !GRAPE_WORDS.test(this.text)) return this.block();
+    if (this.sent === 0 && this.text.trim() && !this.onTopic()) return this.block();
     return this.release();
   }
 
   // True when the reader already saw part of the answer and it must be taken back.
   get retract() {
     return this.blocked && this.sent > 0;
+  }
+
+  private onTopic() {
+    const lower = this.text.toLowerCase();
+    return GRAPE_WORDS.test(this.text) || this.extraWords.some((w) => lower.includes(w));
   }
 
   private release() {

@@ -13,7 +13,7 @@
 //
 // The work is split into modules in server/grapeBot/; this file only handles the request.
 
-import { GENERAL_GRAPE_ARTICLE, findGrapeByWiki } from "../../shared/grapes";
+import { GENERAL_GRAPE_ARTICLE, GRAPES, TOPICS, findGrapeByWiki } from "../../shared/grapes";
 import { SOURCES } from "../../shared/sources";
 import { translate } from "../../shared/i18n";
 import { pickJoke, wantsJoke } from "../../shared/jokes";
@@ -30,6 +30,9 @@ const json = (data: unknown, status = 200) =>
     status,
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
+
+// Grape names and topic words: an answer that uses one of them is about grapes (see AnswerGuard).
+const ON_TOPIC_WORDS = [...GRAPES, ...TOPICS].flatMap((x) => x.keywords).filter((w) => w.length >= 4);
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const { request, env } = ctx;
@@ -90,7 +93,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
         return;
       }
       let wrote = false;
-      const guard = new AnswerGuard();
+      const guard = new AnswerGuard(ON_TOPIC_WORDS);
       const send = (text: string) => {
         if (!text) return;
         wrote = true;

@@ -19,7 +19,7 @@ const LABELS = /app data|key facts|extracts/i;
 
 const BASE = process.argv[2] || "https://bandicroc-niagaragrapes.pages.dev";
 
-const REFUSAL = /only (know|talk) about grapes|zajmuję się tylko|tylko o winogronach/i;
+const REFUSAL = /only (know|talk) about grapes|(don'?t|do not|can'?t) (write|help with) code|zajmuję się tylko|tylko o winogronach/i;
 
 const CASES = [
   // From tester feedback
