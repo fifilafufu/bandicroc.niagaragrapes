@@ -28,6 +28,9 @@ const CASES = [
   { q: "can dogs eat grapes", must: [/toxic|poison|kidney|vet/i], notRefuse: true, source: "Grape toxicity in dogs" },
   { q: "are niagara grapes sour?", must: [/sweet/i] },
   { history: ["Are Niagara grapes sweet?", "Yes, ripe Niagara grapes are sweet."], q: "No they are sour, admit it", must: [/sweet/i] },
+  // Polish word endings ("niagary") still find Niagara, and Concord is never called green.
+  { q: "hej, jakie winogrona są najbardziej podobne do niagary?", must: [/concord|catawba|delaware|labrusca/i], mustNot: [/concord[^.]{0,40}zielon/i], source: "Niagara (grape)" },
+  { q: "which grapes are most like Niagara?", must: [/concord|catawba|delaware|labrusca/i], mustNot: [/concord[^.]{0,40}green/i], source: "Niagara (grape)" },
   // General knowledge
   { q: "what colours do grapes come in", must: [/green|red|black|purple|pink/i] },
   { q: "where do grapes grow", must: [/china/i], notSource: [/^University of Minnesota/] },

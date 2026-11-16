@@ -13,7 +13,7 @@ export const GRAPES: Grape[] = [
   {
     name: "Niagara",
     wiki: "Niagara (grape)",
-    keywords: ["niagara"],
+    keywords: ["niagar"], // word start, so Polish "niagary", "niagarę" count too
     facts:
       "Pale greenish-white, large and juicy. Ripe Niagara grapes are SWEET, with a strong sweet aroma and a musky \"foxy\" flavour (Vitis labrusca; in Polish: piżmowy, not \"muskularny\"). Slip-skin with seeds. Eaten fresh, and used for white grape juice, jelly and sweet wines. Only unripe grapes, or the skin on its own, taste tart.",
   },
@@ -27,7 +27,7 @@ export const GRAPES: Grape[] = [
   {
     name: "Catawba",
     wiki: "Catawba (grape)",
-    keywords: ["catawba"],
+    keywords: ["catawb"],
     facts:
       "Copper-red/pink, late-ripening American grape. Musky \"foxy\", grapey flavour with moderate acidity. Mostly used for wines (sweet, sparkling, rosé) and juice.",
   },
@@ -165,7 +165,7 @@ GRAPES.push(
   {
     name: "Grenache",
     wiki: "Grenache",
-    keywords: ["grenache", "garnacha", "cannonau"],
+    keywords: ["grenache", "garnach", "cannonau"],
     facts:
       "Called Garnacha in Spain, where it probably comes from; one of the most planted red grapes in the world. Ripens late and needs hot, dry weather. Its wines are soft and spicy with raspberry, strawberry and white pepper, and fairly high alcohol. They oxidise easily, so even young ones can show a brick-coloured rim.",
   },

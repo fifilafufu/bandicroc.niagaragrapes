@@ -2,7 +2,7 @@
 // resistance scores, Grow Your Grape, Winemaking, Wine basics), picked to fit the question. Each note
 // comes with the source chips the app shows under the answer, so every link is ours, never the AI's.
 
-import { mentions, wikiUrl, type Grape } from "../../shared/grapes";
+import { GRAPES, mentions, wikiUrl, type Grape } from "../../shared/grapes";
 import { DISEASE_NAMES, resistanceWord, type DiseaseKey } from "../../shared/diseases";
 import { GENERAL_CALENDAR, GENERAL_DISEASE, GENERAL_PRUNING, GROW, rootstockAdvice } from "../../shared/grow";
 import { MONTHS } from "../../shared/growthCycle";
@@ -22,7 +22,7 @@ const any = (text: string, words: string[]) => words.some((w) => mentions(text, 
 // Not plain "grow": "where do grapes grow" and "where is it grown" are about places, not gardening.
 const GROWING = ["how to grow", "how do i grow", "how should i grow", "how can i grow", "i grow", "growing", "plant", "prune", "pruning", "trellis", "frost", "winter", "cold", "hardy", "hardiness", "disease", "mildew", "rot", "garden", "rootstock", "phylloxera", "care", "vigour", "vigor", "ripen", "upraw", "sadz", "przycin", "mróz", "mroz", "zim", "chorob", "mączniak", "ogród", "ogrod", "podkład", "filoksera"];
 const ABOUT = ["what is", "what are", "tell me about", "co to", "opowiedz", "czym jest"];
-const PASSPORT = ["parent", "bred", "cross", "origin", "come from", "species", "hybrid", "colour", "color", "vivc", "rodzic", "skrzyżow", "pochodz", "gatun", "kolor", "mieszańc"];
+const PASSPORT = ["similar", "compare", "podobn", "porówn", "parent", "bred", "cross", "origin", "come from", "species", "hybrid", "colour", "color", "vivc", "rodzic", "skrzyżow", "pochodz", "gatun", "kolor", "mieszańc"];
 const MADE = ["made", "make", "making", "process", "produce", "steps", "robi", "powstaj", "produk", "wytwarza"];
 const WINEMAKING = ["winemaking", "wine made", "wine is made", "make wine", "making wine", "ferment", "robi się wino", "produkcja wina", "fermentac"];
 const STYLE_WORDS: Record<Style["id"], string[]> = {
@@ -135,6 +135,16 @@ function wineBasicsNotes(text: string, out: Knowledge) {
     p.src?.forEach((s) => out.chips.push(sourceChip(s)));
     p.wiki.forEach((w) => out.chips.push(wikiChip(w)));
   }
+}
+
+// Every app grape's skin colour (VIVC colour class), so the bot never guesses a colour when it
+// compares or suggests varieties. Grapes without a VIVC passport are left out.
+export function colourList(): string {
+  const items = GRAPES.flatMap((g) => {
+    const colour = varietyInfo(g.name)?.vivc?.colour;
+    return colour ? [`${g.name} ${COLOUR_CLASS[colour].meaning}`] : [];
+  });
+  return `Skin colour of grapes (VIVC colour class): ${items.join(", ")}.`;
 }
 
 // The checked notes and source chips for one question. `grapes` are the grapes it is about.
