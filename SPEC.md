@@ -18,7 +18,7 @@
 
 ## Screens
 
-The bottom bar (top bar on wide screens) has **four tabs, never more**. New pages go inside a tab.
+The bottom bar (top bar on wide screens) has **four tabs, never more**. New pages go inside a tab. Switching sections never loses your place: pages you opened stay as you left them (quiz round, sliders, scroll position) until the app is closed.
 
 | Tab | Pages | Address |
 |---|---|---|
@@ -53,7 +53,7 @@ SQL for each table is in `supabase/*.sql` (run in the Supabase SQL Editor; safe 
 
 The table creates itself on first use. Without the `DB` binding the bot has no daily limit.
 
-**On the device only** (localStorage): theme, language, dismissed tips, quiz questions already seen, jokes heard, today's grape juice (for the meter), and a guest's quiz scores and saved wines (moved to the account at login).
+**On the device only** (localStorage): theme, language, dismissed tips, quiz questions already seen, jokes heard, today's grape juice (for the meter), the chat message being typed (until it is sent), the quiz round in progress (until it ends or the player goes back to the list), and a guest's quiz scores and saved wines (moved to the account at login).
 
 **In the repo** (curated, versioned, works offline):
 

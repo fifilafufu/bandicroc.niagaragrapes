@@ -3,7 +3,7 @@ import { CATEGORIES } from "../../shared/quiz/categories";
 import type { Category, Level } from "../../shared/quiz/types";
 import { accountsAvailable, type User } from "../lib/account";
 import { useLang } from "../lib/lang";
-import { saveLevel, savedLevel } from "../lib/quiz";
+import { saveLevel, savedLevel, savedRound } from "../lib/quiz";
 import { bestResult, useQuizResults } from "../lib/useQuizResults";
 import QuizRound from "./quiz/QuizRound";
 import QuizScoreboard from "./quiz/QuizScoreboard";
@@ -12,7 +12,8 @@ import QuizScoreboard from "./quiz/QuizScoreboard";
 export default function QuizzesPage({ user, onLogin }: { user: User | null; onLogin: () => void }) {
   const { lang, t } = useLang();
   const { results, add, synced } = useQuizResults(user);
-  const [cat, setCat] = useState<Category | null>(null);
+  // A round left unfinished (the app was closed or reloaded) opens again where it stopped.
+  const [cat, setCat] = useState<Category | null>(() => savedRound()?.cat ?? null);
   const [level, setLevelState] = useState<Level>(savedLevel);
   const setLevel = (l: Level) => {
     setLevelState(l);

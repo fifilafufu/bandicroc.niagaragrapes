@@ -68,7 +68,14 @@ Rules for every step: numbers, units and sources stay exactly as in English; gra
   - Checked live on 2026-11-15: the app's own requests work; another site's Origin and no Origin get 403; a 70 KB body gets 400.
 - [ ] **Grape juice.** Same daily allowance for everyone (about 50 answers), counted per scrambled internet address in Cloudflare D1; small talk free; meter in the chat; friendly message when empty.
   - Done when: the user has created the D1 database and its id is in `wrangler.toml`; live, the meter appears after an answer and drops about 2% per answer; "ok" or "thanks" gets an instant reply and doesn't change it.
+- [ ] **Grape facts in comparisons.** Polish word endings ("niagary") find the grape; every app grape's VIVC skin colour is in the bot's key facts, so it can't call Concord green (tester report 2026-11-16).
+  - Done when: `npm run test:bot` passes against the live site, including the two "most like Niagara" cases.
 - Later, only if needed: seal the bot's answers so forged chat history is ignored (needs a Cloudflare secret and a `chat_history` column); Llama Guard safety check (costs AI allowance).
+
+## Keep your place (requested 2026-11-16)
+
+- [x] **Pages keep their state.** Opened pages stay alive while hidden and come back at their scroll position; the unsent chat message and the quiz round in progress are saved on the device.
+  - Done when: a quiz round survives going to Wine basics and back and a reload; a half-typed chat message survives switching tabs and a reload; "←" in a quiz gives the round up. Checked locally at 375 px and desktop on 2026-11-16.
 
 ## Notes for later steps
 

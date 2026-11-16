@@ -3,7 +3,7 @@ import { CATEGORIES, categoryName } from "../../../shared/quiz/categories";
 import { scoreMessage } from "../../../shared/quiz/scoreboard";
 import type { Category, Level, Question } from "../../../shared/quiz/types";
 import { useLang } from "../../lib/lang";
-import { markSeen, newRound } from "../../lib/quiz";
+import { markSeen, newRound, saveRound, savedRound } from "../../lib/quiz";
 import ChoiceQuestion from "./ChoiceQuestion";
 import DiagramQuestion from "./DiagramQuestion";
 import NumberQuestion from "./NumberQuestion";
@@ -29,16 +29,25 @@ function Ask({ q, onAnswer }: { q: Question; onAnswer: (right: boolean) => void 
 
 export default function QuizRound({ cat, level, onFinish, onBack, onPro }: Props) {
   const { lang, t } = useLang();
-  const [round, setRound] = useState(() => newRound(cat, level, lang));
-  const [index, setIndex] = useState(0);
+  // Carry on with the saved round if it is this same quiz.
+  const [resume] = useState(() => {
+    const r = savedRound();
+    return r && r.cat === cat && r.level === level && r.lang === lang ? r : null;
+  });
+  const [round, setRound] = useState(() => resume?.round ?? newRound(cat, level, lang));
+  const [index, setIndex] = useState(resume?.index ?? 0);
   const [right, setRight] = useState<boolean | null>(null);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState(resume?.score ?? 0);
   const [verdict, setVerdict] = useState<ReturnType<typeof scoreMessage> | null>(null);
   const info = CATEGORIES.find((c) => c.id === cat)!;
   const title = `${info.emoji} ${categoryName(cat, lang)}`;
 
   // Remember these questions so the next rounds skip them (safe to run twice: it only adds them).
   useEffect(() => markSeen(cat, round), [cat, round]);
+  // Save progress at the start of each question; a finished round is forgotten.
+  useEffect(() => {
+    if (right === null) saveRound(verdict ? null : { cat, level, lang, round, index, score });
+  }, [cat, level, lang, round, index, score, right, verdict]);
 
   function answer(ok: boolean) {
     setRight(ok);
@@ -53,6 +62,11 @@ export default function QuizRound({ cat, level, onFinish, onBack, onPro }: Props
     }
     setIndex(n);
   }
+  // Back to the quiz list: this round is given up, so it isn't offered again.
+  function leave() {
+    saveRound(null);
+    onBack();
+  }
   function restart() {
     setRound(newRound(cat, level, lang));
     setIndex(0);
@@ -62,13 +76,13 @@ export default function QuizRound({ cat, level, onFinish, onBack, onPro }: Props
   }
 
   if (verdict)
-    return <QuizEnd title={title} score={score} total={round.length} verdict={verdict} offerPro={level === "newbie" && score >= round.length * 0.75} onAgain={restart} onBack={onBack} onPro={onPro} />;
+    return <QuizEnd title={title} score={score} total={round.length} verdict={verdict} offerPro={level === "newbie" && score >= round.length * 0.75} onAgain={restart} onBack={leave} onPro={onPro} />;
 
   const q = round[index];
   return (
     <div className="quiz">
       <p className="quiz-progress muted small">
-        <button className="link inline" onClick={onBack}>
+        <button className="link inline" onClick={leave}>
           ← {title}
         </button>{" "}
         · {t("quiz.progress", { i: index + 1, n: round.length, score })}

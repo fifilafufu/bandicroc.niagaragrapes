@@ -41,6 +41,11 @@ export function saveJuice(left: number) {
   writePref(JUICE_KEY, `${today()}|${left}`);
 }
 
+// The message you're typing but haven't sent yet.
+const DRAFT_KEY = "chat-draft";
+export const savedDraft = () => readPref(DRAFT_KEY) ?? "";
+export const saveDraft = (text: string) => writePref(DRAFT_KEY, text ? text : null);
+
 // Ask Grape Bot. Yields events as they arrive; throws if the server can't be reached.
 export async function* askGrapeBot(history: Msg[], favourite: string | null, lang: Lang): AsyncGenerator<BotEvent> {
   const res = await fetch("/api/chat", {

@@ -73,3 +73,18 @@ export function markSeen(cat: Category, round: Question[]) {
   if (seen.size >= all) seen = new Set(round.map((q) => q.id));
   writePref(seenKey(cat), JSON.stringify([...seen]));
 }
+
+// The round you're in the middle of, kept on this device so leaving the app (or the phone closing it
+// in the background) doesn't lose it. Saved before the current question is answered, so it comes
+// back unanswered and the score never counts it twice.
+export type SavedRound = { cat: Category; level: Level; lang: Lang; round: Question[]; index: number; score: number };
+const ROUND_KEY = "quiz-round";
+export function savedRound(): SavedRound | null {
+  try {
+    const v = JSON.parse(readPref(ROUND_KEY) ?? "null") as SavedRound | null;
+    return v && Array.isArray(v.round) && v.index < v.round.length ? v : null;
+  } catch {
+    return null;
+  }
+}
+export const saveRound = (r: SavedRound | null) => writePref(ROUND_KEY, r ? JSON.stringify(r) : null);

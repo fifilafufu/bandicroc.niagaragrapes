@@ -3,7 +3,7 @@ import Counter from "./Counter";
 import ChatBubble from "./ChatBubble";
 import JuiceMeter from "./JuiceMeter";
 import { GREETING, SUGGESTIONS, type Msg } from "../lib/chatMessages";
-import { askGrapeBot, photosFor, rememberJoke, savedJuice, saveJuice } from "../lib/grapeBot";
+import { askGrapeBot, photosFor, rememberJoke, saveDraft, savedDraft, savedJuice, saveJuice } from "../lib/grapeBot";
 import { useLang } from "../lib/lang";
 
 const MAX = 500;
@@ -19,7 +19,13 @@ type Props = {
 };
 
 export default function Chat({ favourite, loggedIn, messages, setMessages, autoAsk, onAutoAsked, onQuiz }: Props) {
-  const [input, setInput] = useState("");
+  // What you're typing is kept on this device until you send it, so leaving the chat, a slip of the
+  // finger or a reload doesn't lose it.
+  const [input, setInputState] = useState(savedDraft);
+  const setInput = (text: string) => {
+    setInputState(text);
+    saveDraft(text);
+  };
   const [busy, setBusy] = useState(false);
   // Today's grape juice, % left (null: unknown yet, or no daily limit on the server).
   const [juice, setJuice] = useState<number | null>(savedJuice);
@@ -74,7 +80,7 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
     const history = [...messages, { role: "user" as const, content }];
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     setMessages([...history, { role: "assistant", content: "", pending: true, id }]);
-    setInput("");
+    if (text === input) setInput(""); // a suggestion or a question from another page keeps your draft
     setBusy(true);
 
     // Grapes that already had a photo in this chat don't get another one.

@@ -10,6 +10,7 @@ import { accountsAvailable } from "./lib/account";
 import Home from "./components/Home";
 import { NO_GUEST, useGuestMerge, type Guest } from "./lib/useGuestMerge";
 import { useHideOnScroll } from "./lib/useHideOnScroll";
+import { useKeepPages } from "./lib/useKeepPages";
 import InstallSheet from "./components/InstallSheet";
 import AccountMenu from "./components/AccountMenu";
 import { LoginSheet, SavePrompt } from "./components/LoginSheet";
@@ -77,10 +78,8 @@ export default function App() {
   const topbarRef = useRef<HTMLElement>(null);
   const barOffset = useHideOnScroll(contentRef, topbarRef, page);
 
-  // A new section starts at the top.
-  useEffect(() => {
-    contentRef.current?.scrollTo({ top: 0 });
-  }, [page]);
+  // Opened pages stay alive while hidden, and each comes back at its own scroll position.
+  const opened = useKeepPages(page, contentRef);
 
   // A tab stays lit on every page inside it.
   const active = (tab: Page) => page === tab || (tab === "home" && isLearnPage(page)) || (tab === "quizzes" && isGamePage(page));
@@ -96,6 +95,46 @@ export default function App() {
   const hideTip = () => {
     setShowTip(false);
     dismissTip();
+  };
+
+  const loading = <p className="muted center loading">{t("app.loading")}</p>;
+  // Every section except the chat (its conversation already lives here, and it scrolls by itself).
+  const view = (p: Page) => {
+    switch (p) {
+      case "home":
+        return <Home onChat={() => go("chat")} onMyGrapes={() => go("mine")} onAsk={ask} go={go} />;
+      case "stats":
+        return <StatsPage />;
+      case "taste":
+        return <TastePage onAsk={ask} />;
+      case "biology":
+        return <BiologyPage />;
+      case "winemaking":
+        return <WinemakingPage />;
+      case "basics":
+        return <WineBasicsPage />;
+      case "grow":
+        return <GrowPage favourite={auth.favourite} />;
+      case "quizzes":
+        return <QuizzesPage user={auth.user} onLogin={() => setLogin("in")} />;
+      case "wine":
+        return <MakeWinePage user={auth.user} favourite={auth.favourite} onLogin={() => setLogin("in")} />;
+      case "mine":
+        return (
+          <MyGrapes
+            {...auth}
+            guest={guest}
+            setGuest={setGuest}
+            onLogin={setLogin}
+            onGuestSaved={(what) => accountsAvailable && !promptOff.current && setSavePrompt(what)}
+            onWines={() => go("wine")}
+          />
+        );
+      case "settings":
+        return <Settings user={auth.user} onGetApp={openSheet} theme={theme} setTheme={setTheme} onLoggedOut={() => go("mine")} goToLogin={() => setLogin("in")} />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -149,18 +188,16 @@ export default function App() {
       )}
 
       <main ref={contentRef} className={`content ${page === "chat" ? "flush" : ""}`}>
-        <Suspense fallback={<p className="muted center loading">{t("app.loading")}</p>}>
-          {isLearnPage(page) && <SubNav items={LEARN_ITEMS} page={page} go={go} label={t("nav.learn")} />}
-          {isGamePage(page) && <SubNav items={GAME_ITEMS} page={page} go={go} label={t("nav.games")} />}
-          {page === "home" && <Home onChat={() => go("chat")} onMyGrapes={() => go("mine")} onAsk={ask} go={go} />}
-          {page === "stats" && <StatsPage />}
-          {page === "taste" && <TastePage onAsk={ask} />}
-          {page === "biology" && <BiologyPage />}
-          {page === "winemaking" && <WinemakingPage />}
-          {page === "basics" && <WineBasicsPage />}
-          {page === "grow" && <GrowPage favourite={auth.favourite} />}
-          {page === "quizzes" && <QuizzesPage user={auth.user} onLogin={() => setLogin("in")} />}
-          {page === "wine" && <MakeWinePage user={auth.user} favourite={auth.favourite} onLogin={() => setLogin("in")} />}
+        {isLearnPage(page) && <SubNav items={LEARN_ITEMS} page={page} go={go} label={t("nav.learn")} />}
+        {isGamePage(page) && <SubNav items={GAME_ITEMS} page={page} go={go} label={t("nav.games")} />}
+        {opened
+          .filter((p) => p !== "chat")
+          .map((p) => (
+            <div key={p} hidden={p !== page}>
+              <Suspense fallback={loading}>{view(p)}</Suspense>
+            </div>
+          ))}
+        <Suspense fallback={loading}>
           {page === "chat" && (
             <Chat
               favourite={auth.favourite}
@@ -170,26 +207,6 @@ export default function App() {
               autoAsk={autoAsk}
               onAutoAsked={() => setAutoAsk(null)}
               onQuiz={() => go("quizzes")}
-            />
-          )}
-          {page === "mine" && (
-            <MyGrapes
-              {...auth}
-              guest={guest}
-              setGuest={setGuest}
-              onLogin={setLogin}
-              onGuestSaved={(what) => accountsAvailable && !promptOff.current && setSavePrompt(what)}
-              onWines={() => go("wine")}
-            />
-          )}
-          {page === "settings" && (
-            <Settings
-              user={auth.user}
-              onGetApp={openSheet}
-              theme={theme}
-              setTheme={setTheme}
-              onLoggedOut={() => go("mine")}
-              goToLogin={() => setLogin("in")}
             />
           )}
         </Suspense>
