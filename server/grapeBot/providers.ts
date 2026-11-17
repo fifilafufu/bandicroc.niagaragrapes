@@ -96,7 +96,8 @@ async function streamOpenRouter(env: Env, messages: { role: string; content: str
         "Content-Type": "application/json",
         "X-Title": "Grapes",
       },
-      body: JSON.stringify({ model, messages, max_tokens: MAX_ANSWER_TOKENS, stream: true }),
+      // No hidden "thinking": it would spend the whole token budget and leave no answer.
+      body: JSON.stringify({ model, messages, max_tokens: MAX_ANSWER_TOKENS, stream: true, reasoning: { enabled: false } }),
     });
     if (res.ok && res.body) return { model, chunks: readSSE(res.body) };
     lastError = new Error(`OpenRouter ${model} ${res.status}: ${(await res.text()).slice(0, 200)}`);

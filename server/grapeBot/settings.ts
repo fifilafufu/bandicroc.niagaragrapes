@@ -41,9 +41,10 @@ export const MODELS = [
 
 // OpenRouter backup: free models only (their ids end in ":free"), tried in order. Anything else is
 // skipped, so a paid model can never be used by mistake. Free list: https://openrouter.ai/models?q=free
+// Each must answer with thinking switched off (thinking would use up MAX_ANSWER_TOKENS); tested 2026-11-17.
 export const OPENROUTER_MODELS = [
+  "particle-ai/particle-1:free",
+  "nvidia/nemotron-3-ultra-550b-a55b:free",
   "google/gemma-4-31b-it:free",
-  "google/gemma-4-26b-a4b-it:free",
-  "nvidia/nemotron-3.5-lightning:free",
 ];
 export const isFreeModel = (model: string) => model.endsWith(":free");
