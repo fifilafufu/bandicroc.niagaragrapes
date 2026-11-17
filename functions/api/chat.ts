@@ -22,6 +22,7 @@ import { curatedKnowledge } from "../../server/grapeBot/knowledge";
 import { AnswerGuard, checkTurns, wrapQuestion } from "../../server/grapeBot/guard";
 import { answerCost, openMeter } from "../../server/grapeBot/juice";
 import { followUps, isPolish, systemPrompt } from "../../server/grapeBot/prompt";
+import { AiUnavailable, type AiFailure } from "../../server/grapeBot/failure";
 import { streamAnswer } from "../../server/grapeBot/providers";
 import { fromOwnSite, parseBody, readBody } from "../../server/grapeBot/request";
 import { smallTalk } from "../../server/grapeBot/smallTalk";
@@ -32,6 +33,9 @@ const json = (data: unknown, status = 200) =>
     status,
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
+
+// What the visitor reads when no AI could answer, by reason.
+const AI_FAILURE_TEXT: Record<AiFailure, TextKey> = { limit: "bot.aiLimit", busy: "bot.aiBusy", down: "bot.aiDown" };
 
 // Grape names and topic words: an answer that uses one of them is about grapes (see AnswerGuard).
 const ON_TOPIC_WORDS = [...GRAPES, ...TOPICS].flatMap((x) => x.keywords).filter((w) => w.length >= 4);
@@ -128,9 +132,10 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
         await meter?.charge(answerCost(written));
         controller.enqueue(line({ type: "done", model, juice: meter?.left() ?? null }));
       } catch (error) {
-        // The real error stays in the server log; the browser only gets a friendly line.
+        // The real error stays in the server log; the browser only gets a plain sentence saying why.
         console.error("Grape Bot error:", error);
-        controller.enqueue(line({ type: "error", text: wrote ? say("bot.cutOff") : say("bot.empty") }));
+        const why = error instanceof AiUnavailable ? AI_FAILURE_TEXT[error.kind] : "chat.serverDown";
+        controller.enqueue(line({ type: "error", text: wrote ? say("bot.cutOff") : say(why) }));
       } finally {
         controller.close();
       }

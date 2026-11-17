@@ -5,6 +5,7 @@ import { AnswerGuard, TOPIC_CHECK_CHARS, checkTurns, looksLikeJailbreak } from "
 import { smallTalk } from "../server/grapeBot/smallTalk.ts";
 import { addressKey, answerCost, percentLeft } from "../server/grapeBot/juice.ts";
 import { JUICE_BASE, JUICE_PER_DAY } from "../server/grapeBot/settings.ts";
+import { aiFailure } from "../server/grapeBot/failure.ts";
 
 let failed = 0;
 function check(name: string, got: boolean, want: boolean) {
@@ -102,6 +103,16 @@ check("spaced en dash becomes a comma", run(["Chardonnay ma neutralny smak – w
 check("unspaced em dash becomes a comma", run(["Concord grapes—dark and sweet—make juice."]).shown === "Concord grapes, dark and sweet, make juice.", true);
 check("number ranges keep their en dash", run(["Grapes grow in bunches of 15–300 berries."]).shown === "Grapes grow in bunches of 15–300 berries.", true);
 check(`topic check waits for ${TOPIC_CHECK_CHARS} chars`, new AnswerGuard().push("Hello there") === "", true);
+
+// When no AI answers, the visitor is told why: limit used up, busy, or down.
+const wai = (m: string) => new Error(m);
+check("Workers AI daily allowance → limit", aiFailure([wai("4006: you have used up your daily free allocation of 10,000 neurons")]) === "limit", true);
+check("OpenRouter daily free cap → limit", aiFailure([wai("OpenRouter x:free 429: Rate limit exceeded: free-models-per-day")]) === "limit", true);
+check("OpenRouter rate-limited upstream → busy", aiFailure([wai("OpenRouter x:free 429: temporarily rate-limited upstream")]) === "busy", true);
+check("Workers AI capacity → busy", aiFailure([wai("3040: Capacity temporarily exceeded")]) === "busy", true);
+check("limit then busy backup → busy", aiFailure([wai("4006: daily free allocation"), wai("OpenRouter 429: rate-limited upstream")]) === "busy", true);
+check("limit then broken backup → limit", aiFailure([wai("4006: daily free allocation"), wai("OpenRouter 401: no auth")]) === "limit", true);
+check("unknown error → down", aiFailure([wai("Workers AI binding 'AI' is missing")]) === "down", true);
 
 // Small talk is free and answered without the AI; real questions are not small talk.
 const talk: [string, string | null][] = [

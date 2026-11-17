@@ -3,7 +3,7 @@ import Counter from "./Counter";
 import ChatBubble from "./ChatBubble";
 import JuiceMeter from "./JuiceMeter";
 import { GREETING, SUGGESTIONS, type Msg } from "../lib/chatMessages";
-import { askGrapeBot, photosFor, rememberJoke, saveDraft, savedDraft, savedJuice, saveJuice } from "../lib/grapeBot";
+import { ChatProblem, askGrapeBot, photosFor, rememberJoke, saveDraft, savedDraft, savedJuice, saveJuice } from "../lib/grapeBot";
 import { useLang } from "../lib/lang";
 
 const MAX = 500;
@@ -102,13 +102,15 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           patchLast(gen, (m) => ({ ...m, content: ev.text ?? "", sources: ev.sources ?? [], photos: undefined }));
         }
       }
-      patchLast(gen, (m) => ({ ...m, pending: false, content: m.content.trim() || t("chat.wrong") }));
-    } catch {
+      patchLast(gen, (m) => ({ ...m, pending: false, content: m.content.trim() || t("bot.lost") }));
+    } catch (error) {
+      // Always a plain reason: part of an answer keeps it and says it was cut off.
+      const why = error instanceof ChatProblem ? error.why : "chat.serverDown";
       patchLast(gen, (m) => ({
         ...m,
         pending: false,
         followUps: [],
-        content: m.content.trim() || (navigator.onLine ? t("chat.wrong") : t("chat.offline")),
+        content: m.content.trim() ? m.content.trimEnd() + t("bot.cutOff") : t(why === "bot.cutOff" ? "chat.noServer" : why),
       }));
     } finally {
       if (gen === generation.current) setBusy(false);

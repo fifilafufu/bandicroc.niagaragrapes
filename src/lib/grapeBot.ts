@@ -2,7 +2,7 @@ import { findGrapeByWiki } from "../../shared/grapes";
 import { readPref, writePref } from "./prefs";
 import { photoOf } from "../../shared/varieties";
 import { GREETING, type Msg } from "./chatMessages";
-import type { Lang } from "../../shared/i18n";
+import type { Lang, TextKey } from "../../shared/i18n";
 
 // Talking to Grape Bot's server function (functions/api/chat.ts). The reply streams as one JSON
 // object per line: a "meta" event (sources, follow-ups, grapes, joke), then "text" pieces, then
@@ -46,32 +46,70 @@ const DRAFT_KEY = "chat-draft";
 export const savedDraft = () => readPref(DRAFT_KEY) ?? "";
 export const saveDraft = (text: string) => writePref(DRAFT_KEY, text ? text : null);
 
-// Ask Grape Bot. Yields events as they arrive; throws if the server can't be reached.
+// Thrown by askGrapeBot when there's no answer to show: `why` is the plain sentence to show instead.
+export class ChatProblem extends Error {
+  readonly why: TextKey;
+  constructor(why: TextKey) {
+    super(why);
+    this.why = why;
+  }
+}
+
+// What a failed reply from the server means for the visitor.
+function problemFor(status: number): TextKey {
+  if (status === 400 || status === 413) return "chat.badRequest";
+  if (status === 403) return "chat.notAllowed";
+  if (status === 429) return "chat.tooMany";
+  if (status === 404) return "chat.noServer";
+  return "chat.serverDown";
+}
+
+const unreachable = (): TextKey => (navigator.onLine ? "chat.noServer" : "chat.offline");
+
+// Ask Grape Bot. Yields events as they arrive. Throws ChatProblem when there's nothing to answer
+// with: "chat.cutOff" means part of the answer arrived before the connection dropped.
 export async function* askGrapeBot(history: Msg[], favourite: string | null, lang: Lang): AsyncGenerator<BotEvent> {
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      messages: history.filter((m) => m !== GREETING).map(({ role, content }) => ({ role, content })),
-      favourite,
-      seenJokes: heardJokes(),
-      lang,
-    }),
-  });
-  if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+  let res: Response;
+  try {
+    res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: history.filter((m) => m !== GREETING).map(({ role, content }) => ({ role, content })),
+        favourite,
+        seenJokes: heardJokes(),
+        lang,
+      }),
+    });
+  } catch {
+    throw new ChatProblem(unreachable());
+  }
+  if (!res.ok || !res.body) throw new ChatProblem(problemFor(res.status));
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
   for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
+    let chunk: ReadableStreamReadResult<Uint8Array>;
+    try {
+      chunk = await reader.read();
+    } catch {
+      throw new ChatProblem(navigator.onLine ? "bot.cutOff" : "chat.offline");
+    }
+    if (chunk.done) break;
+    buffer += decoder.decode(chunk.value, { stream: true });
     let nl;
     while ((nl = buffer.indexOf("\n")) >= 0) {
       const line = buffer.slice(0, nl).trim();
       buffer = buffer.slice(nl + 1);
-      if (line) yield JSON.parse(line) as BotEvent;
+      if (!line) continue;
+      let ev: BotEvent;
+      try {
+        ev = JSON.parse(line) as BotEvent;
+      } catch {
+        throw new ChatProblem("chat.serverDown");
+      }
+      yield ev;
     }
   }
 }

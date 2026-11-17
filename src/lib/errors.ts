@@ -14,6 +14,7 @@ const MAP: [RegExp, TextKey][] = [
   [/failed to fetch|network|load failed|fetch failed/i, "err.network"],
   [/jwt|session.*(expired|missing)|not authenticated/i, "err.session"],
   [/value too long|check constraint/i, "err.tooLong"],
+  [/\b50\d\b|internal server|service unavailable|bad gateway|timed? ?out/i, "err.server"],
 ];
 
 export function friendlyError(message: string | null | undefined): TextKey {

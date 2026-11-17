@@ -2,6 +2,7 @@
 // (falling back through MODELS), then OpenRouter as an automatic backup when its key is set.
 
 import { MAX_ANSWER_TOKENS, MODELS, OPENROUTER_MODELS, isFreeModel, type Env } from "./settings";
+import { AiUnavailable, aiFailure } from "./failure";
 
 type Chunks = AsyncGenerator<string, void, unknown>;
 
@@ -71,15 +72,20 @@ async function streamWorkersAI(env: Env, messages: { role: string; content: stri
 
 // Picks the provider: Workers AI first and, when none of its models can answer (for example the free
 // daily allowance is used up), OpenRouter if its key is set. AI_PROVIDER = "openrouter" swaps the order.
+// Throws AiUnavailable when nothing could answer.
 export async function streamAnswer(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
   const order = env.AI_PROVIDER === "openrouter" ? [streamOpenRouter, streamWorkersAI] : [streamWorkersAI, streamOpenRouter];
-  try {
-    return await order[0](env, messages);
-  } catch (first) {
-    if (!env.OPENROUTER_API_KEY) throw first; // no backup configured
-    console.error("Main AI failed, trying the backup:", first);
-    return await order[1](env, messages);
+  const tries = env.OPENROUTER_API_KEY ? order : order.filter((p) => p !== streamOpenRouter);
+  const errors: unknown[] = [];
+  for (const provider of tries) {
+    try {
+      return await provider(env, messages);
+    } catch (error) {
+      console.error("AI provider failed:", error);
+      errors.push(error);
+    }
   }
+  throw new AiUnavailable(aiFailure(errors));
 }
 
 // Free models only: OPENROUTER_MODEL (if free) first, then OPENROUTER_MODELS; falls back on error.
