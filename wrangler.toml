@@ -11,4 +11,5 @@ binding = "AI"
 # If the first one fails and the OPENROUTER_API_KEY secret is set, the other is tried automatically.
 AI_PROVIDER = "workers-ai"
 WORKERS_AI_MODEL = "@cf/meta/llama-4-scout-17b-16e-instruct"
-OPENROUTER_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+# Backup model on OpenRouter. Must end in ":free"; paid models are refused (see server/grapeBot/settings.ts).
+OPENROUTER_MODEL = "google/gemma-4-31b-it:free"

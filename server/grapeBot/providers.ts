@@ -1,7 +1,7 @@
 // The AI providers. Each one streams the answer as text chunks: Cloudflare Workers AI first
 // (falling back through MODELS), then OpenRouter as an automatic backup when its key is set.
 
-import { MAX_ANSWER_TOKENS, MODELS, type Env } from "./settings";
+import { MAX_ANSWER_TOKENS, MODELS, OPENROUTER_MODELS, isFreeModel, type Env } from "./settings";
 
 type Chunks = AsyncGenerator<string, void, unknown>;
 
@@ -82,18 +82,25 @@ export async function streamAnswer(env: Env, messages: { role: string; content: 
   }
 }
 
+// Free models only: OPENROUTER_MODEL (if free) first, then OPENROUTER_MODELS; falls back on error.
 async function streamOpenRouter(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
   if (!env.OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY is not set");
-  const model = env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-      "X-Title": "Grapes",
-    },
-    body: JSON.stringify({ model, messages, max_tokens: MAX_ANSWER_TOKENS, stream: true }),
-  });
-  if (!res.ok || !res.body) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  return { model, chunks: readSSE(res.body) };
+  if (env.OPENROUTER_MODEL && !isFreeModel(env.OPENROUTER_MODEL)) console.error(`OPENROUTER_MODEL ${env.OPENROUTER_MODEL} is not free; skipped`);
+  const models = [...new Set([env.OPENROUTER_MODEL, ...OPENROUTER_MODELS].filter((m): m is string => !!m && isFreeModel(m)))];
+  let lastError: unknown;
+  for (const model of models) {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "X-Title": "Grapes",
+      },
+      body: JSON.stringify({ model, messages, max_tokens: MAX_ANSWER_TOKENS, stream: true }),
+    });
+    if (res.ok && res.body) return { model, chunks: readSSE(res.body) };
+    lastError = new Error(`OpenRouter ${model} ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    console.error(lastError);
+  }
+  throw lastError;
 }

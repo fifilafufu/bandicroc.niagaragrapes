@@ -38,3 +38,12 @@ export const MODELS = [
   "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "@cf/meta/llama-3.1-8b-instruct",
 ];
+
+// OpenRouter backup: free models only (their ids end in ":free"), tried in order. Anything else is
+// skipped, so a paid model can never be used by mistake. Free list: https://openrouter.ai/models?q=free
+export const OPENROUTER_MODELS = [
+  "google/gemma-4-31b-it:free",
+  "google/gemma-4-26b-a4b-it:free",
+  "nvidia/nemotron-3.5-lightning:free",
+];
+export const isFreeModel = (model: string) => model.endsWith(":free");
