@@ -13,3 +13,10 @@ AI_PROVIDER = "workers-ai"
 WORKERS_AI_MODEL = "@cf/meta/llama-4-scout-17b-16e-instruct"
 # Backup model on OpenRouter. Must end in ":free"; paid models are refused (see server/grapeBot/settings.ts).
 OPENROUTER_MODEL = "particle-ai/particle-1:free"
+
+# Grape juice: each visitor's daily Grape Bot allowance (see server/grapeBot/juice.ts).
+# The binding must be called DB: the code reads it as env.DB.
+[[d1_databases]]
+binding = "DB"
+database_name = "grape-juice"
+database_id = "d1c62b6e-d0b2-4340-b282-ffe70ef9c9a4"
