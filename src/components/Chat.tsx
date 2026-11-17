@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "re
 import Counter from "./Counter";
 import ChatBubble from "./ChatBubble";
 import JuiceMeter from "./JuiceMeter";
-import { GREETING, SUGGESTIONS, type Msg } from "../lib/chatMessages";
+import { GREETING, SUGGESTIONS, plainAnswer, type Msg } from "../lib/chatMessages";
+import { useTypewriter } from "../lib/useTypewriter";
 import { ChatProblem, askGrapeBot, photosFor, rememberJoke, saveDraft, savedDraft, savedJuice, saveJuice } from "../lib/grapeBot";
 import { useLang } from "../lib/lang";
 
@@ -34,6 +35,13 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
   // Bumped by "Clear chat" so a reply that arrives afterwards is ignored.
   const generation = useRef(0);
 
+  // The newest answer is typed out smoothly; `typing` stays true until it's all on screen.
+  const lastIndex = messages.length - 1;
+  const last = messages[lastIndex];
+  const lastText = last?.role === "assistant" ? plainAnswer(last.content) : "";
+  const shown = useTypewriter(lastText, !!last?.pending, last?.id);
+  const typing = busy || shown < lastText.length;
+
   // Scrolling (only the message list, never the page around it):
   // - opening the chat shows the newest messages;
   // - while an answer comes in, the list follows it only until your question reaches the top, so the
@@ -55,8 +63,8 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
       const questionTop = bubble.getBoundingClientRect().top - el.getBoundingClientRect().top + el.scrollTop - 8;
       el.scrollTop = Math.min(el.scrollHeight - el.clientHeight, questionTop);
     }
-    if (!busy) question.current = null; // answer finished: stop following
-  }, [messages, busy]);
+    if (!typing) question.current = null; // answer finished: stop following
+  }, [messages, typing, shown]);
   const stopFollowing = () => {
     userScrolled.current = true;
   };
@@ -146,8 +154,6 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
     box.style.height = `${Math.min(box.scrollHeight, 132)}px`;
   }, [input]);
 
-  const lastIndex = messages.length - 1;
-
   return (
     <div className="chat">
       <div className="chat-head">
@@ -165,17 +171,18 @@ export default function Chat({ favourite, loggedIn, messages, setMessages, autoA
           <div
             className="messages"
             aria-live="polite"
+            aria-busy={typing}
             ref={listRef}
             onWheel={stopFollowing}
             onTouchStart={stopFollowing}
             onPointerDown={stopFollowing}
           >
             {messages.map((m, i) => (
-              <ChatBubble key={i} m={m} />
+              <ChatBubble key={i} m={m} shown={i === lastIndex ? shown : undefined} />
             ))}
 
             {/* Follow-up questions under the latest answer; starter questions on an empty chat. */}
-            {!busy && (
+            {!typing && (
               <div className="suggestions">
                 {(messages.length === 1 ? SUGGESTIONS.map((k) => t(k)) : messages[lastIndex].followUps ?? []).map((s) => (
                   <button key={s} className="chip" onClick={() => send(s)}>

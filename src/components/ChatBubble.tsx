@@ -4,9 +4,13 @@ import { isGreeting, plainAnswer, type Msg } from "../lib/chatMessages";
 import { useLang } from "../lib/lang";
 
 // One chat message: the typing dots while waiting, then photos, text, answer tools and source links.
-export default function ChatBubble({ m }: { m: Msg }) {
+// `shown`: for the answer being typed out, how many characters are on screen so far.
+export default function ChatBubble({ m, shown }: { m: Msg; shown?: number }) {
   const { t } = useLang();
-  if (m.pending && !m.content) {
+  const answer = m.role === "assistant" ? plainAnswer(m.content) : m.content;
+  const visible = shown === undefined ? answer : answer.slice(0, shown);
+  const typing = !!m.pending || visible.length < answer.length;
+  if (typing && !visible) {
     return (
       <div className={`bubble ${m.role} typing`}>
         <span />
@@ -36,10 +40,10 @@ export default function ChatBubble({ m }: { m: Msg }) {
           </span>
         </span>
       ))}
-      {isGreeting(m) ? t("chat.greeting") : m.role === "assistant" ? plainAnswer(m.content) : m.content}
-      {m.pending && <span className="caret" aria-hidden="true" />}
-      {m.role === "assistant" && !m.pending && !isGreeting(m) && <AnswerTools text={plainAnswer(m.content)} />}
-      {m.sources && m.sources.length > 0 && !m.pending && (
+      {isGreeting(m) ? t("chat.greeting") : visible}
+      {typing && <span className="caret" aria-hidden="true" />}
+      {m.role === "assistant" && !typing && !isGreeting(m) && <AnswerTools text={answer} />}
+      {m.sources && m.sources.length > 0 && !typing && (
         <div className="sources">
           {m.sources.map((s) => (
             <a key={s.url} href={s.url} target="_blank" rel="noreferrer">
