@@ -66,8 +66,9 @@ Rules for every step: numbers, units and sources stay exactly as in English; gra
 - [x] **Same-site check and size cap.** `/api/chat` answers only the app's own site and refuses bodies over 64 KB.
   - Done when: live, the app's chat still works and a request with another site's Origin gets 403.
   - Checked live on 2026-11-15: the app's own requests work; another site's Origin and no Origin get 403; a 70 KB body gets 400.
-- [ ] **Grape juice.** Same daily allowance for everyone (about 50 answers), counted per scrambled internet address in Cloudflare D1; small talk free; meter in the chat; friendly message when empty.
+- [x] **Grape juice.** Same daily allowance for everyone (about 50 answers), counted per scrambled internet address in Cloudflare D1; small talk free; meter in the chat; friendly message when empty.
   - Done when: the user has created the D1 database and its id is in `wrangler.toml`; live, the meter appears after an answer and drops about 2% per answer; "ok" or "thanks" gets an instant reply and doesn't change it.
+  - Checked live on 2026-11-17: D1 database `grape-juice` bound as `DB`; answers took the meter from 98% to 96%, "thanks" left it at 96%, and the chat shows the meter. Locally, an empty meter shows the used-up message.
 - [x] **Grape facts in comparisons.** Polish word endings ("niagary") find the grape; every app grape's VIVC skin colour is in the bot's key facts, so it can't call Concord green (tester report 2026-11-16). "Similar" now means same species, family and taste first, colour second; the answer guard drops any sentence that names the prompt's labels.
   - Done when: `npm run test:bot` passes against the live site, including the two "most like Niagara" cases.
   - Checked live on 2026-11-17: 40/40. Still seen: the bot sometimes calls Scuppernong a Vitis labrusca grape (it is a muscadine, Vitis rotundifolia); the test does not catch this yet.
