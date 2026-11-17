@@ -34,6 +34,9 @@ const json = (data: unknown, status = 200) =>
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 
+// How many times the AI may write an answer when it slips into another script.
+const MAX_ATTEMPTS = 2;
+
 // What the visitor reads when no AI could answer, by reason.
 const AI_FAILURE_TEXT: Record<AiFailure, TextKey> = { limit: "bot.aiLimit", busy: "bot.aiBusy", down: "bot.aiDown" };
 
@@ -107,22 +110,34 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       controller.enqueue(line(meta));
       let wrote = false;
       let written = 0; // characters the AI wrote, for the grape juice
-      const guard = new AnswerGuard(ON_TOPIC_WORDS);
+      let guard = new AnswerGuard(ON_TOPIC_WORDS);
+      let model = "none";
       const send = (text: string) => {
         if (!text) return;
         wrote = true;
         controller.enqueue(line({ type: "text", text }));
       };
       try {
-        const { model, chunks } = await streamAnswer(env, messages);
-        await meter?.charge(JUICE_BASE); // taken up front, so many questions at once can't skip the meter
-        for await (const text of chunks) {
-          written += text.length;
-          send(guard.push(text));
-          if (guard.blocked) break;
+        // An answer that slips into another script before anything is shown is asked for once more.
+        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+          guard = new AnswerGuard(ON_TOPIC_WORDS);
+          const answer = await streamAnswer(env, messages);
+          model = answer.model;
+          // Taken up front, so many questions at once can't skip the meter; a retry is on the house.
+          if (attempt === 0) await meter?.charge(JUICE_BASE);
+          for await (const text of answer.chunks) {
+            written += text.length;
+            send(guard.push(text));
+            if (guard.blocked) break;
+          }
+          send(guard.finish());
+          if (!guard.garbled) break;
+          console.error(`Grape Bot answer from ${model} slipped into another script (attempt ${attempt + 1})`);
         }
-        send(guard.finish());
-        if (guard.blocked) {
+        if (guard.garbled) {
+          controller.enqueue(line({ type: "text", text: say("bot.garbled") }));
+          wrote = true;
+        } else if (guard.blocked) {
           // The answer went off topic: replace whatever was shown with the refusal, and drop its sources.
           console.error("Grape Bot answer blocked by the guard");
           controller.enqueue(line(guard.retract ? { type: "replace", text: say("bot.offTopic"), sources: [] } : { type: "text", text: say("bot.offTopic") }));

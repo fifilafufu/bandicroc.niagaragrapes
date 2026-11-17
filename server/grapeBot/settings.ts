@@ -21,6 +21,9 @@ export const MAX_BODY_BYTES = 64 * 1024; // a full 40-message chat is well under
 export const MAX_ARTICLES = 2;
 export const MAX_ARTICLE_CHARS = 1500;
 export const MAX_ANSWER_TOKENS = 300;
+// Low randomness: a tutor should be steady, and higher values make free models drift into other
+// languages mid-sentence (Chinese characters in Polish answers, 2026-11-17).
+export const TEMPERATURE = 0.3;
 export const MAX_DATA_GRAPES = 2; // grapes whose app data goes into one prompt
 export const MAX_CHIPS = 6; // source links under one answer
 // Grape juice: everyone's daily Grape Bot allowance, in drops. An AI answer costs JUICE_BASE drops

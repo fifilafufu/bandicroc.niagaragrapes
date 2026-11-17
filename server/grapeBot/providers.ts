@@ -1,7 +1,7 @@
 // The AI providers. Each one streams the answer as text chunks: Cloudflare Workers AI first
 // (falling back through MODELS), then OpenRouter as an automatic backup when its key is set.
 
-import { MAX_ANSWER_TOKENS, MODELS, OPENROUTER_MODELS, isFreeModel, type Env } from "./settings";
+import { MAX_ANSWER_TOKENS, MODELS, OPENROUTER_MODELS, TEMPERATURE, isFreeModel, type Env } from "./settings";
 import { AiUnavailable, aiFailure } from "./failure";
 
 type Chunks = AsyncGenerator<string, void, unknown>;
@@ -49,6 +49,7 @@ async function streamWorkersAI(env: Env, messages: { role: string; content: stri
       const result = await env.AI.run(model as Parameters<Ai["run"]>[0], {
         messages,
         max_tokens: MAX_ANSWER_TOKENS,
+        temperature: TEMPERATURE,
         stream: true,
       } as never);
       if (result instanceof ReadableStream) return { model, chunks: readSSE(result as ReadableStream<Uint8Array>) };
@@ -103,7 +104,7 @@ async function streamOpenRouter(env: Env, messages: { role: string; content: str
         "X-Title": "Grapes",
       },
       // No hidden "thinking": it would spend the whole token budget and leave no answer.
-      body: JSON.stringify({ model, messages, max_tokens: MAX_ANSWER_TOKENS, stream: true, reasoning: { enabled: false } }),
+      body: JSON.stringify({ model, messages, max_tokens: MAX_ANSWER_TOKENS, temperature: TEMPERATURE, stream: true, reasoning: { enabled: false } }),
     });
     if (res.ok && res.body) return { model, chunks: readSSE(res.body) };
     lastError = new Error(`OpenRouter ${model} ${res.status}: ${(await res.text()).slice(0, 200)}`);

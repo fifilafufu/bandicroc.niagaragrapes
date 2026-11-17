@@ -73,7 +73,7 @@ function run(chunks: string[]) {
     if (g.blocked) break;
   }
   shown += g.finish();
-  return { shown, blocked: g.blocked, retract: g.retract };
+  return { shown, blocked: g.blocked, retract: g.retract, garbled: g.garbled };
 }
 const grapeAnswer = "Grapes come from the Middle East and Western Asia, where people first grew them 6,000 to 8,000 years ago. Today China grows the most. ".repeat(2);
 const r1 = run(grapeAnswer.match(/.{1,20}/gs)!);
@@ -102,6 +102,15 @@ check("em dashes become commas", run(["Niagara grapes are sweet — and very jui
 check("spaced en dash becomes a comma", run(["Chardonnay ma neutralny smak – większość aromatów wina pochodzi z beczki. To winogrono."]).shown === "Chardonnay ma neutralny smak, większość aromatów wina pochodzi z beczki. To winogrono.", true);
 check("unspaced em dash becomes a comma", run(["Concord grapes—dark and sweet—make juice."]).shown === "Concord grapes, dark and sweet, make juice.", true);
 check("number ranges keep their en dash", run(["Grapes grow in bunches of 15–300 berries."]).shown === "Grapes grow in bunches of 15–300 berries.", true);
+// Other scripts: before anything is shown the answer is asked again; later, the sentence is dropped.
+const plStart = "Winogrona mogą mieć różne kolory, w zależności od odmiany. ";
+const r3 = run([plStart + "Do常見ych kolorów należą: czerwony, czarny i zielony. " + "Białe winogrona są właściwie zielone i powstały z fioletowych. ".repeat(2)]);
+check("Chinese in the first part asks again, shows nothing", r3.garbled && !r3.retract && r3.shown === "", true);
+const later = "Niagara grapes are sweet and juicy, with a strong foxy smell. ".repeat(4);
+const r4 = run([later, "Они растут в Нью-Йорке. ", "They make great juice."]);
+check("a Cyrillic sentence later on is dropped", !r4.blocked && r4.shown === (later + "They make great juice.").trimEnd(), true);
+check("a script aside after a name is removed", run(["Kyoho (巨峰) is a large black table grape from Japan, grown a lot in China."]).shown === "Kyoho is a large black table grape from Japan, grown a lot in China.", true);
+check("Polish letters are fine", run(["Grona są duże, a jagody żółtozielone. Dojrzewają we wrześniu i mają słodki smak, łagodną kwasowość oraz zapach truskawek."]).blocked, false);
 check(`topic check waits for ${TOPIC_CHECK_CHARS} chars`, new AnswerGuard().push("Hello there") === "", true);
 
 // When no AI answers, the visitor is told why: limit used up, busy, or down.

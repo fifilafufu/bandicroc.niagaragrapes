@@ -230,6 +230,7 @@ export const EN = {
   "chat.s2": "Can dogs eat grapes?",
   "chat.s3": "What colours do grapes come in?",
   "chat.s4": "What's my favourite grape?",
+  "bot.garbled": "The AI mixed another language into that answer, so I didn't show it. Please ask again. 🍇",
   "bot.lost": "The AI sent back an empty answer. Please ask again. 🍇",
   "bot.cutOff": " …(The answer was cut off before the end. Ask again to get all of it.)",
   "bot.offTopic": "I only know about grapes, so that's one I can't help with. Ask me anything about grapes, vines or wine! 🍇",

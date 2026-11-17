@@ -222,6 +222,7 @@ export const PL: Partial<Record<TextKey, string>> = {
   "chat.s2": "Czy psy mogą jeść winogrona?",
   "chat.s3": "Jakie kolory mają winogrona?",
   "chat.s4": "Jaka jest moja ulubiona odmiana?",
+  "bot.garbled": "AI wplotło w tę odpowiedź inny język, więc jej nie pokazałem. Zapytaj jeszcze raz. 🍇",
   "bot.lost": "AI odesłało pustą odpowiedź. Zapytaj jeszcze raz. 🍇",
   "bot.cutOff": " …(Odpowiedź urwała się przed końcem. Zapytaj jeszcze raz, żeby dostać całą.)",
   "bot.offTopic": "Zajmuję się tylko winogronami, więc w tym nie pomogę. Zapytaj mnie o winogrona, winorośl albo wino! 🍇",
