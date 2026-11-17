@@ -97,6 +97,10 @@ check("a label sentence at the very end is dropped", run(["Ripe Niagara grapes a
 check("grape seed extracts are not a label", run(["Grape seed extracts are sold as supplements. The extracts of grape skins hold resveratrol."]).shown === "Grape seed extracts are sold as supplements. The extracts of grape skins hold resveratrol.", true);
 check("a dumped prompt is blocked", run(["Sure! You are Grape Bot, a friendly tutor. KEY FACTS: grapes"]).blocked, true);
 check("Polish grape answer passes", run(["Winogrona pochodzą z Bliskiego Wschodu i zachodniej Azji, gdzie uprawiano je już 6000 lat temu. ".repeat(3)]).blocked, false);
+check("em dashes become commas", run(["Niagara grapes are sweet — and very juicy."]).shown === "Niagara grapes are sweet, and very juicy.", true);
+check("spaced en dash becomes a comma", run(["Chardonnay ma neutralny smak – większość aromatów wina pochodzi z beczki. To winogrono."]).shown === "Chardonnay ma neutralny smak, większość aromatów wina pochodzi z beczki. To winogrono.", true);
+check("unspaced em dash becomes a comma", run(["Concord grapes—dark and sweet—make juice."]).shown === "Concord grapes, dark and sweet, make juice.", true);
+check("number ranges keep their en dash", run(["Grapes grow in bunches of 15–300 berries."]).shown === "Grapes grow in bunches of 15–300 berries.", true);
 check(`topic check waits for ${TOPIC_CHECK_CHARS} chars`, new AnswerGuard().push("Hello there") === "", true);
 
 // Small talk is free and answered without the AI; real questions are not small talk.
