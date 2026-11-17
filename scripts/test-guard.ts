@@ -106,6 +106,11 @@ check("number ranges keep their en dash", run(["Grapes grow in bunches of 15–3
 const plStart = "Winogrona mogą mieć różne kolory, w zależności od odmiany. ";
 const r3 = run([plStart + "Do常見ych kolorów należą: czerwony, czarny i zielony. " + "Białe winogrona są właściwie zielone i powstały z fioletowych. ".repeat(2)]);
 check("Chinese in the first part asks again, shows nothing", r3.garbled && !r3.retract && r3.shown === "", true);
+check("on the last try the broken first sentence is dropped, the rest shown", (() => {
+  const g = new AnswerGuard([], false);
+  const out = g.push(plStart + "Do常見ych kolorów należą: czerwony, czarny i zielony. " + "Białe winogrona są właściwie zielone i powstały z fioletowych. ".repeat(2)) + g.finish();
+  return !g.garbled && g.strange === "常見" && out === plStart + "Białe winogrona są właściwie zielone i powstały z fioletowych. ".repeat(2);
+})(), true);
 const later = "Niagara grapes are sweet and juicy, with a strong foxy smell. ".repeat(4);
 const r4 = run([later, "Они растут в Нью-Йорке. ", "They make great juice."]);
 check("a Cyrillic sentence later on is dropped", !r4.blocked && r4.shown === (later + "They make great juice.").trimEnd(), true);

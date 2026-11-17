@@ -40,9 +40,9 @@ async function* readSSE(stream: ReadableStream<Uint8Array>): Chunks {
 }
 
 // Starts the first model that accepts the request; falls back to the next on error.
-async function streamWorkersAI(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
+async function streamWorkersAI(env: Env, messages: { role: string; content: string }[], avoid?: string): Promise<{ model: string; chunks: Chunks }> {
   if (!env.AI) throw new Error("Workers AI binding 'AI' is missing on this Pages project");
-  const models = [...new Set([env.WORKERS_AI_MODEL, ...MODELS].filter(Boolean) as string[])];
+  const models = [...new Set([env.WORKERS_AI_MODEL, ...MODELS].filter((m): m is string => !!m && m !== avoid))];
   let lastError: unknown;
   for (const model of models) {
     try {
@@ -73,14 +73,14 @@ async function streamWorkersAI(env: Env, messages: { role: string; content: stri
 
 // Picks the provider: Workers AI first and, when none of its models can answer (for example the free
 // daily allowance is used up), OpenRouter if its key is set. AI_PROVIDER = "openrouter" swaps the order.
-// Throws AiUnavailable when nothing could answer.
-export async function streamAnswer(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
+// avoid: a model to skip (one whose answer just went wrong). Throws AiUnavailable when nothing could answer.
+export async function streamAnswer(env: Env, messages: { role: string; content: string }[], avoid?: string): Promise<{ model: string; chunks: Chunks }> {
   const order = env.AI_PROVIDER === "openrouter" ? [streamOpenRouter, streamWorkersAI] : [streamWorkersAI, streamOpenRouter];
   const tries = env.OPENROUTER_API_KEY ? order : order.filter((p) => p !== streamOpenRouter);
   const errors: unknown[] = [];
   for (const provider of tries) {
     try {
-      return await provider(env, messages);
+      return await provider(env, messages, avoid);
     } catch (error) {
       console.error("AI provider failed:", error);
       errors.push(error);
@@ -90,10 +90,10 @@ export async function streamAnswer(env: Env, messages: { role: string; content: 
 }
 
 // Free models only: OPENROUTER_MODEL (if free) first, then OPENROUTER_MODELS; falls back on error.
-async function streamOpenRouter(env: Env, messages: { role: string; content: string }[]): Promise<{ model: string; chunks: Chunks }> {
+async function streamOpenRouter(env: Env, messages: { role: string; content: string }[], avoid?: string): Promise<{ model: string; chunks: Chunks }> {
   if (!env.OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY is not set");
   if (env.OPENROUTER_MODEL && !isFreeModel(env.OPENROUTER_MODEL)) console.error(`OPENROUTER_MODEL ${env.OPENROUTER_MODEL} is not free; skipped`);
-  const models = [...new Set([env.OPENROUTER_MODEL, ...OPENROUTER_MODELS].filter((m): m is string => !!m && isFreeModel(m)))];
+  const models = [...new Set([env.OPENROUTER_MODEL, ...OPENROUTER_MODELS].filter((m): m is string => !!m && isFreeModel(m) && m !== avoid))];
   let lastError: unknown;
   for (const model of models) {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {

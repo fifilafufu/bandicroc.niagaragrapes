@@ -119,9 +119,11 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       };
       try {
         // An answer that slips into another script before anything is shown is asked for once more.
+        // The second try uses a different model, and drops broken sentences instead of giving up.
         for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-          guard = new AnswerGuard(ON_TOPIC_WORDS);
-          const answer = await streamAnswer(env, messages);
+          const lastTry = attempt === MAX_ATTEMPTS - 1;
+          guard = new AnswerGuard(ON_TOPIC_WORDS, !lastTry);
+          const answer = await streamAnswer(env, messages, attempt > 0 ? model : undefined);
           model = answer.model;
           // Taken up front, so many questions at once can't skip the meter; a retry is on the house.
           if (attempt === 0) await meter?.charge(JUICE_BASE);
@@ -131,10 +133,11 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
             if (guard.blocked) break;
           }
           send(guard.finish());
+          if (guard.strange) console.error(`Grape Bot answer from ${model} used other scripts (try ${attempt + 1}): ${guard.strange.slice(0, 40)}`);
           if (!guard.garbled) break;
-          console.error(`Grape Bot answer from ${model} slipped into another script (attempt ${attempt + 1})`);
         }
-        if (guard.garbled) {
+        if (!wrote && guard.strange) {
+          // Every sentence was broken: say so plainly instead of showing nothing.
           controller.enqueue(line({ type: "text", text: say("bot.garbled") }));
           wrote = true;
         } else if (guard.blocked) {

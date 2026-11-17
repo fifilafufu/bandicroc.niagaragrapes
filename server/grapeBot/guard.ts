@@ -54,7 +54,7 @@ const SENTENCE_END = /[.!?…]+["')\]]*\s+|\n+/g;
 // sentence holding one, dropped.
 const FOREIGN = /[^\P{L}\p{Script=Latin}]|[　-〿＀-￯]/u;
 const FOREIGN_ASIDE = /\s*[(（](?:[^\p{L}()（）]|[^\P{L}\p{Script=Latin}])+[)）]/gu;
-const FOREIGN_SENTENCE = /[^.!?\n]*(?:[^\P{L}\p{Script=Latin}]|[　-〿＀-￯])[^.!?\n]*[.!?…。]*["')\]]*[ \t]*/gu;
+const FOREIGN_SENTENCE = /(?:[^.!?\s][^.!?\n]*)?(?:[^\P{L}\p{Script=Latin}]|[　-〿＀-￯])[^.!?\n]*[.!?…。]*["')\]]*[ \t]*/gu;
 
 // Words at least one of which nearly every real grape answer uses (English and Polish).
 const GRAPE_WORDS =
@@ -98,9 +98,13 @@ const noDashes =(text: string) =>
 // send now (the first TOPIC_CHECK_CHARS are held back until they mention grapes). Once blocked, it stays blocked.
 export class AnswerGuard {
   // extraWords: more words that show an answer is on topic (the app passes its grape names).
+  // retry: when the answer slips into another script before anything is shown, stop so the AI can be
+  // asked again (false on the last try: then the broken sentences are just dropped).
   private extraWords: string[];
-  constructor(extraWords: string[] = []) {
+  private retry: boolean;
+  constructor(extraWords: string[] = [], retry = true) {
     this.extraWords = extraWords;
+    this.retry = retry;
   }
 
   private text = ""; // everything the AI wrote, for the checks
@@ -109,6 +113,8 @@ export class AnswerGuard {
   blocked = false;
   // The answer slipped into another script before anything was shown: ask the AI again.
   garbled = false;
+  // The letters from other scripts that were found, for the server log.
+  strange = "";
 
   push(chunk: string): string {
     if (this.blocked) return "";
@@ -145,8 +151,9 @@ export class AnswerGuard {
     let out = this.pending.slice(0, cut).replace(FOREIGN_ASIDE, "");
     this.pending = this.pending.slice(cut);
     if (FOREIGN.test(out)) {
-      // Nothing shown yet: start over. Otherwise drop just the broken sentence.
-      if (this.sent === 0) {
+      this.strange += [...out].filter((c) => FOREIGN.test(c)).join("");
+      // Nothing shown yet: start over (if allowed). Otherwise drop just the broken sentence.
+      if (this.sent === 0 && this.retry) {
         this.garbled = true;
         return this.block();
       }
