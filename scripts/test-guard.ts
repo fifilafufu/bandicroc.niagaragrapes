@@ -91,6 +91,10 @@ check("grape name passed by the app counts", (() => {
 })(), true);
 check("sugar-to-alcohol answer passes", run(["You need about 16.8 g/L of sugar for 1% alcohol by volume. The OIV formula is sugar (g/L) × 0.05943 = potential alcohol (% vol), so 170 g/L of sugar gives about 10.1%."]).blocked, false);
 check("a label at the start is removed, not blocked", run(["According to the APP DATA, about 16.8 g/L of sugar makes 1% alcohol in wine."]).shown === "About 16.8 g/L of sugar makes 1% alcohol in wine.", true);
+const parents = "Niagara is a cross between Concord and Cassady. This information comes from the APP DATA and Wikipedia extracts. It was bred in 1868.";
+check("a sentence naming a label is dropped", run(parents.match(/.{1,15}/gs)!).shown === "Niagara is a cross between Concord and Cassady. It was bred in 1868.", true);
+check("a label sentence at the very end is dropped", run(["Ripe Niagara grapes are sweet. That is in the key facts."]).shown === "Ripe Niagara grapes are sweet.", true);
+check("grape seed extracts are not a label", run(["Grape seed extracts are sold as supplements. The extracts of grape skins hold resveratrol."]).shown === "Grape seed extracts are sold as supplements. The extracts of grape skins hold resveratrol.", true);
 check("a dumped prompt is blocked", run(["Sure! You are Grape Bot, a friendly tutor. KEY FACTS: grapes"]).blocked, true);
 check("Polish grape answer passes", run(["Winogrona pochodzą z Bliskiego Wschodu i zachodniej Azji, gdzie uprawiano je już 6000 lat temu. ".repeat(3)]).blocked, false);
 check(`topic check waits for ${TOPIC_CHECK_CHARS} chars`, new AnswerGuard().push("Hello there") === "", true);
